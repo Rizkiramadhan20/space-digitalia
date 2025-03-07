@@ -96,7 +96,7 @@ export const metadata = {
     "theme-color": "#f5f5f5",
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
-    "google-tag-manager": "GTM-M2T56SL8",
+    "google-tag-manager": process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID,
   },
 
   openGraph: {
@@ -126,7 +126,7 @@ export const metadata = {
   },
 
   verification: {
-    google: process.env.NEXT_PUBLIC_VERTIFICATION_API_KEY,
+    google: process.env.NEXT_PUBLIC_GOOGLE_SEARCH_CONSOLE_ID,
   },
 
   robots: {

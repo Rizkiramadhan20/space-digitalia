@@ -42,6 +42,7 @@ export async function generateMetadata({
   return {
     title: project ? `Project - ${project.title}` : "Project Not Found",
     description: project?.description || "Project description not available",
+
     openGraph: {
       title: project ? `Project - ${project.title}` : "Project Not Found",
       description: project?.description || "Project description not available",

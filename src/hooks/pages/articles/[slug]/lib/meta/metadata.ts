@@ -55,6 +55,11 @@ export async function generateMetadata({
 
   return {
     ...baseMetadata,
+    other: {
+      ...baseMetadata.other,
+      "google-tag-manager": process.env
+        .NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string,
+    },
     title,
     description,
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL as string),
