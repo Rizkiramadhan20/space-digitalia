@@ -134,5 +134,10 @@ export const metadata = {
     follow: true,
     noarchive: true,
     nocache: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+    sitemap: "https://spacedigitalia.my.id/sitemap.xml",
   },
 };
