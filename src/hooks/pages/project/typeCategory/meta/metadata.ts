@@ -6,13 +6,18 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 
 import { ProjectType } from "@/components/ui/project/lib/schema";
 
-async function getProject(): Promise<ProjectType | null> {
+async function getProject(typeCategory: string): Promise<ProjectType | null> {
+  if (!typeCategory || typeof typeCategory !== "string") {
+    console.warn("Invalid typeCategory:", typeCategory);
+    return null;
+  }
+
   try {
     const projectRef = collection(
       db,
       process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT as string
     );
-    const q = query(projectRef, where("createdAt", "!=", ""));
+    const q = query(projectRef, where("typeCategory", "==", typeCategory));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
@@ -27,8 +32,12 @@ async function getProject(): Promise<ProjectType | null> {
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const project = await getProject();
+export async function getProjectMetadata({
+  params,
+}: {
+  params: { type: string };
+}): Promise<Metadata> {
+  const project = await getProject(params.type);
 
   return {
     title: project ? `Project - ${project.typeCategory}` : "Project Not Found",
@@ -38,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
         ? `Project - ${project.typeCategory}`
         : "Project Not Found",
       description: project?.description || "Project description not available",
-      images: project?.imageUrl ? [project.imageUrl[0]] : [],
+      images: project?.imageUrl ? [project.imageUrl] : [],
     },
   };
 }

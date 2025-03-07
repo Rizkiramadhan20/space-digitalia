@@ -1,11 +1,11 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 
-import { FetchProjectType } from '@/hooks/pages/project/[type]/lib/FetchType'
+import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
 
 import { ProjectType } from '@/components/ui/project/lib/schema'
 
-import ProjectTypeSkelaton from '@/hooks/pages/project/[type]/ProjectTypeSkelaton'
+import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
 
 import Image from 'next/image'
 
@@ -41,7 +41,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
     const itemsPerPage = 9
 
     useEffect(() => {
-        const unsubscribe = FetchProjectType(typeCategory, (data) => {
+        const unsubscribe = FetchTypeCategory(typeCategory, (data) => {
             try {
                 setProjects([...data].sort((a, b) => {
                     // Add type checking and error handling for dates

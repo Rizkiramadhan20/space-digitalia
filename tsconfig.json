@@ -23,6 +23,7 @@
       "@/*": ["./src/*"],
       "@/assets/*": ["./public/assets/*", "./src/base/*"]
     },
+    "typeRoots": ["./node_modules/@types", "src/types"],
     "downlevelIteration": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

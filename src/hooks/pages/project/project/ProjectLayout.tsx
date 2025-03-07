@@ -556,7 +556,7 @@ export default function ProjectLayout() {
             />
 
             <section className='min-h-full py-24 bg-gradient-to-b from-gray-50/40 via-white to-white relative'>
-                <div className='container px-4 xl:px-10 mx-auto max-w-[1400px]'>
+                <div className='container px-4 xl:px-10'>
                     {/* Modern Filter Bar */}
                     <div className='absolute top-0 left-0 right-0 mx-4 md:mx-8 lg:mx-auto lg:max-w-6xl 
                         py-6 md:py-8 px-4 md:px-8 
@@ -771,7 +771,7 @@ export default function ProjectLayout() {
                                                 <p className='text-sm text-white font-medium tracking-wide'>Preview</p>
                                             </button>
 
-                                            <Link href={`/project/${formatSlug(item.typeTitle)}/${item.slug}`} className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
+                                            <Link href={`/project/${item.slug}`} className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
                                                 <span className='p-4 rounded-full bg-white/20 backdrop-blur-xl hover:bg-white/40 transition-colors duration-300 shadow-lg'>
                                                     <FaExternalLinkAlt className='text-xl text-white' />
                                                 </span>

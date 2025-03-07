@@ -12,13 +12,13 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 
 import banner from '@/base/assets/pages/transaction/img.jpg'
 
-import { FetchProjectType } from '@/hooks/pages/project/[type]/lib/FetchType'
+import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
 
 import { ProjectType } from '@/components/ui/project/lib/schema'
 
-import ProjectTypeSkelaton from '@/hooks/pages/project/[type]/ProjectTypeSkelaton'
+import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
 
-export default function HeroCheckout({ typeCategory }: { typeCategory: string }) {
+export default function TypeCategoryProject({ typeCategory }: { typeCategory: string }) {
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 500], [0, 250]);
     const opacity = useTransform(scrollY, [0, 300], [1, 0]);
@@ -29,7 +29,7 @@ export default function HeroCheckout({ typeCategory }: { typeCategory: string })
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        const unsubscribe = FetchProjectType(typeCategory, (data) => {
+        const unsubscribe = FetchTypeCategory(typeCategory, (data) => {
             setProjects(data)
             setIsLoading(false)
         })
