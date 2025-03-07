@@ -1,0 +1,18 @@
+export interface ArticleType {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  content: string;
+  thumbnail: string;
+  status: string;
+  category: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  author: {
+    name: string;
+    photoURL: string;
+    role: string;
+  };
+}
