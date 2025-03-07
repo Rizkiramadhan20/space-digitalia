@@ -1,5 +1,7 @@
 {
   "name": "space-digitalia",
+  "title": "Space Digitalia",
+  "description": "Space Digitalia is a platform for digital marketing services",
   "version": "0.1.0",
   "private": true,
   "scripts": {

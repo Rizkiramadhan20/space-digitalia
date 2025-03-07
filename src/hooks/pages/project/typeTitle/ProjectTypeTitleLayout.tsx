@@ -2,11 +2,11 @@
 import React, { useEffect, useState, Fragment } from 'react'
 import { motion } from 'framer-motion'
 
-import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
+import { FetchTypeTitle } from '@/hooks/pages/project/typeTitle/lib/FetchTypeTitle'
 
 import { ProjectType } from '@/components/ui/project/lib/schema'
 
-import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
+import ProjectTypeTitleSkelaton from '@/hooks/pages/project/typeTitle/ProjectTypeTitleSkelaton'
 
 import Image from 'next/image'
 
@@ -36,12 +36,11 @@ import { db } from '@/utils/firebase';
 
 import { LicenseDetail, Address, PaymentData } from '@/hooks/pages/project/project/lib/schema';
 
-export default function ProjectTypeDetails({ typeCategory }: { typeCategory: string }) {
+export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: string }) {
     const [projects, setProjects] = useState<ProjectType[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
     const [currentPage, setCurrentPage] = useState(0)
-    const [selectedType, setSelectedType] = useState<string>('all')
     const [openDropdown, setOpenDropdown] = useState<string | null>(null)
     const [selectedLicense, setSelectedLicense] = useState<{
         title: string;
@@ -78,42 +77,43 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = FetchTypeCategory(typeCategory, (data) => {
+        const unsubscribe = FetchTypeTitle(typeTitle, (data) => {
             try {
                 setProjects([...data].sort((a, b) => {
-                    // Add type checking and error handling for dates
                     const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
                     const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
-
-                    return dateB.getTime() - dateA.getTime(); // Sort in descending order
+                    return dateB.getTime() - dateA.getTime();
                 }));
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error sorting projects:', error);
-                setProjects(data); // Use unsorted data if sorting fails
+                setProjects(data);
                 setIsLoading(false);
             }
         })
 
         return () => unsubscribe()
-    }, [typeCategory])
+    }, [typeTitle])
 
-    // Fix the types array filtering logic
-    const types = Array.from(new Set(projects
-        .filter(item => item.typeTitle)  // Only filter for existence of typeTitle
-        .map(item => item.typeTitle)
-    ));
-
-    // Fix the filter logic for projects
+    // Fix the filter logic for projects - filter by paid/free status
     const filteredProjects = projects.filter(item => {
-        const typeMatch = selectedType === 'all' ||
-            (item.typeTitle && item.typeTitle.toLowerCase() === selectedType.toLowerCase());
+        // If no license is selected, show all projects
+        if (!selectedLicense) return true;
 
-        const licenseMatch = !selectedLicense ||
-            (item.licenseTitle && selectedLicense.licenseTitle &&
-                item.licenseTitle.toLowerCase() === selectedLicense.licenseTitle.toLowerCase());
+        // Check if the project has license details
+        if (!item.licenseDetails || item.licenseDetails.length === 0) return false;
 
-        return typeMatch && licenseMatch;
+        // If "Free" is selected, show projects that have at least one free license
+        if (selectedLicense.licenseTitle.toLowerCase() === 'free') {
+            return item.licenseDetails.some(license => license.price === 0);
+        }
+
+        // If "Paid" is selected, show projects that have at least one paid license
+        if (selectedLicense.licenseTitle.toLowerCase() === 'paid') {
+            return item.licenseDetails.some(license => license.price > 0);
+        }
+
+        return true;
     });
 
     const filteredProductsCount = filteredProjects.length;
@@ -486,7 +486,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
     const isSocialVerified = socialVerified.instagram && socialVerified.tiktok;
 
     if (isLoading) {
-        return <ProjectTypeSkelaton />
+        return <ProjectTypeTitleSkelaton />
     }
 
     return (
@@ -510,8 +510,8 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                                 transition-all duration-300 ease-in-out">
                                             <div className="flex items-center gap-2">
                                                 <GiSettingsKnobs className='text-lg text-gray-600' />
-                                                <span className='text-sm font-medium text-gray-700'>
-                                                    {typeCategory}
+                                                <span className='text-sm font-medium text-gray-700 capitalize'>
+                                                    {typeTitle.replace(/-/g, ' ')}
                                                 </span>
                                             </div>
                                         </button>
@@ -520,49 +520,16 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                     {/* Type Filter */}
                                     <div className="dropdown relative w-fit sm:w-auto">
                                         <button
-                                            onClick={() => setOpenDropdown(openDropdown === 'type' ? null : 'type')}
                                             className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 px-4 py-2.5 rounded-xl
                                                 bg-gray-50/80 hover:bg-gray-100 active:bg-gray-200
                                                 transition-all duration-300 ease-in-out">
                                             <div className="flex items-center gap-2">
                                                 <GiSettingsKnobs className='text-lg text-gray-600' />
                                                 <span className='text-sm font-medium text-gray-700 capitalize'>
-                                                    {selectedType === 'all' ? 'All Types' : selectedType}
+                                                    {typeTitle.replace(/-/g, ' ')}
                                                 </span>
                                             </div>
                                         </button>
-
-                                        <div className={`dropdown-content absolute z-50 mt-2 bg-white/95 backdrop-blur-md 
-                                                rounded-xl shadow-xl border border-gray-100/50 p-2 
-                                                w-full sm:w-[260px]
-                                                transform origin-top transition-all duration-300
-                                                ${openDropdown === 'type' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}>
-                                            <button
-                                                onClick={() => setSelectedType('all')}
-                                                className={`flex items-center gap-2 w-full text-left px-4 py-3 text-sm 
-                                                        rounded-xl transition-all duration-300 
-                                                        ${selectedType === 'all'
-                                                        ? 'bg-blue-600 text-white font-medium shadow-md'
-                                                        : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                                    }`}
-                                            >
-                                                All Types
-                                            </button>
-                                            {types.map((type) => (
-                                                <button
-                                                    key={type}
-                                                    onClick={() => setSelectedType(type)}
-                                                    className={`flex items-center gap-2 w-full text-left px-4 py-3 text-sm 
-                                                            rounded-xl transition-all duration-300 capitalize
-                                                            ${selectedType === type
-                                                            ? 'bg-blue-600 text-white font-medium shadow-md'
-                                                            : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                                        }`}
-                                                >
-                                                    {type}
-                                                </button>
-                                            ))}
-                                        </div>
                                     </div>
 
                                     {/* License Filter */}
@@ -623,7 +590,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                 <div className='text-sm font-medium text-gray-700 bg-gray-50/80 
                                         px-4 py-2.5 rounded-xl flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start'>
                                     <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                                    <p className='capitalize'>Showing {filteredProductsCount} Project With Category {typeCategory}</p>
+                                    <p className='capitalize'>Showing {filteredProductsCount} Project With Type {typeTitle.replace(/-/g, ' ')}</p>
                                 </div>
                             </div>
                         </div>
@@ -674,7 +641,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                                     <p className='text-sm text-white font-medium tracking-wide'>Preview</p>
                                                 </button>
 
-                                                <Link href={`/project/${formatSlug(item.typeCategory)}/${item.slug}`}
+                                                <Link href={`/project/${formatSlug(item.typeCategory)}/${formatSlug(typeTitle)}/${item.slug}`}
                                                     className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
                                                     <span className='p-4 rounded-full bg-white/20 backdrop-blur-xl hover:bg-white/40 transition-colors duration-300 shadow-lg'>
                                                         <FaExternalLinkAlt className='text-xl text-white' />
@@ -1285,7 +1252,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                 >
                                     <div className="flex items-center gap-3">
                                         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                                         </svg>
                                         <span className="font-medium">Follow on Instagram</span>
                                     </div>

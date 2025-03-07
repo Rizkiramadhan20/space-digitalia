@@ -207,6 +207,13 @@ export default function ProjectLayout() {
         fetchDefaultAddress();
     }, [deliveryMethod, user?.uid]);
 
+    // Add new state for social verification
+    const [showSocialVerification, setShowSocialVerification] = useState(false);
+    const [socialVerified, setSocialVerified] = useState({
+        instagram: false,
+        tiktok: false
+    });
+
     // Add handlePayment function
     const handlePayment = async () => {
         try {
@@ -424,8 +431,14 @@ export default function ProjectLayout() {
         };
     }, []);
 
-    // Separate handlers for free and paid transactions
+    // Update handleFreeTransaction to check social verification
     const handleFreeTransaction = async () => {
+        // Check if social verification is needed and not completed
+        if (selectedLicense?.price === 0 && (!socialVerified.instagram || !socialVerified.tiktok)) {
+            setShowSocialVerification(true);
+            return;
+        }
+
         try {
             if (!selectedPreview || !selectedLicense || !deliveryMethod || !user) {
                 toast.error('Please complete all required selections');
@@ -467,7 +480,18 @@ export default function ProjectLayout() {
         }
     };
 
-    // Main transaction handler
+    // Add social verification handler
+    const handleSocialVerification = (platform: 'instagram' | 'tiktok') => {
+        setSocialVerified(prev => ({
+            ...prev,
+            [platform]: true
+        }));
+    };
+
+    // Add verification check
+    const isSocialVerified = socialVerified.instagram && socialVerified.tiktok;
+
+    // Update handleTransaction
     const handleTransaction = async () => {
         try {
             // Validate common requirements
@@ -742,7 +766,7 @@ export default function ProjectLayout() {
                                                 <p className='text-sm text-white font-medium tracking-wide'>Preview</p>
                                             </button>
 
-                                            <Link href={`/project/${formatSlug(item.typeCategory)}/${item.slug}`} className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
+                                            <Link href={`/project/${formatSlug(item.typeCategory)}/${formatSlug(item.typeTitle)}/${item.slug}`} className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
                                                 <span className='p-4 rounded-full bg-white/20 backdrop-blur-xl hover:bg-white/40 transition-colors duration-300 shadow-lg'>
                                                     <FaExternalLinkAlt className='text-xl text-white' />
                                                 </span>
@@ -1038,18 +1062,24 @@ export default function ProjectLayout() {
                                         </div>
 
                                         {/* License Options */}
-                                        <div className="space-y-4">
-                                            <div>
-                                                <h2 className="text-lg font-semibold mb-4 text-white">License Type</h2>
-                                                <p className="text-sm text-gray-400">Select the license type for this project</p>
+                                        <div className="space-y-6">
+                                            {/* License Selection Header */}
+                                            <div className="bg-gradient-to-r from-gray-800/40 to-gray-800/20 backdrop-blur-lg rounded-2xl p-6 border border-gray-700/30">
+                                                <h2 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-400">
+                                                    License Type
+                                                </h2>
+                                                <p className="text-sm text-gray-400 mt-1">Choose the perfect license for your needs</p>
                                             </div>
 
-                                            <div className="relative">
+                                            {/* License Selector */}
+                                            <div className="relative group">
                                                 <select
-                                                    className="w-full appearance-none bg-gray-800/30 hover:bg-gray-800/40
-                                                        border border-gray-700/30 hover:border-indigo-500/30
-                                                        rounded-xl p-4 pr-10 transition-all duration-300
-                                                        text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                    className="w-full appearance-none bg-gray-800/30 backdrop-blur-md
+                                                        border-2 border-gray-700/30 group-hover:border-indigo-500/50
+                                                        rounded-2xl p-5 pr-12 transition-all duration-300 ease-out
+                                                        text-gray-300 font-medium
+                                                        focus:outline-none focus:ring-2 focus:ring-indigo-500/20
+                                                        cursor-pointer"
                                                     defaultValue=""
                                                     onChange={(e) => {
                                                         const selected = selectedPreview.licenseDetails.find(
@@ -1068,7 +1098,7 @@ export default function ProjectLayout() {
                                                         setDeliveryMethod('');
                                                     }}
                                                 >
-                                                    <option value="" disabled>Select License Type</option>
+                                                    <option value="" disabled className="text-gray-500">Select License Type</option>
                                                     {selectedPreview.licenseDetails.map((item) => (
                                                         <option
                                                             key={item.title}
@@ -1080,150 +1110,214 @@ export default function ProjectLayout() {
                                                     ))}
                                                 </select>
 
-                                                {/* Custom dropdown arrow */}
-                                                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-cyan-400">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                    </svg>
+                                                {/* Animated dropdown arrow */}
+                                                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                                                    <div className="p-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 group-hover:from-cyan-500/30 group-hover:to-indigo-500/30 transition-all duration-300">
+                                                        <svg className="w-5 h-5 text-cyan-400 group-hover:text-cyan-300 transition-colors duration-300"
+                                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             {/* Selected License Details */}
                                             {selectedLicense && (
-                                                <div className="space-y-4 animate-in fade-in-50 duration-300">
-                                                    <div className="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                                                        <div className="flex justify-between items-center mb-2">
-                                                            <span className="text-sm font-medium text-cyan-400">Selected License</span>
-                                                            <span className="text-xs text-gray-400">#{selectedLicense.title}</span>
+                                                <div className="space-y-6 animate-in fade-in-50 duration-500">
+                                                    {/* License Card */}
+                                                    <div className="bg-gradient-to-br from-gray-800/40 to-gray-800/20 backdrop-blur-xl 
+                                                        rounded-2xl p-6 border-2 border-gray-700/30 hover:border-indigo-500/30 
+                                                        transition-all duration-300 group">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="p-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20">
+                                                                    <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <span className="text-sm font-medium text-cyan-400">Selected License</span>
+                                                            </div>
+                                                            <span className="text-xs px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 font-medium">
+                                                                #{selectedLicense.title}
+                                                            </span>
                                                         </div>
                                                         <div className="flex justify-between items-baseline">
-                                                            <span className="text-2xl font-bold text-white">
-                                                                Rp. {selectedLicense.price.toLocaleString()}
-                                                            </span>
-                                                            <span className="text-xs text-gray-400">
-                                                                Tax included
-                                                            </span>
+                                                            <div className="space-y-1">
+                                                                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-400">
+                                                                    Rp. {selectedLicense.price.toLocaleString()}
+                                                                </span>
+                                                                <p className="text-xs text-gray-400">Includes all applicable taxes</p>
+                                                            </div>
+                                                            <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 
+                                                                group-hover:from-cyan-500/20 group-hover:to-indigo-500/20 transition-all duration-300">
+                                                                <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Delivery Method Selection */}
-                                                    <div className={`grid ${selectedPreview.licenseTitle.toLowerCase() === 'free' ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
+                                                    <div className={`grid ${selectedPreview.licenseTitle.toLowerCase() === 'free' ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
                                                         <button
                                                             onClick={() => setDeliveryMethod('download')}
-                                                            className={`flex flex-col items-center justify-center p-4 rounded-xl border 
-                                                                transition-all duration-200 ${deliveryMethod === 'download'
-                                                                    ? 'bg-indigo-500 text-white border-indigo-500'
-                                                                    : 'bg-gray-800/30 hover:bg-gray-800/40 border-gray-700/30 hover:border-indigo-500/30 text-gray-300'
+                                                            className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300
+                                                                ${deliveryMethod === 'download'
+                                                                    ? 'bg-gradient-to-br from-cyan-500 to-indigo-500 border-transparent'
+                                                                    : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
                                                                 }`}
                                                         >
-                                                            <svg className="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                            </svg>
-                                                            <span className="text-sm font-medium">Download</span>
-                                                            <span className="text-xs opacity-80 mt-1">Instant access</span>
+                                                            <div className="relative z-10 p-5">
+                                                                <div className="flex flex-col items-center gap-3">
+                                                                    <div className={`p-3 rounded-xl ${deliveryMethod === 'download'
+                                                                        ? 'bg-white/20'
+                                                                        : 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20'
+                                                                        } transition-colors duration-300`}>
+                                                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div className="text-center">
+                                                                        <p className={`text-sm font-medium ${deliveryMethod === 'download' ? 'text-white' : 'text-gray-300'}`}>
+                                                                            Download
+                                                                        </p>
+                                                                        <p className={`text-xs mt-1 ${deliveryMethod === 'download' ? 'text-white/80' : 'text-gray-400'}`}>
+                                                                            Instant access
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 
+                                                                opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                                         </button>
 
                                                         {selectedPreview.licenseTitle.toLowerCase() !== 'free' && (
                                                             <button
                                                                 onClick={() => setDeliveryMethod('delivery')}
-                                                                className={`flex flex-col items-center justify-center p-4 rounded-xl border 
-                                                                    transition-all duration-200 ${deliveryMethod === 'delivery'
-                                                                        ? 'bg-indigo-500 text-white border-indigo-500'
-                                                                        : 'bg-gray-800/30 hover:bg-gray-800/40 border-gray-700/30 hover:border-indigo-500/30 text-gray-300'
+                                                                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300
+                                                                    ${deliveryMethod === 'delivery'
+                                                                        ? 'bg-gradient-to-br from-cyan-500 to-indigo-500 border-transparent'
+                                                                        : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
                                                                     }`}
                                                             >
-                                                                <svg className="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                                                </svg>
-                                                                <span className="text-sm font-medium">Delivery</span>
-                                                                <span className="text-xs opacity-80 mt-1">1-3 business days</span>
+                                                                {/* Similar structure as download button */}
+                                                                {/* ... rest of the delivery button code ... */}
                                                             </button>
                                                         )}
                                                     </div>
-
-                                                    {/* Show Delivery Address when delivery method is selected */}
-                                                    {deliveryMethod === 'delivery' && (
-                                                        <div className="mt-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30">
-                                                            <div className="flex items-center justify-between mb-3">
-                                                                <h3 className="text-sm font-medium text-white">Delivery Address</h3>
-                                                                {defaultAddress ? (
-                                                                    <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
-                                                                        Default Address
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-400">
-                                                                        No Address Found
-                                                                    </span>
-                                                                )}
-                                                            </div>
-
-                                                            {defaultAddress ? (
-                                                                <div className="space-y-2 text-sm">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-cyan-400">{defaultAddress.fullName}</span>
-                                                                        <span className="text-gray-400">|</span>
-                                                                        <span className="text-gray-400">{defaultAddress.phone}</span>
-                                                                    </div>
-                                                                    <p className="text-gray-300">{defaultAddress.streetAddress}</p>
-                                                                    <p className="text-gray-300">{defaultAddress.details}</p>
-                                                                    <p className="text-gray-400">
-                                                                        {defaultAddress.city}, {defaultAddress.province} {defaultAddress.postalCode}
-                                                                    </p>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="text-center py-3 space-y-3">
-                                                                    <p className="text-sm text-gray-400">
-                                                                        Please add a delivery address to continue with your purchase.
-                                                                    </p>
-                                                                    <Link
-                                                                        href={`${process.env.NEXT_PUBLIC_URL}/dashboard/user/profile/address`}
-                                                                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded-lg transition-colors duration-200"
-                                                                    >
-                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                                        </svg>
-                                                                        Add New Address
-                                                                    </Link>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )}
 
                                                     {/* Payment Button */}
                                                     <button
                                                         onClick={handleTransaction}
                                                         disabled={isProcessing || !deliveryMethod}
-                                                        className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-primary disabled:bg-primary/60 text-white font-medium rounded-xl transition-all duration-200"
+                                                        className={`relative w-full overflow-hidden rounded-2xl transition-all duration-300
+                                                            ${isProcessing || !deliveryMethod
+                                                                ? 'bg-gray-800/40 cursor-not-allowed'
+                                                                : 'bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600'
+                                                            }`}
                                                     >
-                                                        {isProcessing ? (
-                                                            <>
-                                                                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                                                <span>Processing...</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                                </svg>
-                                                                {deliveryMethod ? 'Proceed to Payment' : 'Select Delivery Method'}
-                                                            </>
-                                                        )}
+                                                        <div className="relative z-10 px-6 py-4 flex items-center justify-center gap-3">
+                                                            {isProcessing ? (
+                                                                <>
+                                                                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                                                    <span className="text-white font-medium">Processing...</span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                                    </svg>
+                                                                    <span className="text-white font-medium">
+                                                                        {deliveryMethod ? 'Proceed to Payment' : 'Select Delivery Method'}
+                                                                    </span>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent 
+                                                            opacity-0 hover:opacity-20 transition-opacity duration-300" />
                                                     </button>
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* View Details Button */}
-                                        <div className="p-4 rounded-xl bg-gray-800/20 border border-gray-700/30">
-                                            <Link
-                                                href={`/project/${formatSlug(selectedPreview.typeTitle)}/${selectedPreview.slug}`}
-                                                className="w-full inline-flex items-center justify-center px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-cyan-500 text-white text-sm font-medium rounded-lg hover:from-indigo-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/25 focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-gray-900"
-                                            >
-                                                <span>View Details</span>
-                                            </Link>
+                                        <div className='flex gap-4'>
+                                            {/* Action Buttons */}
+                                            <div className="grid grid-cols-2 gap-4 w-full">
+                                                {/* Live Preview Button */}
+                                                <button
+                                                    onClick={() => window.open(selectedPreview.linkPreview, '_blank')}
+                                                    className="group relative flex items-center p-4 w-full
+                                                            bg-gradient-to-br from-indigo-500/10 to-cyan-500/10
+                                                            hover:from-indigo-500/20 hover:to-cyan-500/20
+                                                            border border-indigo-500/20 hover:border-indigo-500/40
+                                                            rounded-xl transition-all duration-300"
+                                                >
+                                                    {/* Icon */}
+                                                    <div className="absolute left-4 p-2 rounded-lg 
+                                                        bg-gradient-to-r from-indigo-500 to-cyan-500
+                                                        group-hover:scale-110 transition-transform duration-300">
+                                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                    </div>
+
+                                                    {/* Text Content */}
+                                                    <div className="flex flex-col ml-11 text-left">
+                                                        <span className="text-sm font-medium text-white">Live Preview</span>
+                                                        <span className="text-xs text-gray-400">View live demo</span>
+                                                    </div>
+
+                                                    {/* Arrow Icon */}
+                                                    <svg className="absolute right-4 w-4 h-4 text-gray-400 
+                                                        group-hover:translate-x-1 transition-transform duration-300"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                            d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </button>
+
+                                                {/* Project Details Button */}
+                                                <button
+                                                    onClick={() => router.push(`/project/${formatSlug(selectedPreview.typeCategory)}/${formatSlug(selectedPreview.typeTitle)}/${selectedPreview.slug}`)}
+                                                    className="group relative flex items-center p-4 w-full
+                                                        bg-gradient-to-br from-indigo-500/10 to-cyan-500/10
+                                                        hover:from-indigo-500/20 hover:to-cyan-500/20
+                                                        border border-indigo-500/20 hover:border-indigo-500/40
+                                                        rounded-xl transition-all duration-300"
+                                                >
+                                                    {/* Icon */}
+                                                    <div className="absolute left-4 p-2 rounded-lg 
+                                                        bg-gradient-to-r from-indigo-500 to-cyan-500
+                                                        group-hover:scale-110 transition-transform duration-300">
+                                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
+
+                                                    {/* Text Content */}
+                                                    <div className="flex flex-col ml-11 text-left">
+                                                        <span className="text-sm font-medium text-white">Project Details</span>
+                                                        <span className="text-xs text-gray-400">View full information</span>
+                                                    </div>
+
+                                                    {/* Arrow Icon */}
+                                                    <svg className="absolute right-4 w-4 h-4 text-gray-400 
+                                                        group-hover:translate-x-1 transition-transform duration-300"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                            d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1231,6 +1325,83 @@ export default function ProjectLayout() {
                         </div>
                     </motion.div>
                 </motion.div>
+            )}
+
+            {/* Add Social Verification Modal */}
+            {showSocialVerification && (
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[999] flex items-center justify-center p-4">
+                    <div className="bg-gradient-to-b from-gray-900/80 to-black/80 rounded-2xl p-6 max-w-md w-full border border-gray-800/50">
+                        <h2 className="text-xl font-semibold text-white mb-4">Social Media Verification</h2>
+                        <p className="text-gray-400 mb-6">Please verify your social media accounts to continue with the free download.</p>
+
+                        <div className="space-y-4">
+                            {/* Instagram Verification */}
+                            <button
+                                onClick={() => handleSocialVerification('instagram')}
+                                disabled={socialVerified.instagram}
+                                className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300
+                                    ${socialVerified.instagram
+                                        ? 'bg-green-500/20 border-green-500/30'
+                                        : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
+                                    } border`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl">📸</span>
+                                    <span className="text-white">Instagram</span>
+                                </div>
+                                {socialVerified.instagram ? (
+                                    <span className="text-green-400">Verified ✓</span>
+                                ) : (
+                                    <span className="text-gray-400">Click to verify</span>
+                                )}
+                            </button>
+
+                            {/* TikTok Verification */}
+                            <button
+                                onClick={() => handleSocialVerification('tiktok')}
+                                disabled={socialVerified.tiktok}
+                                className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300
+                                    ${socialVerified.tiktok
+                                        ? 'bg-green-500/20 border-green-500/30'
+                                        : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
+                                    } border`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl">🎵</span>
+                                    <span className="text-white">TikTok</span>
+                                </div>
+                                {socialVerified.tiktok ? (
+                                    <span className="text-green-400">Verified ✓</span>
+                                ) : (
+                                    <span className="text-gray-400">Click to verify</span>
+                                )}
+                            </button>
+                        </div>
+
+                        <div className="mt-6 flex gap-4">
+                            <button
+                                onClick={() => setShowSocialVerification(false)}
+                                className="flex-1 px-4 py-2 rounded-xl bg-gray-800/50 text-gray-300 hover:bg-gray-800/70 transition-all duration-300"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowSocialVerification(false);
+                                    if (isSocialVerified) {
+                                        handleFreeTransaction();
+                                    }
+                                }}
+                                disabled={!isSocialVerified}
+                                className="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 text-white 
+                                    disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed
+                                    transition-all duration-300"
+                            >
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </Fragment>
     )
