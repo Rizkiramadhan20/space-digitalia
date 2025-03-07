@@ -10,13 +10,15 @@ import { IoIosArrowForward } from 'react-icons/io'
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 
-import banner from '@/base/assets/pages/transaction/img.jpg'
+import banner from '@/base/assets/pages/project/bg.jpg'
 
 import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
 
 import { ProjectType } from '@/components/ui/project/lib/schema'
 
 import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
+
+import ProjectTypeNotFound from '@/hooks/pages/project/typeCategory/ProjectTypeNotFound'
 
 export default function ProjectTypeHero({ typeCategory }: { typeCategory: string }) {
     const [project, setProject] = useState<ProjectType | null>(null)
@@ -43,7 +45,7 @@ export default function ProjectTypeHero({ typeCategory }: { typeCategory: string
     }
 
     if (!project) {
-        return <div>Project not found</div>
+        return <ProjectTypeNotFound typeCategory={typeCategory} />
     }
 
     return (
@@ -71,12 +73,16 @@ export default function ProjectTypeHero({ typeCategory }: { typeCategory: string
                         scale,
                     }}
                 >
-                    <h3 className='text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight drop-shadow-lg'>
+                    <h3 className='text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight drop-shadow-lg capitalize'>
                         {typeCategory}
                     </h3>
                     <div className="flex items-center gap-4 bg-white/10 px-8 py-3 rounded-full backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300">
                         <Link href="/" className='text-sm md:text-base text-white hover:text-primary transition-all duration-300'>
                             Home
+                        </Link>
+                        <IoIosArrowForward className="text-white/90 text-sm" />
+                        <Link href="/project" className='text-sm md:text-base text-white hover:text-primary transition-all duration-300'>
+                            Project
                         </Link>
                         <IoIosArrowForward className="text-white/90 text-sm" />
                         <span className='text-sm md:text-base text-white/80 capitalize'>{typeCategory}</span>

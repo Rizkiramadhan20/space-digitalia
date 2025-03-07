@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     // Fetch project data
     const projectRef = db
-      .collection(process.env.NEXT_PUBLIC_COLLECTIONS_PROJECTS!)
+      .collection(process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT!)
       .doc(body.projectId);
     const projectSnap = await projectRef.get();
 
@@ -175,7 +175,7 @@ export async function POST(request: Request) {
           .collection(process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS!)
           .doc(orderId);
         const projectRef = db
-          .collection(process.env.NEXT_PUBLIC_COLLECTIONS_PROJECTS!)
+          .collection(process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT!)
           .doc(body.projectId);
 
         try {

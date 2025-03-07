@@ -96,6 +96,7 @@ export const metadata = {
     "theme-color": "#f5f5f5",
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
+    "google-tag-manager": "GTM-M2T56SL8",
   },
 
   openGraph: {
