@@ -8,18 +8,23 @@ export function FetchTypeCategory(
   typeCategory: string,
   callback: (project: ProjectType[]) => void
 ) {
+  const normalizedCategory = typeCategory
+    .replace(/-/g, " ")
+    .toLowerCase()
+    .trim();
+
   const q = query(
     collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT as string),
-    where("typeCategory", "==", typeCategory)
+    where("typeCategory", "==", normalizedCategory)
   );
 
   return onSnapshot(q, (snapshot) => {
-    callback(
-      snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.().toISOString(),
-      })) as ProjectType[]
-    );
+    const projects = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate?.().toISOString(),
+    })) as ProjectType[];
+
+    callback(projects);
   });
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Image from 'next/image'
 
@@ -18,19 +18,20 @@ import { ProjectType } from '@/components/ui/project/lib/schema'
 
 import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
 
-export default function TypeCategoryProject({ typeCategory }: { typeCategory: string }) {
+export default function ProjectTypeHero({ typeCategory }: { typeCategory: string }) {
+    const [project, setProject] = useState<ProjectType | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 500], [0, 250]);
     const opacity = useTransform(scrollY, [0, 300], [1, 0]);
     const titleY = useTransform(scrollY, [0, 300], [0, 100]);
     const scale = useTransform(scrollY, [0, 300], [1, 0.9]);
 
-    const [projects, setProjects] = useState<ProjectType[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-
     useEffect(() => {
         const unsubscribe = FetchTypeCategory(typeCategory, (data) => {
-            setProjects(data)
+            if (data && data.length > 0) {
+                setProject(data[0])
+            }
             setIsLoading(false)
         })
 
@@ -39,6 +40,10 @@ export default function TypeCategoryProject({ typeCategory }: { typeCategory: st
 
     if (isLoading) {
         return <ProjectTypeSkelaton />
+    }
+
+    if (!project) {
+        return <div>Project not found</div>
     }
 
     return (
@@ -66,15 +71,15 @@ export default function TypeCategoryProject({ typeCategory }: { typeCategory: st
                         scale,
                     }}
                 >
-                    <h3 className='text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight drop-shadow-lg uppercase' style={{ letterSpacing: '.3em' }}>
-                        {projects[0].typeCategory}
+                    <h3 className='text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight drop-shadow-lg'>
+                        {typeCategory}
                     </h3>
                     <div className="flex items-center gap-4 bg-white/10 px-8 py-3 rounded-full backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300">
                         <Link href="/" className='text-sm md:text-base text-white hover:text-primary transition-all duration-300'>
                             Home
                         </Link>
                         <IoIosArrowForward className="text-white/90 text-sm" />
-                        <span className='text-sm md:text-base text-white/80 capitalize'>{projects[0].typeCategory}</span>
+                        <span className='text-sm md:text-base text-white/80 capitalize'>{typeCategory}</span>
                     </div>
                 </motion.div>
             </motion.div>

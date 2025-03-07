@@ -36,8 +36,6 @@ import { doc, getDoc } from 'firebase/firestore';
 
 import { db } from '@/utils/firebase';
 
-import { Toaster } from 'react-hot-toast';
-
 import { LicenseDetail, Address, PaymentData } from '@/hooks/pages/project/project/lib/schema';
 
 export default function ProjectLayout() {
@@ -528,33 +526,6 @@ export default function ProjectLayout() {
     }
     return (
         <Fragment>
-            <Toaster
-                position="top-center"
-                toastOptions={{
-                    style: {
-                        background: '#333',
-                        color: '#fff',
-                        zIndex: 99999,
-                    },
-                    duration: 3000,
-                    className: 'z-[99999]',
-                    success: {
-                        style: {
-                            background: 'green',
-                        },
-                    },
-                    error: {
-                        style: {
-                            background: 'red',
-                        },
-                    },
-                }}
-                containerStyle={{
-                    zIndex: 99999,
-                    position: 'relative',
-                }}
-            />
-
             <section className='min-h-full py-24 bg-gradient-to-b from-gray-50/40 via-white to-white relative'>
                 <div className='container px-4 xl:px-10'>
                     {/* Modern Filter Bar */}
@@ -771,7 +742,7 @@ export default function ProjectLayout() {
                                                 <p className='text-sm text-white font-medium tracking-wide'>Preview</p>
                                             </button>
 
-                                            <Link href={`/project/${item.slug}`} className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
+                                            <Link href={`/project/${formatSlug(item.typeCategory)}/${item.slug}`} className='flex items-center flex-col gap-3 hover:scale-110 transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'>
                                                 <span className='p-4 rounded-full bg-white/20 backdrop-blur-xl hover:bg-white/40 transition-colors duration-300 shadow-lg'>
                                                     <FaExternalLinkAlt className='text-xl text-white' />
                                                 </span>

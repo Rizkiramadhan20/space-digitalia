@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function AdminSkelaton() {
+export default function ProjectTypeSkelaton() {
     return (
         <section className="min-h-full py-0 px-0 sm:py-4 sm:px-4">
             {/* Header Section Skeleton */}

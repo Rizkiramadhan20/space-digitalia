@@ -25,9 +25,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
     const [projects, setProjects] = useState<ProjectType[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
-    // Add new states
     const [currentPage, setCurrentPage] = useState(0)
-    // const [selectedCategory, setSelectedCategory] = useState<string>
     const [selectedType, setSelectedType] = useState<string>('all')
     const [openDropdown, setOpenDropdown] = useState<string | null>(null)
     const [selectedLicense, setSelectedLicense] = useState<{
@@ -37,7 +35,6 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
         downloadUrl: string;
     } | null>(null)
 
-    // Add constants
     const itemsPerPage = 9
 
     useEffect(() => {
