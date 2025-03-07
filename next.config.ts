@@ -8,21 +8,6 @@ const nextConfig: NextConfig = {
       "avatars.githubusercontent.com",
     ],
   },
-  webpack: (config) => {
-    // Handle module fallbacks
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      punycode: false,
-    };
-
-    // Handle image imports
-    config.module.rules.push({
-      test: /\.(png|jpg|jpeg|gif|svg)$/i,
-      type: "asset/resource",
-    });
-
-    return config;
-  },
 };
 
 export default nextConfig;
