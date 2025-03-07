@@ -20,7 +20,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/assets/*": ["./public/assets/*", "./src/base/*"]
     },
     "downlevelIteration": true
   },

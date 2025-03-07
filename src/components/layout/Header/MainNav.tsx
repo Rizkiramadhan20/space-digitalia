@@ -27,6 +27,13 @@ export default function MainNav() {
     const { user, logout, getDashboardUrl } = useAuth();
     const pathname = usePathname();
 
+    const isActiveLink = (href: string) => {
+        if (href === '/') {
+            return pathname === href;
+        }
+        return pathname.startsWith(href);
+    };
+
     const handleMobileMenuToggle = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
         setIsMobileProfileOpen(false);
@@ -72,11 +79,11 @@ export default function MainNav() {
                                 <Link
                                     href={item.href}
                                     className={`text-gray-600 hover:text-primary transition-all font-medium text-[15px] relative group
-                                        ${pathname === item.href ? 'text-primary' : ''}`}
+                                        ${isActiveLink(item.href) ? 'text-primary' : ''}`}
                                 >
                                     {item.name}
                                     <span className={`absolute left-0 -bottom-1.5 h-0.5 bg-primary/80 transition-all duration-300 ease-out
-                                        ${pathname === item.href ? 'w-full' : 'w-0 group-hover:w-full'}`}>
+                                        ${isActiveLink(item.href) ? 'w-full' : 'w-0 group-hover:w-full'}`}>
                                     </span>
                                 </Link>
                             </li>
@@ -198,7 +205,7 @@ export default function MainNav() {
                                         <Link
                                             href={item.href}
                                             className={`flex items-center gap-3 px-8 py-4 transition-all
-                                                ${pathname === item.href
+                                                ${isActiveLink(item.href)
                                                     ? 'text-primary bg-gray-50/80'
                                                     : 'text-gray-600 hover:text-primary hover:bg-gray-50/80'}`}
                                             onClick={() => setIsMobileMenuOpen(false)}
