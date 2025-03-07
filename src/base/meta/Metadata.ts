@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_URL as string;
+const BASE_URL = "https://spacedigitalia.my.id";
 
 export const viewport = {
   width: "device-width",
@@ -9,11 +9,12 @@ export const viewport = {
 
 export const metadata = {
   title: "Space Digitalia",
+  url: BASE_URL,
   description:
     "Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik. Wujudkan visi digital Anda bersama Space Digitalia.",
-  favicon: "/public/icon.png",
+  favicon: "/icon.png",
   authors: [{ name: "Rizki Ramadhan" }],
-  sitemap: "/public/sitemap.xml",
+  sitemap: "/sitemap.xml",
   keywords: [
     "Space Digitalia",
     "Space",
@@ -98,6 +99,10 @@ export const metadata = {
     apple: "/icon.png",
     shortcut: "/icon.png",
     appleTouchIcon: "/icon.png",
+    other: {
+      rel: "icon",
+      url: "/icon.png",
+    },
   },
 
   manifest: "/manifest.json",
@@ -109,12 +114,15 @@ export const metadata = {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "google-tag-manager": process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID,
+    "google-site-verification":
+      process.env.NEXT_PUBLIC_GOOGLE_SEARCH_CONSOLE_ID,
   },
 
   openGraph: {
     type: "website",
     title: "Space Digitalia",
-    description: "Space Digitalia",
+    description:
+      "Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik. Wujudkan visi digital Anda bersama Space Digitalia.",
     url: BASE_URL,
     siteName: "Space Digitalia",
     locale: "id_ID",
@@ -131,7 +139,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Space Digitalia",
-    description: "Space Digitalia",
+    description:
+      "Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik. Wujudkan visi digital Anda bersama Space Digitalia.",
     creator: "@rizki_ramadhan",
     site: "@rizki_ramadhan",
     images: ["/icon.png"],
@@ -145,6 +154,10 @@ export const metadata = {
     index: true,
     follow: true,
     noarchive: true,
+    noimageindex: true,
+    nosnippet: true,
+    nofollow: true,
+    noindex: true,
     nocache: true,
     googleBot: {
       index: true,
