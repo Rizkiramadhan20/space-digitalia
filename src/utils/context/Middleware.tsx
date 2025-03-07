@@ -8,12 +8,11 @@ import { Role } from '@/utils/context/interface/Auth';
 const publicPaths = [
     '/',
     '/auth/register',
-    '/about',
-    '/contact',
-    '/browser-menu',
-    '/special-offer',
-    '/restaurant',
-    '/track-order',
+    '/about-us',
+    '/services',
+    '/project',
+    '/articles',
+    '/contact-us',
 ];
 
 // Auth paths that should be accessible only for non-authenticated users
