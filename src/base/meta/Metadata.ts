@@ -11,6 +11,7 @@ export const metadata = {
   title: "Space Digitalia",
   description: "Space Digitalia",
   authors: [{ name: "Rizki Ramadhan" }],
+  sitemap: "/public/sitemap.xml",
   keywords: [
     "Space Digitalia",
     "Space",
@@ -88,7 +89,6 @@ export const metadata = {
   },
 
   manifest: "/manifest.json",
-
   metadataBase: new URL(BASE_URL),
   canonical: BASE_URL,
 

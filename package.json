@@ -8,6 +8,12 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "type": "module",
+  "homepage": "https://spacedigitalia.my.id/",
+  "files": [
+    "public/sitemap.xml",
+    "public/robots.txt"
+  ],
   "dependencies": {
     "@hookform/resolvers": "^4.1.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",

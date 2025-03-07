@@ -21,7 +21,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/assets/*": ["./public/assets/*", "./src/base/*"]
+      "@/assets/*": ["./src/base/*"],
+      "@/public/*": ["./public/*"]
     },
     "typeRoots": ["./node_modules/@types", "src/types"],
     "downlevelIteration": true
