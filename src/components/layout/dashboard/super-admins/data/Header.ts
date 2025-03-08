@@ -116,8 +116,6 @@ export const menuItems = [
 
       { label: "Unpaid", href: "/dashboard/super-admins/transaction/unpaid" },
 
-      { label: "Pending", href: "/dashboard/super-admins/transaction/pending" },
-
       { label: "Paid", href: "/dashboard/super-admins/transaction/paid" },
 
       { label: "Free", href: "/dashboard/super-admins/transaction/free" },
