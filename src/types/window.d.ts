@@ -9,6 +9,25 @@ interface MidtransResult {
   transaction_status: string;
 }
 
+interface DataLayerObject {
+  event?: string;
+  articleData?: {
+    title: string;
+    description: string;
+    slug: string;
+    url: string;
+    imageUrl: string;
+  };
+  projectData?: {
+    title: string;
+    description: string;
+    typeCategory: string;
+    url: string;
+    imageUrl: string;
+  };
+  [key: string]: unknown;
+}
+
 interface Window {
   snap: {
     pay: (
@@ -21,4 +40,5 @@ interface Window {
       }
     ) => void;
   };
+  dataLayer: DataLayerObject[];
 }

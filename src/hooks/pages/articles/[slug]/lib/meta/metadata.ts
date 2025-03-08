@@ -11,6 +11,7 @@ export interface Article {
   description: string;
   imageUrl: string[];
   slug: string;
+  publishedDate?: string;
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -53,13 +54,25 @@ export async function generateMetadata({
     article?.description || `Baca artikel ${slug} di Space Digitalia`;
   const imageUrl = article?.imageUrl?.[0] || "/icon.png";
 
-  return {
-    ...baseMetadata,
-    other: {
-      ...baseMetadata.other,
-      "google-tag-manager": process.env
-        .NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string,
+  // Add script to push data to dataLayer
+  const script = {
+    type: "application/ld+json",
+    json: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: title,
+      description: description,
+      image: imageUrl,
+      url: url,
+      datePublished: article?.publishedDate || new Date().toISOString(),
+      author: {
+        "@type": "Person",
+        name: "Rizki Ramadhan",
+      },
     },
+  };
+
+  return {
     title,
     description,
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL as string),
@@ -92,6 +105,10 @@ export async function generateMetadata({
       creator: "@rizki_ramadhan",
       site: "@rizki_ramadhan",
       images: [imageUrl],
+    },
+    other: {
+      "google-tag-manager": "GTM-YOUR-ID",
+      "json-ld": JSON.stringify(script.json),
     },
   };
 }
