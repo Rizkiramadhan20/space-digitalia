@@ -1,14 +1,20 @@
 import { FiHome, FiSettings } from "react-icons/fi";
 
-import { RiAdminFill, RiCustomerService2Fill } from "react-icons/ri";
+import { RiAdminFill } from "react-icons/ri";
 
-import { GiCardboardBoxClosed } from "react-icons/gi";
-
-import { GrArticle } from "react-icons/gr";
+import { GrArticle, GrTransaction } from "react-icons/gr";
 
 import { FiLayout } from "react-icons/fi";
 
-import { FcAbout } from "react-icons/fc";
+import { FaBuildingUser } from "react-icons/fa6";
+
+import { MdOutlineHomeRepairService, MdUnsubscribe } from "react-icons/md";
+
+import { GoProject } from "react-icons/go";
+
+import { TbReportAnalytics } from "react-icons/tb";
+
+import { IoMdContact } from "react-icons/io";
 
 export const menuItems = [
   {
@@ -47,7 +53,7 @@ export const menuItems = [
   },
 
   {
-    icon: FcAbout,
+    icon: FaBuildingUser,
     label: "About",
     href: "/dashboard/super-admins/about",
     subItems: [
@@ -61,7 +67,7 @@ export const menuItems = [
   },
 
   {
-    icon: RiCustomerService2Fill,
+    icon: MdOutlineHomeRepairService,
     label: "Service",
     href: "/dashboard/super-admins/service",
     subItems: [
@@ -75,7 +81,7 @@ export const menuItems = [
   },
 
   {
-    icon: GiCardboardBoxClosed,
+    icon: GoProject,
     label: "Project",
     href: "/dashboard/super-admins/project",
     subItems: [
@@ -96,6 +102,59 @@ export const menuItems = [
       { label: "Category", href: "/dashboard/super-admins/article/category" },
       { label: "Tags", href: "/dashboard/super-admins/article/tags" },
     ],
+  },
+
+  {
+    icon: GrTransaction,
+    label: "Transaction",
+    href: "/dashboard/super-admins/transaction",
+    subItems: [
+      {
+        label: "Daftar Transaction",
+        href: "/dashboard/super-admins/transaction",
+      },
+
+      { label: "Unpaid", href: "/dashboard/super-admins/transaction/unpaid" },
+
+      { label: "Pending", href: "/dashboard/super-admins/transaction/pending" },
+
+      { label: "Paid", href: "/dashboard/super-admins/transaction/paid" },
+
+      { label: "Free", href: "/dashboard/super-admins/transaction/free" },
+
+      {
+        label: "Canceled",
+        href: "/dashboard/super-admins/transaction/canceled",
+      },
+
+      {
+        label: "Completed",
+        href: "/dashboard/super-admins/transaction/completed",
+      },
+    ],
+  },
+
+  {
+    icon: TbReportAnalytics,
+    label: "Rekap",
+    href: "/dashboard/super-admins/rekap",
+    subItems: [{ label: "Rekap", href: "/dashboard/super-admins/rekap" }],
+  },
+
+  {
+    icon: IoMdContact,
+    label: "Contact",
+    href: "/dashboard/super-admins/contact",
+    subItems: [
+      { label: "Read", href: "/dashboard/super-admins/contact/read" },
+      { label: "Unread", href: "/dashboard/super-admins/contact/unread" },
+    ],
+  },
+
+  {
+    icon: MdUnsubscribe,
+    label: "Subscription",
+    href: "/dashboard/super-admins/subscription",
   },
 
   {

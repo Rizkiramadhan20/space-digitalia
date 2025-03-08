@@ -107,7 +107,8 @@ export async function generateMetadata({
       images: [imageUrl],
     },
     other: {
-      "google-tag-manager": "GTM-YOUR-ID",
+      "google-tag-manager": process.env
+        .NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string,
       "json-ld": JSON.stringify(script.json),
     },
   };

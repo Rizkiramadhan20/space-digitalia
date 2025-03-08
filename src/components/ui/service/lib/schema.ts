@@ -11,3 +11,13 @@ export interface ServiceType {
   };
   createdAt: string;
 }
+
+export interface ServiceItemProps {
+  item: ServiceType;
+  index: number;
+}
+
+export interface ServicePathsProps {
+  serviceLength: number;
+  visibleSections: number[];
+}

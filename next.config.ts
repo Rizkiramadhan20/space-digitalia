@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
       "avatars.githubusercontent.com",
     ],
   },
+
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@react-pdf/renderer": require.resolve("@react-pdf/renderer"),
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

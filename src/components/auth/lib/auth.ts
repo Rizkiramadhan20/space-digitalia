@@ -59,3 +59,11 @@ export const signUpSchema = z
   });
 
 export type SignUpFormData = z.infer<typeof signUpSchema>;
+
+//====== Facebook Sign In Schema ======//
+
+export const facebookSignInSchema = z.object({
+  email: z.string().email("Please enter a valid email address").trim(),
+});
+
+export type FacebookSignInFormData = z.infer<typeof facebookSignInSchema>;

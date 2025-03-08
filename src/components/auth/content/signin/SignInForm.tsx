@@ -1,12 +1,19 @@
 'use client'
 
 import React from 'react'
+
 import Link from 'next/link'
+
 import Image from 'next/image'
+
 import { useForm } from 'react-hook-form'
+
 import { zodResolver } from '@hookform/resolvers/zod'
+
 import { signInSchema, type SignInFormData } from '@/components/auth/lib/auth'
+
 import googleIcon from '@/base/assets/auth/google.png'
+
 import githubIcon from "@/base/assets/auth/github.svg"
 
 interface SignInFormProps {
@@ -136,6 +143,7 @@ export default function SignInForm({ isLoading, onSubmit, onGoogleSignIn, onGith
                     >
                         <Image src={githubIcon} alt='github icon' className='w-10 h-10' />
                     </button>
+
                     <button
                         type="button"
                         onClick={onGoogleSignIn}

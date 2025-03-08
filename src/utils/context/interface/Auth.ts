@@ -22,6 +22,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<UserAccount>;
   loginWithGoogle: () => Promise<UserAccount>;
   loginWithGithub: () => Promise<UserAccount>;
+  loginWithFacebook: () => Promise<UserAccount>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   hasRole: (roles: string | string[]) => boolean;
