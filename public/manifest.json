@@ -22,6 +22,16 @@
   "display": "standalone",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
+  "orientation": "portrait",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Space Digitalia",
+      "url": "/",
+      "icons": [{ "src": "/icon.png", "sizes": "64x64" }]
+    }
+  ],
+  "sitemap.xml": "https://spacedigitalia.com/sitemap.xml",
   "prefer_related_applications": false,
   "categories": [
     "space",
