@@ -8,62 +8,9 @@ import { db } from '@/utils/firebase'
 
 import Image from 'next/image'
 
-interface Transaction {
-    id: string;
-    amount: number;
-    createdAt: Timestamp;
-    deliveryAddress: null | string;
-    deliveryMethod: string;
-    imageUrl: string;
-    licenseType: string;
-    linkTransaction: string;
-    orderId: string;
-    paymentMethod: string;
-    projectId: string;
-    projectTitle: string;
-    status: string;
-    statusDelivery: null | string;
-    updatedAt: Timestamp;
-    userEmail: string;
-    userId: string;
-    userName: string;
-    paymentDetails: {
-        bca_va_number: string;
-        finish_redirect_url: string;
-        fraud_status: string;
-        gross_amount: string;
-        order_id: string;
-        payment_type: string;
-        pdf_url: string;
-        status_code: string;
-        status_message: string;
-        transaction_id: string;
-        transaction_status: string;
-        transaction_time: string;
-        va_numbers: Array<{
-            bank: string;
-            va_number: string;
-        }>;
-    };
-    downloadUrl: string;
-    paymentToken: string;
-    redirectUrl: string;
-    transactionId: string;
-}
+import { toast } from 'react-hot-toast'
 
-// Add this script to your HTML head or import it in your _app.tsx
-declare global {
-    interface Window {
-        snap: {
-            pay: (token: string, options: {
-                onSuccess: (result: MidtransResult) => void;
-                onPending: (result: MidtransResult) => void;
-                onError: (result: MidtransResult) => void;
-                onClose: () => void;
-            }) => void;
-        };
-    }
-}
+import { Transaction } from '@/hooks/dashboard/user/transaction/unpaid/lib/schema'
 
 export default function TransactionUnpaidLayout() {
     const [pendingTransactions, setPendingTransactions] = useState<Transaction[]>([]);
@@ -165,16 +112,20 @@ export default function TransactionUnpaidLayout() {
 
     // Add this new function to handle cancellation
     const handleCancelTransaction = async (transactionId: string) => {
-        if (!window.confirm('Are you sure you want to cancel this transaction?')) {
-            return;
-        }
-
         setIsLoading(true);
         try {
-            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, transactionId);
+            // Add a console.log to debug the collection path
+            console.log('Collection path:', process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS);
+
+            // Ensure we have a valid collection path
+            const collectionPath = process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS || 'transactions';
+            const transactionRef = doc(db, collectionPath, transactionId);
+
             await updateDoc(transactionRef, {
                 status: 'cancelled',
-                updatedAt: Timestamp.now()
+                updatedAt: Timestamp.now(),
+                'paymentDetails.transaction_status': 'cancelled',
+                'paymentDetails.status_message': 'Transaction cancelled by user'
             });
 
             // Update local state
@@ -182,33 +133,47 @@ export default function TransactionUnpaidLayout() {
             setIsModalOpen(false);
             setSelectedTransaction(null);
 
-            // You might want to add a toast notification here
-            alert('Transaction cancelled successfully');
+            // Show success toast
+            toast.success('Transaction cancelled successfully', {
+                duration: 4000,
+                position: 'top-center',
+            });
         } catch (error) {
             console.error('Error cancelling transaction:', error);
-            alert('Failed to cancel transaction');
+            console.error('Transaction ID:', transactionId); // Add this for debugging
+            toast.error('Failed to cancel transaction', {
+                duration: 4000,
+                position: 'top-center',
+            });
         } finally {
             setIsLoading(false);
+            // Close the cancel confirmation modal
+            const modal = document.getElementById('cancel_confirm_modal') as HTMLDialogElement;
+            if (modal) modal.close();
         }
     };
 
-    const updateTransactionStatus = async (transactionId: string, result: MidtransResult) => {
+    const updateTransactionStatus = async (transactionId: string, result: MidtransResult, isCompleted: boolean = false) => {
         try {
             // Tentukan status berdasarkan transaction_status dari Midtrans
             let status = 'pending';
-            if (result.transaction_status === 'settlement' || result.transaction_status === 'capture') {
+            let statusMessage = "Your Transaction is being processed";
+
+            if (isCompleted && result.transaction_status === 'settlement') {
                 status = 'success';
+                statusMessage = "Success, transaction is found";
             } else if (result.transaction_status === 'deny' || result.transaction_status === 'cancel' || result.transaction_status === 'expire') {
                 status = 'failed';
+                statusMessage = result.status_message;
             }
 
             const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, transactionId);
             await updateDoc(transactionRef, {
-                status: status, // Menggunakan status yang sudah ditentukan
+                status: status,
                 updatedAt: Timestamp.now(),
                 paymentDetails: {
                     status_code: result.status_code,
-                    status_message: result.status_message,
+                    status_message: statusMessage,
                     transaction_status: result.transaction_status,
                     transaction_id: result.transaction_id,
                     transaction_time: result.transaction_time,
@@ -230,7 +195,7 @@ export default function TransactionUnpaidLayout() {
         }
 
         const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
-        const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
+        const clientKey = process.env.MIDTRANS_CLIENT_KEY;
 
         const myMidtransClientKey = clientKey;
 
@@ -259,7 +224,7 @@ export default function TransactionUnpaidLayout() {
             window.snap.pay(transaction.paymentToken, {
                 onSuccess: async function (result: MidtransResult) {
                     console.log('success', result);
-                    await updateTransactionStatus(transaction.id, result);
+                    await updateTransactionStatus(transaction.id, result, true);
                     setIsModalOpen(false);
                 },
                 onPending: async function (result: MidtransResult) {
@@ -380,27 +345,61 @@ export default function TransactionUnpaidLayout() {
                                 </div>
                             </div>
 
-                            {/* Action Button - Only View Details */}
-                            <button
-                                onClick={() => {
-                                    setSelectedTransaction(transaction);
-                                    setIsModalOpen(true);
-                                }}
-                                className="w-full mt-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 
-                                           text-white rounded-xl transition-all duration-200 flex items-center 
-                                           justify-center gap-2 font-medium"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                    strokeWidth={2} stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                    />
-                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                    />
-                                </svg>
-                                View Details
-                            </button>
+                            {/* Action Buttons - Outside Modal */}
+                            <div className="grid grid-cols-3 gap-2 mt-2">
+                                <button
+                                    onClick={() => {
+                                        setSelectedTransaction(transaction);
+                                        setIsModalOpen(true);
+                                    }}
+                                    className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 
+                                               text-gray-700 rounded-xl transition-all duration-200 flex items-center 
+                                               justify-center gap-2"
+                                    title="View Details"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                        strokeWidth={2} stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                        />
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                        />
+                                    </svg>
+                                </button>
+
+                                <button
+                                    onClick={() => handleContinuePayment(transaction)}
+                                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 
+                                               text-white rounded-xl transition-all duration-200 flex items-center 
+                                               justify-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                    Continue
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        const modal = document.getElementById('cancel_confirm_modal') as HTMLDialogElement;
+                                        if (modal) modal.showModal();
+                                    }}
+                                    disabled={isLoading}
+                                    className="px-4 py-2.5 bg-red-600 hover:bg-red-700 
+                                               text-white rounded-xl transition-all duration-200 flex items-center 
+                                               justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isLoading ? (
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    )}
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -537,111 +536,47 @@ export default function TransactionUnpaidLayout() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Modal action buttons */}
-                            <div className="mt-6 pt-4 border-t border-gray-200">
-                                <div className="flex gap-4">
-                                    <button
-                                        onClick={() => handleContinuePayment(selectedTransaction)}
-                                        className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                        </svg>
-                                        Continue Payment
-                                    </button>
-
-                                    <button
-                                        onClick={() => handleCancelTransaction(selectedTransaction.id)}
-                                        disabled={isLoading}
-                                        className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {isLoading ? (
-                                            <span>Processing...</span>
-                                        ) : (
-                                            <>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                                Cancel Transaction
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Add this section in the modal content, after the basic information cards */}
-                            <div className="mt-6 bg-gray-50 rounded-xl p-6">
-                                <h4 className="text-base font-semibold text-gray-900 mb-4">Payment Details</h4>
-                                <div className="space-y-4">
-                                    {selectedTransaction.paymentDetails.payment_type === 'bank_transfer' && (
-                                        <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                            <h5 className="font-medium text-gray-900 mb-3">Bank Transfer Details</h5>
-                                            {selectedTransaction.paymentDetails.va_numbers.map((va, index) => (
-                                                <div key={index} className="space-y-2">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-gray-600">Bank</span>
-                                                        <span className="font-medium text-gray-900 uppercase">{va.bank}</span>
-                                                    </div>
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-gray-600">VA Number</span>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-medium text-gray-900">{va.va_number}</span>
-                                                            <button
-                                                                onClick={() => navigator.clipboard.writeText(va.va_number)}
-                                                                className="p-1 hover:bg-gray-100 rounded"
-                                                                title="Copy VA Number"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            <div className="mt-3 pt-3 border-t border-gray-100">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-gray-600">Total Amount</span>
-                                                    <span className="font-medium text-gray-900">
-                                                        Rp {parseFloat(selectedTransaction.paymentDetails.gross_amount).toLocaleString('id-ID')}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-col gap-3">
-                                        <a
-                                            href={selectedTransaction.paymentDetails.pdf_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                            Download Payment Instructions
-                                        </a>
-                                    </div>
-
-                                    <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4">
-                                        <div className="flex items-start gap-3">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <div>
-                                                <p className="text-sm font-medium text-yellow-800">Payment Status</p>
-                                                <p className="text-sm text-yellow-700 mt-1">{selectedTransaction.paymentDetails.status_message}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            <dialog id="cancel_confirm_modal" className="modal modal-bottom sm:modal-middle">
+                <div className="modal-box bg-white rounded-2xl shadow-xl">
+                    <h3 className="font-bold text-xl text-gray-900 mb-4">Cancel Transaction</h3>
+                    <div className="py-4 text-gray-600">
+                        <p>Are you sure you want to cancel this transaction? This action cannot be undone.</p>
+                    </div>
+                    <div className="modal-action flex gap-3">
+                        <form method="dialog" className="flex gap-3 w-full">
+                            <button
+                                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all duration-200"
+                            >
+                                No, keep it
+                            </button>
+                            <button
+                                onClick={() => handleCancelTransaction(selectedTransaction?.id || '')}
+                                disabled={isLoading}
+                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {isLoading ? (
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                ) : (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Yes, cancel it
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
         </section>
     )
 }
