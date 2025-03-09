@@ -15,6 +15,7 @@ export const menuItems = [
     href: "/dashboard/user/transaction",
     subItems: [
       { label: "Daftar Transaksi", href: "/dashboard/user/transaction" },
+      { label: "Transaksi Gratis", href: "/dashboard/user/transaction/free" },
       { label: "Belum Dibayar", href: "/dashboard/user/transaction/unpaid" },
       { label: "Dikirim", href: "/dashboard/user/transaction/shipped" },
       { label: "Dibatalkan", href: "/dashboard/user/transaction/canceled" },

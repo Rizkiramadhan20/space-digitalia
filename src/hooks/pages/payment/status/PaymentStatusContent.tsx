@@ -568,7 +568,7 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <Link
-                                    href={`${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction`}
+                                    href={`${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction/unpaid`}
                                     className="group relative inline-flex w-full items-center justify-center px-8 py-4 text-lg font-medium text-white bg-blue-500 rounded-xl overflow-hidden transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/25"
                                 >
                                     {/* Shine Effect */}
