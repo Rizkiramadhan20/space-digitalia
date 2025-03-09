@@ -12,7 +12,7 @@ export const metadata = {
   url: BASE_URL,
   description:
     "Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik. Wujudkan visi digital Anda bersama Space Digitalia.",
-  favicon: "/icon.png",
+  favicon: "/favicon.ico",
   authors: [{ name: "Rizki Ramadhan" }],
   sitemap: "/sitemap.xml",
   keywords: [
@@ -91,17 +91,17 @@ export const metadata = {
   icons: {
     icon: [
       {
-        url: "/icon.png",
+        url: "/favicon.ico",
         sizes: "64x64 32x32 24x24 16x16",
         type: "image/x-icon",
       },
     ],
-    apple: "/icon.png",
-    shortcut: "/icon.png",
-    appleTouchIcon: "/icon.png",
+    apple: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    appleTouchIcon: "/favicon.ico",
     other: {
       rel: "icon",
-      url: "/icon.png",
+      url: "/favicon.ico",
     },
   },
 
@@ -128,7 +128,7 @@ export const metadata = {
     locale: "id_ID",
     images: [
       {
-        url: "/icon.png",
+        url: "/favicon.ico",
         width: 1920,
         height: 1080,
         alt: "Icon for Space Digitalia",
@@ -143,7 +143,7 @@ export const metadata = {
       "Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik. Wujudkan visi digital Anda bersama Space Digitalia.",
     creator: "@rizki_ramadhan",
     site: "@rizki_ramadhan",
-    images: ["/icon.png"],
+    images: ["/favicon.ico"],
   },
 
   verification: {

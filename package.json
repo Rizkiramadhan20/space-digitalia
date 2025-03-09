@@ -87,7 +87,7 @@
   "files": [
     "/sitemap.xml",
     "/robots.txt",
-    "/icon.png"
+    "/favicon.ico"
   ],
   "dependencies": {
     "@hookform/resolvers": "^4.1.1",
