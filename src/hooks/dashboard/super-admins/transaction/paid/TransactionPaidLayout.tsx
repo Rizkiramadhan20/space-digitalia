@@ -10,11 +10,16 @@ import Image from 'next/image'
 
 import { Transaction } from '@/hooks/dashboard/super-admins/transaction/paid/lib/paid'
 
+import TransactionPaidSkeleton from '@/hooks/dashboard/super-admins/transaction/paid/TransactionPaidSkelaton'
+
+import { Pagination } from '@/base/helper/Pagination'
+
 export default function TransactionPaidLayout() {
     const [successTransactions, setSuccessTransactions] = useState<Transaction[]>([]);
     const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Filter states
     const [dateRange, setDateRange] = useState({
@@ -24,6 +29,10 @@ export default function TransactionPaidLayout() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [isFilterVisible, setIsFilterVisible] = useState(false);
+
+    // Add pagination states
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 9; // Show 9 items per page (3x3 grid)
 
     useEffect(() => {
         const fetchSuccessTransactions = async () => {
@@ -49,6 +58,7 @@ export default function TransactionPaidLayout() {
 
                 setSuccessTransactions(sortedTransactions);
                 setFilteredTransactions(sortedTransactions); // Initialize filtered with all transactions
+                setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching success transactions:', error);
             }
@@ -125,6 +135,25 @@ export default function TransactionPaidLayout() {
             document.removeEventListener('keydown', handleEscKey);
         };
     }, [isModalOpen]);
+
+    // Calculate pagination
+    const paginatedTransactions = filteredTransactions.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+    );
+
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+
+    // Handle page change
+    const handlePageChange = (selectedItem: { selected: number }) => {
+        setCurrentPage(selectedItem.selected);
+        // Scroll to top of the transaction grid
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    if (isLoading) {
+        return <TransactionPaidSkeleton />;
+    }
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
@@ -250,7 +279,7 @@ export default function TransactionPaidLayout() {
 
             {/* Transaction Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredTransactions.map((transaction, index) => (
+                {paginatedTransactions.map((transaction, index) => (
                     <div key={index} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                         {/* Image Container */}
                         <div className="relative h-48 w-full">
@@ -321,11 +350,7 @@ export default function TransactionPaidLayout() {
                                         </svg>
                                     </div>
                                     <p className="text-sm text-gray-700">
-                                        {transaction.createdAt.toDate().toLocaleDateString('id-ID', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric'
-                                        })}
+                                        {transaction.paymentDetails.transaction_time}
                                     </p>
                                 </div>
                             </div>
@@ -357,6 +382,32 @@ export default function TransactionPaidLayout() {
                     </div>
                 ))}
             </div>
+
+            {/* Add Pagination Component */}
+            {filteredTransactions.length > 0 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
+            )}
+
+            {/* Show empty state when no transactions */}
+            {filteredTransactions.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-12 px-4">
+                    <div className="bg-gray-50 rounded-full p-4 mb-4">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">No transactions found</h3>
+                    <p className="text-gray-500 text-center">
+                        Try adjusting your search or filter criteria
+                    </p>
+                </div>
+            )}
 
             {isModalOpen && selectedTransaction && (
                 <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto" onClick={handleClickOutside}>
