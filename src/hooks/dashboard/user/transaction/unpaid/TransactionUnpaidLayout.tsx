@@ -2,13 +2,12 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore'
+import { collection, query, where, Timestamp, doc, updateDoc, onSnapshot } from 'firebase/firestore'
 
 import { db } from '@/utils/firebase'
 
 import Image from 'next/image'
 
-// Interface untuk data transaksi
 interface Transaction {
     id: string;
     amount: number;
@@ -28,21 +27,63 @@ interface Transaction {
     userEmail: string;
     userId: string;
     userName: string;
+    paymentDetails: {
+        bca_va_number: string;
+        finish_redirect_url: string;
+        fraud_status: string;
+        gross_amount: string;
+        order_id: string;
+        payment_type: string;
+        pdf_url: string;
+        status_code: string;
+        status_message: string;
+        transaction_id: string;
+        transaction_status: string;
+        transaction_time: string;
+        va_numbers: Array<{
+            bank: string;
+            va_number: string;
+        }>;
+    };
+    downloadUrl: string;
+    paymentToken: string;
+    redirectUrl: string;
+    transactionId: string;
+}
+
+// Add this script to your HTML head or import it in your _app.tsx
+declare global {
+    interface Window {
+        snap: {
+            pay: (token: string, options: {
+                onSuccess: (result: MidtransResult) => void;
+                onPending: (result: MidtransResult) => void;
+                onError: (result: MidtransResult) => void;
+                onClose: () => void;
+            }) => void;
+        };
+    }
 }
 
 export default function TransactionUnpaidLayout() {
     const [pendingTransactions, setPendingTransactions] = useState<Transaction[]>([]);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Listen for pending transactions
     useEffect(() => {
-        const fetchPendingTransactions = async () => {
-            try {
-                const transactionRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string);
-                const q = query(transactionRef, where('status', '==', 'pending'));
-                const querySnapshot = await getDocs(q);
+        const transactionRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string);
 
-                const transactions = querySnapshot.docs.map(doc => ({
+        // Create query with const since it's never reassigned
+        const q = query(
+            transactionRef,
+            where('status', '==', 'pending')
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            try {
+                const transactions = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 })) as Transaction[];
@@ -54,12 +95,37 @@ export default function TransactionUnpaidLayout() {
 
                 setPendingTransactions(sortedTransactions);
             } catch (error) {
-                console.error('Error fetching pending transactions:', error);
+                console.error('Error in transaction listener:', error);
             }
-        };
+        });
 
-        fetchPendingTransactions();
-    }, []);
+        return () => unsubscribe();
+    }, []); // Remove dependency since we're not filtering by user anymore
+
+    // Update the selected transaction when its data changes
+    useEffect(() => {
+        if (!selectedTransaction) return;
+
+        const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, selectedTransaction.id);
+        const unsubscribe = onSnapshot(transactionRef, (doc) => {
+            if (doc.exists()) {
+                const updatedTransaction = {
+                    id: doc.id,
+                    ...doc.data()
+                } as Transaction;
+
+                setSelectedTransaction(updatedTransaction);
+
+                // If transaction is no longer pending, close modal and update list
+                if (updatedTransaction.status !== 'pending') {
+                    setIsModalOpen(false);
+                    setPendingTransactions(prev => prev.filter(t => t.id !== updatedTransaction.id));
+                }
+            }
+        });
+
+        return () => unsubscribe();
+    }, [selectedTransaction]);
 
     useEffect(() => {
         if (isModalOpen) {
@@ -96,6 +162,122 @@ export default function TransactionUnpaidLayout() {
             document.removeEventListener('keydown', handleEscKey);
         };
     }, [isModalOpen]);
+
+    // Add this new function to handle cancellation
+    const handleCancelTransaction = async (transactionId: string) => {
+        if (!window.confirm('Are you sure you want to cancel this transaction?')) {
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, transactionId);
+            await updateDoc(transactionRef, {
+                status: 'cancelled',
+                updatedAt: Timestamp.now()
+            });
+
+            // Update local state
+            setPendingTransactions(prev => prev.filter(t => t.id !== transactionId));
+            setIsModalOpen(false);
+            setSelectedTransaction(null);
+
+            // You might want to add a toast notification here
+            alert('Transaction cancelled successfully');
+        } catch (error) {
+            console.error('Error cancelling transaction:', error);
+            alert('Failed to cancel transaction');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const updateTransactionStatus = async (transactionId: string, result: MidtransResult) => {
+        try {
+            // Tentukan status berdasarkan transaction_status dari Midtrans
+            let status = 'pending';
+            if (result.transaction_status === 'settlement' || result.transaction_status === 'capture') {
+                status = 'success';
+            } else if (result.transaction_status === 'deny' || result.transaction_status === 'cancel' || result.transaction_status === 'expire') {
+                status = 'failed';
+            }
+
+            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, transactionId);
+            await updateDoc(transactionRef, {
+                status: status, // Menggunakan status yang sudah ditentukan
+                updatedAt: Timestamp.now(),
+                paymentDetails: {
+                    status_code: result.status_code,
+                    status_message: result.status_message,
+                    transaction_status: result.transaction_status,
+                    transaction_id: result.transaction_id,
+                    transaction_time: result.transaction_time,
+                    payment_type: result.payment_type,
+                    gross_amount: result.gross_amount,
+                    fraud_status: result.fraud_status,
+                    va_numbers: result.va_numbers
+                }
+            });
+        } catch (error) {
+            console.error('Error updating transaction:', error);
+        }
+    };
+
+    const handleContinuePayment = (transaction: Transaction) => {
+        if (!transaction.paymentToken) {
+            alert('Payment token not found');
+            return;
+        }
+
+        const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
+        const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
+
+        const myMidtransClientKey = clientKey;
+
+        const script = document.createElement('script');
+        script.src = snapScript;
+        script.setAttribute('data-client-key', myMidtransClientKey || '');
+        script.onload = () => {
+            // Set up a listener for this specific transaction
+            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, transaction.id);
+            const unsubscribe = onSnapshot(transactionRef, (doc) => {
+                if (doc.exists()) {
+                    const updatedTransaction = {
+                        id: doc.id,
+                        ...doc.data()
+                    } as Transaction;
+
+                    if (updatedTransaction.status !== 'pending') {
+                        setIsModalOpen(false);
+                        setPendingTransactions(prev => prev.filter(t => t.id !== transaction.id));
+                        unsubscribe();
+                    }
+                }
+            });
+
+            // Open Snap popup with proper typing
+            window.snap.pay(transaction.paymentToken, {
+                onSuccess: async function (result: MidtransResult) {
+                    console.log('success', result);
+                    await updateTransactionStatus(transaction.id, result);
+                    setIsModalOpen(false);
+                },
+                onPending: async function (result: MidtransResult) {
+                    console.log('pending', result);
+                    await updateTransactionStatus(transaction.id, result);
+                },
+                onError: async function (result: MidtransResult) {
+                    console.log('error', result);
+                    await updateTransactionStatus(transaction.id, result);
+                    alert('Payment failed. Please try again.');
+                },
+                onClose: function () {
+                    console.log('customer closed the popup without finishing the payment');
+                }
+            });
+        };
+        document.body.appendChild(script);
+    };
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
@@ -198,17 +380,15 @@ export default function TransactionUnpaidLayout() {
                                 </div>
                             </div>
 
-                            {/* Action Button */}
+                            {/* Action Button - Only View Details */}
                             <button
                                 onClick={() => {
                                     setSelectedTransaction(transaction);
                                     setIsModalOpen(true);
                                 }}
-                                className="w-full mt-2 px-4 py-2.5 bg-white border border-indigo-200 
-                                         hover:bg-indigo-50 hover:border-indigo-300 text-indigo-600 
-                                         rounded-xl transition-all duration-200 flex items-center 
-                                         justify-center gap-2 group-hover:bg-indigo-600 
-                                         group-hover:text-white font-medium"
+                                className="w-full mt-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 
+                                           text-white rounded-xl transition-all duration-200 flex items-center 
+                                           justify-center gap-2 font-medium"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                     strokeWidth={2} stroke="currentColor">
@@ -354,6 +534,107 @@ export default function TransactionUnpaidLayout() {
                                     <div>
                                         <span className="text-gray-500">Updated:</span>
                                         <span className="ml-2 text-gray-900">{selectedTransaction.updatedAt.toDate().toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Modal action buttons */}
+                            <div className="mt-6 pt-4 border-t border-gray-200">
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => handleContinuePayment(selectedTransaction)}
+                                        className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
+                                        Continue Payment
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleCancelTransaction(selectedTransaction.id)}
+                                        disabled={isLoading}
+                                        className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isLoading ? (
+                                            <span>Processing...</span>
+                                        ) : (
+                                            <>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                Cancel Transaction
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Add this section in the modal content, after the basic information cards */}
+                            <div className="mt-6 bg-gray-50 rounded-xl p-6">
+                                <h4 className="text-base font-semibold text-gray-900 mb-4">Payment Details</h4>
+                                <div className="space-y-4">
+                                    {selectedTransaction.paymentDetails.payment_type === 'bank_transfer' && (
+                                        <div className="bg-white p-4 rounded-lg border border-gray-200">
+                                            <h5 className="font-medium text-gray-900 mb-3">Bank Transfer Details</h5>
+                                            {selectedTransaction.paymentDetails.va_numbers.map((va, index) => (
+                                                <div key={index} className="space-y-2">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-gray-600">Bank</span>
+                                                        <span className="font-medium text-gray-900 uppercase">{va.bank}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-gray-600">VA Number</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-medium text-gray-900">{va.va_number}</span>
+                                                            <button
+                                                                onClick={() => navigator.clipboard.writeText(va.va_number)}
+                                                                className="p-1 hover:bg-gray-100 rounded"
+                                                                title="Copy VA Number"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className="mt-3 pt-3 border-t border-gray-100">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600">Total Amount</span>
+                                                    <span className="font-medium text-gray-900">
+                                                        Rp {parseFloat(selectedTransaction.paymentDetails.gross_amount).toLocaleString('id-ID')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex flex-col gap-3">
+                                        <a
+                                            href={selectedTransaction.paymentDetails.pdf_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                            Download Payment Instructions
+                                        </a>
+                                    </div>
+
+                                    <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4">
+                                        <div className="flex items-start gap-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <div>
+                                                <p className="text-sm font-medium text-yellow-800">Payment Status</p>
+                                                <p className="text-sm text-yellow-700 mt-1">{selectedTransaction.paymentDetails.status_message}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

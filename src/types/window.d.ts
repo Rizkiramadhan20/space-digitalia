@@ -7,6 +7,12 @@ interface MidtransResult {
   payment_type: string;
   transaction_time: string;
   transaction_status: string;
+  fraud_status?: string;
+  currency: string;
+  va_numbers?: Array<{
+    bank: string;
+    va_number: string;
+  }>;
 }
 
 interface DataLayerObject {
@@ -31,9 +37,9 @@ interface DataLayerObject {
 interface Window {
   snap: {
     pay: (
-      snapToken: string,
+      token: string,
       options: {
-        onSuccess: (result: MidtransResult) => void | Promise<void>;
+        onSuccess: (result: MidtransResult) => void;
         onPending: (result: MidtransResult) => void;
         onError: (result: MidtransResult) => void;
         onClose: () => void;
@@ -41,4 +47,17 @@ interface Window {
     ) => void;
   };
   dataLayer: DataLayerObject[];
+}
+
+declare global {
+  interface Window {
+    snap: {
+      pay: (token: string, options: {
+        onSuccess: (result: MidtransResult) => void;
+        onPending: (result: MidtransResult) => void;
+        onError: (result: MidtransResult) => void;
+        onClose: () => void;
+      }) => void;
+    };
+  }
 }
