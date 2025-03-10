@@ -14,7 +14,10 @@ import TransactionPaidSkeleton from '@/hooks/dashboard/super-admins/transaction/
 
 import { Pagination } from '@/base/helper/Pagination'
 
+import { useAuth } from '@/utils/context/AuthContext'
+
 export default function TransactionPaidLayout() {
+    const { user } = useAuth();
     const [successTransactions, setSuccessTransactions] = useState<Transaction[]>([]);
     const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -46,9 +49,11 @@ export default function TransactionPaidLayout() {
                         ...doc.data()
                     })) as Transaction[];
 
-                // Filter transactions where paymentDetails.transaction_status is 'settlement'
+                // Filter transactions for current user and settlement status
                 const successTransactions = transactions.filter(
-                    transaction => transaction.paymentDetails?.transaction_status === 'settlement'
+                    transaction =>
+                        transaction.userId === user?.uid &&
+                        transaction.paymentDetails?.transaction_status === 'settlement'
                 );
 
                 // Sort transactions by createdAt in descending order
@@ -57,15 +62,17 @@ export default function TransactionPaidLayout() {
                 );
 
                 setSuccessTransactions(sortedTransactions);
-                setFilteredTransactions(sortedTransactions); // Initialize filtered with all transactions
+                setFilteredTransactions(sortedTransactions);
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching success transactions:', error);
             }
         };
 
-        fetchSuccessTransactions();
-    }, []);
+        if (user) {
+            fetchSuccessTransactions();
+        }
+    }, [user]);
 
     // Apply filters
     useEffect(() => {
@@ -410,7 +417,7 @@ export default function TransactionPaidLayout() {
             )}
 
             {isModalOpen && selectedTransaction && (
-                <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto" onClick={handleClickOutside}>
+                <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50" onClick={handleClickOutside}>
                     <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl transform transition-all my-4">
                         {/* Modal Header */}
                         <div className="p-4 sm:p-6 border-b">

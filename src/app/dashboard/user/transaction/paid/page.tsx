@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Metadata } from 'next'
 
-import TransactionPaidLayout from "@/hooks/dashboard/super-admins/transaction/paid/TransactionPaidLayout"
+import TransactionPaidLayout from "@/hooks/dashboard/user/transaction/paid/TransactionPaidLayout"
 
 export const metadata: Metadata = {
     title: 'Paid Transaction | SPACE DIGITALIA',

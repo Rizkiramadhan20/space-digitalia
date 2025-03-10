@@ -14,6 +14,8 @@ import { Filters, Transaction } from '@/hooks/dashboard/super-admins/transaction
 
 import { useAuth } from '@/utils/context/AuthContext'
 
+import TransactionShippedSkeleton from '@/hooks/dashboard/user/transaction/shipped/TransactionShippedSkelaton'
+
 export default function TransactionShippedLayout() {
     const { user } = useAuth()
     const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -21,6 +23,7 @@ export default function TransactionShippedLayout() {
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [filters, setFilters] = useState<Filters>({
         status: [],
         paymentMethod: [], // Will contain 'delivery' or 'download'
@@ -28,8 +31,12 @@ export default function TransactionShippedLayout() {
     })
 
     const applyFilters = () => {
-        // First filter for transactions with statusDelivery
-        let filtered = transactions.filter(transaction => transaction.statusDelivery);
+        // First filter for transactions with statusDelivery, not cancelled, and not completed
+        let filtered = transactions.filter(transaction =>
+            transaction.statusDelivery &&
+            transaction.status !== 'cancelled' &&
+            transaction.statusDelivery !== 'completed'
+        );
 
         // Then apply other filters
         if (filters.status.length > 0) {
@@ -62,15 +69,20 @@ export default function TransactionShippedLayout() {
                 ...doc.data()
             })) as Transaction[]
 
-            // Filter for transactions with statusDelivery and sort
+            // Filter for transactions with statusDelivery, excluding cancelled and completed status, and sort
             const shippedTransactions = transactionData
-                .filter(transaction => transaction.statusDelivery)
+                .filter(transaction =>
+                    transaction.statusDelivery &&
+                    transaction.status !== 'cancelled' &&
+                    transaction.statusDelivery !== 'completed'
+                )
                 .sort((a, b) =>
                     b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime()
                 );
 
             setTransactions(shippedTransactions)
             setFilteredTransactions(shippedTransactions)
+            setIsLoading(false)
         })
 
         return () => unsubscribe()
@@ -235,6 +247,32 @@ export default function TransactionShippedLayout() {
             </div>
         </div>
     );
+
+
+    if (isLoading) {
+        return <TransactionShippedSkeleton />;
+    }
+
+    if (filteredTransactions.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] text-gray-500">
+                <svg
+                    className="w-16 h-16 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                </svg>
+                <p className="text-lg font-medium">Tidak ada transaksi yang dikirim</p>
+            </div>
+        );
+    }
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
@@ -442,9 +480,10 @@ export default function TransactionShippedLayout() {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-gray-500">Status:</span>
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedTransaction.status === 'success' ? 'bg-green-100 text-green-700' :
-                                                        selectedTransaction.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-red-100 text-red-700'
+                                                    <span className={`font-medium px-3 py-1 rounded-full text-sm capitalize 
+                                                        ${selectedTransaction.status === 'success' ? 'bg-green-100 text-green-700' :
+                                                            selectedTransaction.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                                                'bg-red-100 text-red-700'
                                                         }`}>
                                                         {selectedTransaction.status.toUpperCase()}
                                                     </span>
@@ -520,8 +559,22 @@ export default function TransactionShippedLayout() {
                                             <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Status Pengiriman</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-                                                        {selectedTransaction.statusDelivery || 'N/A'}
+                                                    <span className={`font-medium px-3 py-1 rounded-full text-sm capitalize 
+                                                        ${selectedTransaction.statusDelivery === 'pending'
+                                                            ? 'bg-amber-100 text-amber-800'
+                                                            : selectedTransaction.statusDelivery === 'processing'
+                                                                ? 'bg-blue-100 text-blue-800'
+                                                                : selectedTransaction.statusDelivery === 'shipping'
+                                                                    ? 'bg-indigo-100 text-indigo-800'
+                                                                    : selectedTransaction.statusDelivery === 'delivery'
+                                                                        ? 'bg-purple-100 text-purple-800'
+                                                                        : selectedTransaction.statusDelivery === 'completed'
+                                                                            ? 'bg-green-100 text-green-800'
+                                                                            : selectedTransaction.statusDelivery === 'canceled'
+                                                                                ? 'bg-red-100 text-red-800'
+                                                                                : 'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {selectedTransaction.statusDelivery}
                                                     </span>
                                                 </div>
                                             </div>
@@ -583,9 +636,20 @@ export default function TransactionShippedLayout() {
                                             <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Status Pengiriman</span>
-                                                    <span className={`font-medium px-3 py-1 rounded-full text-sm capitalize ${selectedTransaction.statusDelivery === 'pending'
-                                                        ? 'bg-amber-100 text-amber-800'
-                                                        : 'bg-green-100 text-green-800'
+                                                    <span className={`font-medium px-3 py-1 rounded-full text-sm capitalize 
+                                                        ${selectedTransaction.statusDelivery === 'pending'
+                                                            ? 'bg-amber-100 text-amber-800'
+                                                            : selectedTransaction.statusDelivery === 'processing'
+                                                                ? 'bg-blue-100 text-blue-800'
+                                                                : selectedTransaction.statusDelivery === 'shipping'
+                                                                    ? 'bg-indigo-100 text-indigo-800'
+                                                                    : selectedTransaction.statusDelivery === 'delivery'
+                                                                        ? 'bg-purple-100 text-purple-800'
+                                                                        : selectedTransaction.statusDelivery === 'completed'
+                                                                            ? 'bg-green-100 text-green-800'
+                                                                            : selectedTransaction.statusDelivery === 'canceled'
+                                                                                ? 'bg-red-100 text-red-800'
+                                                                                : 'bg-gray-100 text-gray-800'
                                                         }`}>
                                                         {selectedTransaction.statusDelivery}
                                                     </span>
