@@ -48,11 +48,7 @@ export default function MainNav() {
         <header className='w-full sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-100 z-50'>
             <div className='container px-4 lg:px-8'>
                 <nav className='flex items-center justify-between h-20'>
-                    <Link
-                        href="/"
-                        className="font-bold text-xl text-gray-800 hover:text-primary transition-colors"
-                        aria-label="Space Digitalia - Home"
-                    >
+                    <Link href="/" className="font-bold text-xl text-gray-800 hover:text-primary transition-colors">
                         <svg
                             width="200"
                             height="60"
@@ -60,15 +56,12 @@ export default function MainNav() {
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                             className="w-auto h-12"
-                            role="img"
-                            aria-labelledby="logo-title"
                         >
                             <path
                                 d="M20 30C20 21.7157 26.7157 15 35 15H205C213.284 15 220 21.7157 220 30C220 38.2843 213.284 45 205 45H35C26.7157 45 20 38.2843 20 30Z"
                                 fill="currentColor"
                             />
                             <text
-                                id="logo-title"
                                 x="120"
                                 y="36"
                                 textAnchor="middle"
@@ -85,13 +78,17 @@ export default function MainNav() {
                             <li key={index}>
                                 <Link
                                     href={item.href}
-                                    className={`text-gray-600 hover:text-primary transition-all font-medium text-[15px] relative group
-                                        ${isActiveLink(item.href) ? 'text-primary' : ''}`}
+                                    className={`relative px-3 py-2 text-[15px] font-semibold transition-all duration-300 group
+                                        ${isActiveLink(item.href)
+                                            ? 'text-primary'
+                                            : 'text-gray-800 hover:text-primary'}`}
                                 >
                                     {item.name}
-                                    <span className={`absolute left-0 -bottom-1.5 h-0.5 bg-primary/80 transition-all duration-300 ease-out
-                                        ${isActiveLink(item.href) ? 'w-full' : 'w-0 group-hover:w-full'}`}>
-                                    </span>
+                                    <span className={`absolute bottom-0 left-1/2 w-1/2 h-0.5 bg-primary transform transition-transform duration-300 ease-out -translate-x-1/2
+                                        ${isActiveLink(item.href)
+                                            ? 'scale-x-100'
+                                            : 'scale-x-0 group-hover:scale-x-100'}`}
+                                    />
                                 </Link>
                             </li>
                         ))}
@@ -211,10 +208,10 @@ export default function MainNav() {
                                     <li key={index}>
                                         <Link
                                             href={item.href}
-                                            className={`flex items-center gap-3 px-8 py-4 transition-all
+                                            className={`flex items-center px-8 py-4 transition-all relative
                                                 ${isActiveLink(item.href)
-                                                    ? 'text-primary bg-gray-50/80'
-                                                    : 'text-gray-600 hover:text-primary hover:bg-gray-50/80'}`}
+                                                    ? 'text-primary font-semibold border-l-4 border-primary bg-primary/5'
+                                                    : 'text-gray-800 hover:text-primary hover:bg-gray-50 border-l-4 border-transparent'}`}
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             {item.name}

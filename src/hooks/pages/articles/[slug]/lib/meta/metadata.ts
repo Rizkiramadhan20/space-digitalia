@@ -75,6 +75,7 @@ export async function generateMetadata({
   return {
     title,
     description,
+    keywords: "Articles, SPACE DIGITALIA",
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL as string),
     alternates: {
       canonical: url,
@@ -109,6 +110,8 @@ export async function generateMetadata({
     other: {
       "google-tag-manager": process.env
         .NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string,
+      "google-site-verification": process.env
+        .NEXT_PUBLIC_GOOGLE_SEARCH_CONSOLE_ID as string,
       "json-ld": JSON.stringify(script.json),
     },
   };

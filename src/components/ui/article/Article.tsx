@@ -77,7 +77,7 @@ export default function Article() {
 
                 {topArticle && (
                     <div className="mb-20">
-                        <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                        <Link href={`/articles/${formatSlug(topArticle.category)}/${formatSlug(topArticle.slug)}`} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                                 <div className="relative h-[200px] sm:h-[400px] lg:h-full w-full overflow-hidden">
                                     <Image
@@ -119,26 +119,16 @@ export default function Article() {
                                                 <p className="text-sm text-gray-500">{topArticle?.author?.role}</p>
                                             </div>
                                         </div>
-
-                                        <Link
-                                            href={`/articles/${formatSlug(topArticle.category)}/${formatSlug(topArticle.slug)}`}
-                                            className="inline-flex items-center justify-center px-4 py-3 font-medium text-white bg-gray-900 rounded-lg transition duration-300 hover:bg-gray-800 hover:scale-102"
-                                        >
-                                            Read More
-                                            <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </Link>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {otherArticles.map((item, index) => (
-                        <Link href={`/articles/${item.slug}`} key={index} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                        <Link href={`/articles/${formatSlug(item.category)}/${formatSlug(item.slug)}`} key={index} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
                             <div className="relative h-64 overflow-hidden">
                                 <Image
                                     src={item?.thumbnail || ''}

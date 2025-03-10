@@ -1,7 +1,5 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-
 import Image from 'next/image'
 
 import Link from 'next/link'
@@ -12,11 +10,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 
 import banner from '@/base/assets/pages/articles/bg.jpg'
 
-import HeroArticleSkeleton from '@/hooks/pages/articles/articles/ArticlesSkelaton'
-
 export default function HeroProject() {
-    const [isLoading, setIsLoading] = useState(true);
-
     const { scrollY } = useScroll();
 
     const y = useTransform(scrollY, [0, 500], [0, 250]);
@@ -49,17 +43,6 @@ export default function HeroProject() {
             }
         }
     };
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, []);
-
-    if (isLoading) {
-        return <HeroArticleSkeleton />
-    }
 
     return (
         <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] overflow-hidden">
