@@ -1,4 +1,6 @@
 User-agent: *
+Disallow: /api/
+Disallow: /dashboard/
 Allow: /
 
 Sitemap: https://spacedigitalia.my.id/sitemap.xml

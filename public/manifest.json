@@ -3,17 +3,17 @@
   "name": "Space Digitalia",
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/logo.jpg",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "/favicon.ico",
+      "src": "/logo.jpg",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/favicon.ico",
+      "src": "/logo.jpg",
       "type": "image/png",
       "sizes": "512x512"
     }
@@ -28,10 +28,10 @@
     {
       "name": "Space Digitalia",
       "url": "/",
-      "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
+      "icons": [{ "src": "/logo.jpg", "sizes": "64x64" }]
     }
   ],
-  "sitemap.xml": "https://spacedigitalia.com/sitemap.xml",
+  "sitemap.xml": "https://spacedigitalia.my.id/sitemap.xml",
   "prefer_related_applications": false,
   "categories": [
     "space",
@@ -47,10 +47,10 @@
   ],
   "screenshots": [
     {
-      "src": "/favicon.ico",
+      "src": "/screenshots/home.png",
       "sizes": "1280x720",
       "type": "image/png"
     }
   ],
-  "description": "Space Digitalia"
+  "description": "Space Digitalia - Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik"
 }

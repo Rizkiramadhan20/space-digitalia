@@ -3,9 +3,45 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-       <loc>https://spacedigitalia.my.id/</loc>
-       <lastmod>2025-03-08T19:31:10+00:00</lastmod>
-       <changefreq>daily</changefreq>
-       <priority>1.0000</priority>
+    <loc>https://spacedigitalia.my.id/</loc>
+    <lastmod>2025-03-08T19:31:10+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
+
+  <url>
+    <loc>https://spacedigitalia.my.id/about</loc>
+    <lastmod>2025-03-08T19:31:10+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spacedigitalia.my.id/services</loc>
+    <lastmod>2025-03-08T19:31:10+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spacedigitalia.my.id/project</loc>
+    <lastmod>2025-03-08T19:31:10+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://spacedigitalia.my.id/articles</loc>
+    <lastmod>2025-03-08T19:31:10+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://spacedigitalia.my.id/contact</loc>
+    <lastmod>2025-03-08T19:31:10+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
 </urlset>
