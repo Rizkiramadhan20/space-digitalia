@@ -48,7 +48,11 @@ export default function MainNav() {
         <header className='w-full sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-100 z-50'>
             <div className='container px-4 lg:px-8'>
                 <nav className='flex items-center justify-between h-20'>
-                    <Link href="/" className="font-bold text-xl text-gray-800 hover:text-primary transition-colors">
+                    <Link
+                        href="/"
+                        className="font-bold text-xl text-gray-800 hover:text-primary transition-colors"
+                        aria-label="Space Digitalia - Home"
+                    >
                         <svg
                             width="200"
                             height="60"
@@ -56,12 +60,15 @@ export default function MainNav() {
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                             className="w-auto h-12"
+                            role="img"
+                            aria-labelledby="logo-title"
                         >
                             <path
                                 d="M20 30C20 21.7157 26.7157 15 35 15H205C213.284 15 220 21.7157 220 30C220 38.2843 213.284 45 205 45H35C26.7157 45 20 38.2843 20 30Z"
                                 fill="currentColor"
                             />
                             <text
+                                id="logo-title"
                                 x="120"
                                 y="36"
                                 textAnchor="middle"

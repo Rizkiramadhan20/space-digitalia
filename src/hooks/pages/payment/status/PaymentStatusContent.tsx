@@ -22,8 +22,7 @@ import {
     loadingSpinnerAnimations,
     backgroundAnimations,
     contentVariants,
-    itemVariants,
-    shineAnimation
+    itemVariants
 } from '@/hooks/pages/payment/status/lib/animation'
 
 export default function PaymentStatusContent({ transactionId }: PaymentStatusContentProps) {
@@ -399,7 +398,10 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                     className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 hover:scale-105
                                         ${isSuccess
                                             ? 'bg-gradient-to-br from-green-50 to-emerald-50/80 text-emerald-600'
-                                            : 'bg-gradient-to-br from-amber-50 to-yellow-50/80 text-amber-600'}`
+                                            : transaction.status === 'cancelled'
+                                                ? 'bg-gradient-to-br from-red-50 to-rose-50/80 text-red-600'
+                                                : 'bg-gradient-to-br from-amber-50 to-yellow-50/80 text-amber-600'
+                                        }`
                                     }
                                 >
                                     {isSuccess ? (
@@ -413,6 +415,15 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                             viewBox="0 0 24 24"
                                         >
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </motion.svg>
+                                    ) : transaction.status === 'cancelled' ? (
+                                        <motion.svg
+                                            className="w-7 h-7"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </motion.svg>
                                     ) : (
                                         <motion.svg
@@ -438,7 +449,12 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                         variants={itemVariants}
                                         className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3"
                                     >
-                                        {isSuccess ? 'Payment Successful!' : 'Payment Pending'}
+                                        {isSuccess
+                                            ? 'Payment Successful!'
+                                            : transaction.status === 'cancelled'
+                                                ? 'Payment Cancelled'
+                                                : 'Payment Pending'
+                                        }
                                     </motion.h1>
 
                                     <motion.p
@@ -447,7 +463,10 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                     >
                                         {isSuccess
                                             ? 'Great! Your payment has been successfully processed. You can now access your purchase.'
-                                            : 'Please complete your payment using the provided payment instructions.'}
+                                            : transaction.status === 'cancelled'
+                                                ? 'This payment has been cancelled. Please make a new order if you wish to continue.'
+                                                : 'Please complete your payment using the provided payment instructions.'
+                                        }
                                     </motion.p>
                                 </motion.div>
 
@@ -842,48 +861,6 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                     transition={{ duration: 0.6 }}
                                     whileHover={{ scale: 1.01 }}
                                 >
-                                    {/* Modern Gradient Background Animation */}
-                                    <motion.div
-                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                        initial={{ backgroundPosition: "0% 0%" }}
-                                        animate={{
-                                            backgroundPosition: ["0% 0%", "100% 100%"],
-                                            background: [
-                                                "linear-gradient(45deg, rgba(59, 130, 246, 0.03) 0%, rgba(147, 51, 234, 0.03) 100%)",
-                                                "linear-gradient(45deg, rgba(147, 51, 234, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%)"
-                                            ]
-                                        }}
-                                        transition={{
-                                            repeat: Infinity,
-                                            duration: 8,
-                                            ease: "linear",
-                                            repeatType: "reverse"
-                                        }}
-                                    />
-
-                                    {/* Floating Particles */}
-                                    <motion.div className="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                                        {[...Array(8)].map((_, i) => (
-                                            <motion.div
-                                                key={i}
-                                                className="absolute w-1 h-1 bg-blue-500/10 rounded-full"
-                                                initial={{
-                                                    x: Math.random() * 100 + "%",
-                                                    y: Math.random() * 100 + "%"
-                                                }}
-                                                animate={{
-                                                    y: ["-20%", "120%"],
-                                                    opacity: [0, 1, 0]
-                                                }}
-                                                transition={{
-                                                    duration: 2 + Math.random() * 2,
-                                                    repeat: Infinity,
-                                                    delay: Math.random() * 2
-                                                }}
-                                            />
-                                        ))}
-                                    </motion.div>
-
                                     {/* Content Items with Enhanced Stagger Effect */}
                                     <motion.div
                                         initial="hidden"
@@ -902,11 +879,10 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                         {/* Recipient Info */}
                                         <motion.div
                                             variants={{
-                                                hidden: { opacity: 0, x: -20, filter: "blur(8px)" },
+                                                hidden: { opacity: 0, x: -20 },
                                                 visible: {
                                                     opacity: 1,
                                                     x: 0,
-                                                    filter: "blur(0px)",
                                                     transition: {
                                                         type: "spring",
                                                         stiffness: 200,
@@ -945,11 +921,10 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                         {/* Phone Info */}
                                         <motion.div
                                             variants={{
-                                                hidden: { opacity: 0, x: -20, filter: "blur(8px)" },
+                                                hidden: { opacity: 0, x: -20 },
                                                 visible: {
                                                     opacity: 1,
                                                     x: 0,
-                                                    filter: "blur(0px)",
                                                     transition: {
                                                         type: "spring",
                                                         stiffness: 200,
@@ -989,11 +964,10 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                         {/* Shipping Address */}
                                         <motion.div
                                             variants={{
-                                                hidden: { opacity: 0, x: -20, filter: "blur(8px)" },
+                                                hidden: { opacity: 0, x: -20 },
                                                 visible: {
                                                     opacity: 1,
                                                     x: 0,
-                                                    filter: "blur(0px)",
                                                     transition: {
                                                         type: "spring",
                                                         stiffness: 200,
@@ -1051,17 +1025,6 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                             </motion.div>
                                         </motion.div>
                                     </motion.div>
-
-                                    {/* Modern Shine Effect */}
-                                    <motion.div
-                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none"
-                                        initial={{ rotate: -45, scale: 1.5 }}
-                                        animate={shineAnimation}
-                                        style={{
-                                            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
-                                            width: "50%"
-                                        }}
-                                    />
                                 </motion.div>
                             </motion.div>
                         )}

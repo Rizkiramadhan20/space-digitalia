@@ -6,7 +6,7 @@ export const navLink = [
 
   {
     name: "About Us",
-    href: "/about-us",
+    href: "/about",
   },
 
   {
@@ -26,6 +26,6 @@ export const navLink = [
 
   {
     name: "Contact Us",
-    href: "/contact-us",
+    href: "/contact",
   },
 ];

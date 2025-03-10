@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { collection, getDocs, query } from 'firebase/firestore'
+import { collection, getDocs, query, doc, updateDoc, serverTimestamp } from 'firebase/firestore'
 
 import { db } from '@/utils/firebase'
 
@@ -33,6 +33,9 @@ export default function TransactionPaidLayout() {
     // Add pagination states
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 9; // Show 9 items per page (3x3 grid)
+
+    // Add new state for handling status update
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const fetchSuccessTransactions = async () => {
@@ -151,6 +154,35 @@ export default function TransactionPaidLayout() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // Add function to handle status update
+    const handleStatusUpdate = async (newStatus: string) => {
+        if (!selectedTransaction) return;
+
+        setIsUpdating(true);
+        try {
+            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, selectedTransaction.orderId);
+            await updateDoc(transactionRef, {
+                statusDelivery: newStatus,
+                updatedAt: serverTimestamp()
+            });
+
+            // Update local state
+            setSuccessTransactions(prev => prev.map(tx =>
+                tx.orderId === selectedTransaction.orderId
+                    ? { ...tx, statusDelivery: newStatus }
+                    : tx
+            ));
+
+            // Update selected transaction
+            setSelectedTransaction(prev => prev ? { ...prev, statusDelivery: newStatus } : null);
+
+        } catch (error) {
+            console.error('Error updating status:', error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     if (isLoading) {
         return <TransactionPaidSkeleton />;
     }
@@ -251,7 +283,7 @@ export default function TransactionPaidLayout() {
                                         className="w-full px-4 py-2.5 bg-white/50 border-2 border-transparent hover:border-gray-200 rounded-2xl focus:outline-none focus:border-indigo-500/20 focus:bg-indigo-50/30 transition-all duration-300"
                                     />
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0118 0z" />
                                     </svg>
                                 </div>
                             </div>
@@ -410,7 +442,7 @@ export default function TransactionPaidLayout() {
             )}
 
             {isModalOpen && selectedTransaction && (
-                <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto" onClick={handleClickOutside}>
+                <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50" onClick={handleClickOutside}>
                     <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl transform transition-all my-4">
                         {/* Modal Header */}
                         <div className="p-4 sm:p-6 border-b">
@@ -498,21 +530,41 @@ export default function TransactionPaidLayout() {
                                     </div>
                                     <div className="bg-gray-50 p-3 sm:p-4 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                                         <span className="text-sm font-medium text-gray-500 block mb-1">Status Delivery</span>
-                                        <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${selectedTransaction.statusDelivery === 'completed'
-                                            ? 'bg-green-50 text-green-700 border border-green-200'
-                                            : selectedTransaction.statusDelivery === 'delivered'
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                : selectedTransaction.statusDelivery === 'shipping'
-                                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                                    : selectedTransaction.statusDelivery === 'processing'
-                                                        ? 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                                                        : selectedTransaction.statusDelivery === 'pending'
-                                                            ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                                                            : 'bg-red-50 text-red-700 border border-red-200'
-                                            }`}>
-                                            {selectedTransaction.statusDelivery?.charAt(0).toUpperCase() +
-                                                selectedTransaction.statusDelivery?.slice(1) || 'N/A'}
-                                        </span>
+                                        {
+                                            selectedTransaction.statusDelivery ?
+                                                <div className="relative">
+                                                    <select
+                                                        value={selectedTransaction.statusDelivery || 'pending'}
+                                                        onChange={(e) => handleStatusUpdate(e.target.value)}
+                                                        disabled={isUpdating}
+                                                        className={`w-full px-3 py-2 rounded-lg border ${isUpdating
+                                                            ? 'bg-gray-100 cursor-not-allowed'
+                                                            : 'bg-white hover:border-indigo-500 focus:border-indigo-500'
+                                                            } transition-colors duration-200`}
+                                                    >
+                                                        {[
+                                                            { value: 'pending', label: '🕒 Pending' },
+                                                            { value: 'processing', label: '⚙️ Processing' },
+                                                            { value: 'shipping', label: '🚚 Shipping' },
+                                                            { value: 'delivered', label: '📦 Delivered' },
+                                                            { value: 'completed', label: '✅ Completed' },
+                                                            { value: 'cancelled', label: '❌ Cancelled' }
+                                                        ].map((status) => (
+                                                            <option key={status.value} value={status.value}>
+                                                                {status.label}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    {isUpdating && (
+                                                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-500 border-t-transparent"></div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                :
+                                                <span className="font-semibold text-red-500">N/A</span>
+                                        }
+
                                     </div>
                                 </div>
 

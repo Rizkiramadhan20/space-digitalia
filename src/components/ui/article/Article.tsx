@@ -18,6 +18,8 @@ import Image from 'next/image';
 
 import Link from 'next/link';
 
+import { formatSlug } from '@/base/helper/formatSlug';
+
 export default function Article() {
     const [article, setArticle] = useState<ArticleType[]>([]);
     const [loading, setLoading] = useState(true);
@@ -119,7 +121,7 @@ export default function Article() {
                                         </div>
 
                                         <Link
-                                            href={`/articles/${topArticle.slug}`}
+                                            href={`/articles/${formatSlug(topArticle.category)}/${formatSlug(topArticle.slug)}`}
                                             className="inline-flex items-center justify-center px-4 py-3 font-medium text-white bg-gray-900 rounded-lg transition duration-300 hover:bg-gray-800 hover:scale-102"
                                         >
                                             Read More

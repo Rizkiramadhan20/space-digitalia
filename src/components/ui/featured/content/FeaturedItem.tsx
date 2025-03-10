@@ -21,7 +21,7 @@ export default function FeaturedItem({ item }: FeaturedItemProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-                <h3 className='text-lg font-semibold text-gray-800 line-clamp-2'>{item.title}</h3>
+                <h2 className='text-lg font-semibold text-gray-800 line-clamp-2'>{item.title}</h2>
                 <p className='text-sm text-gray-600 line-clamp-3'>{item.text}</p>
             </div>
         </div>

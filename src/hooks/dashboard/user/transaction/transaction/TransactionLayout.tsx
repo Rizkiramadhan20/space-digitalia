@@ -32,13 +32,19 @@ export default function TransactionLayout() {
 
         if (filters.status.length > 0) {
             filtered = filtered.filter(transaction =>
-                filters.status.includes(transaction.status)
+                filters.status.includes(transaction.status === 'canceled' ? 'cancelled' : transaction.status)
             );
         }
 
         if (filters.paymentMethod.length > 0) {
             filtered = filtered.filter(transaction =>
                 filters.paymentMethod.includes(transaction.deliveryMethod)
+            );
+        }
+
+        if (filters.paymentType.length > 0) {
+            filtered = filtered.filter(transaction =>
+                filters.paymentType.includes(transaction.paymentMethod)
             );
         }
 
@@ -98,7 +104,7 @@ export default function TransactionLayout() {
                             {[
                                 { id: 'pending', icon: '🕒', label: 'Pending' },
                                 { id: 'success', icon: '✅', label: 'Success' },
-                                { id: 'failed', icon: '❌', label: 'Failed' }
+                                { id: 'cancelled', icon: '❌', label: 'Cancelled' }
                             ].map(({ id, icon, label }) => (
                                 <div
                                     key={id}
@@ -668,17 +674,21 @@ export default function TransactionLayout() {
                                         Aksi Cepat
                                     </h3>
                                     <div className="flex flex-wrap gap-4">
-                                        <a
-                                            href={selectedTransaction.downloadUrl || ''}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            Download Project
-                                        </a>
+                                        {
+                                            selectedTransaction.downloadUrl && selectedTransaction.status !== 'cancelled' && (
+                                                <a
+                                                    href={selectedTransaction.downloadUrl || ''}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                    </svg>
+                                                    Download Project
+                                                </a>
+                                            )
+                                        }
                                         {selectedTransaction && (
                                             <PDFDownloadLink
                                                 document={<TransactionPDF transaction={selectedTransaction} />}

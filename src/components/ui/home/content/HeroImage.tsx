@@ -15,6 +15,9 @@ export default function HeroImage({ image }: HeroImageProps) {
                 alt={image.title}
                 className='object-cover w-full h-full'
                 priority
+                sizes="(min-width: 1280px) 80vw, 100vw"
+                quality={100}
+                loading="eager"
             />
         </div>
     );

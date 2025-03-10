@@ -51,13 +51,15 @@ export default function TransactionLayout() {
                 ...doc.data()
             })) as Transaction[]
 
-            // Sort transactions by createdAt in descending order (newest first)
-            const sortedTransactions = transactionData.sort((a, b) =>
-                b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime()
-            )
+            // Filter out cancelled transactions and sort by createdAt
+            const filteredAndSortedTransactions = transactionData
+                .filter(transaction => transaction.status !== 'cancelled')
+                .sort((a, b) =>
+                    b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime()
+                )
 
-            setTransactions(sortedTransactions)
-            setFilteredTransactions(sortedTransactions)
+            setTransactions(filteredAndSortedTransactions)
+            setFilteredTransactions(filteredAndSortedTransactions)
         })
 
         return () => unsubscribe()
@@ -90,7 +92,6 @@ export default function TransactionLayout() {
                             {[
                                 { id: 'pending', icon: '🕒', label: 'Pending' },
                                 { id: 'success', icon: '✅', label: 'Success' },
-                                { id: 'failed', icon: '❌', label: 'Failed' }
                             ].map(({ id, icon, label }) => (
                                 <div
                                     key={id}
@@ -532,11 +533,12 @@ export default function TransactionLayout() {
                                                 </div>
                                                 <div className="bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                                                     <span className="text-sm font-medium text-gray-500 block mb-1">Status Transaksi</span>
-                                                    <span className={`font-semibold ${selectedTransaction.status === 'success' ? 'text-green-600' :
-                                                        selectedTransaction.status === 'pending' ? 'text-yellow-600' :
-                                                            'text-red-600'
+                                                    <span className={`font-semibold ${selectedTransaction.paymentDetails.transaction_status === 'settlement' ? 'text-green-600' :
+                                                        selectedTransaction.paymentDetails.transaction_status === 'pending' ? 'text-yellow-600' :
+                                                            selectedTransaction.paymentDetails.transaction_status === 'cancelled' ? 'text-red-600' :
+                                                                'text-red-600'
                                                         }`}>
-                                                        {selectedTransaction.status}
+                                                        {selectedTransaction.paymentDetails.transaction_status}
                                                     </span>
                                                 </div>
                                             </div>
@@ -660,17 +662,6 @@ export default function TransactionLayout() {
                                         Aksi Cepat
                                     </h3>
                                     <div className="flex flex-wrap gap-4">
-                                        <a
-                                            href={selectedTransaction.downloadUrl || ''}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            Download Project
-                                        </a>
                                         {selectedTransaction && (
                                             <PDFDownloadLink
                                                 document={<TransactionPDF transaction={selectedTransaction} />}
