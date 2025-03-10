@@ -10,7 +10,6 @@ import Image from 'next/image'
 
 import { useAuth } from '@/utils/context/AuthContext'
 
-// Interface untuk data transaksi
 interface Transaction {
     id: string;
     amount: number;

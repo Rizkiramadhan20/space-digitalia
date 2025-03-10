@@ -152,7 +152,7 @@ export default function CheckoutContent() {
     // Add Midtrans script when component mounts
     useEffect(() => {
         const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js'
-        const midtransClientKey = process.env.MIDTRANS_CLIENT_KEY
+        const midtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
 
         const scriptElement = document.createElement('script')
         scriptElement.src = midtransScriptUrl
