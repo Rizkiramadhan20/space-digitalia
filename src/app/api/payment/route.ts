@@ -103,6 +103,7 @@ export async function POST(request: Request) {
       redirectUrl: midtransResponse.redirect_url,
       userEmail: body.userEmail,
       userName: body.userName,
+      userPhotoURL: body.userPhotoURL,
       linkTransaction: `${process.env.NEXT_PUBLIC_URL}/payment/status/${orderId}`,
     };
 

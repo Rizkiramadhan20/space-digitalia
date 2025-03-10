@@ -2,7 +2,7 @@ import React from 'react';
 
 import Image from 'next/image';
 
-import { TransactionCardProps } from '@/hooks/dashboard/user/transaction/canceled/lib/schema';
+import { TransactionCardProps } from '@/hooks/dashboard/user/transaction/cancelled/lib/schema';
 
 export default function TransactionCard({ transaction, onViewDetails, onDelete }: TransactionCardProps) {
     return (

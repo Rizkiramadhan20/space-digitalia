@@ -233,6 +233,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                 userEmail: user.email,
                 userName: user.displayName,
                 imageUrl: selectedPreview.imageUrl,
+                userPhotoURL: user?.photoURL ?? null,
                 downloadUrl: deliveryMethod === 'download' ? selectedLicense.downloadUrl : undefined,
                 ...(deliveryMethod === 'delivery' && defaultAddress && {
                     deliveryAddress: {

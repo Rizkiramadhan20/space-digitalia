@@ -48,6 +48,7 @@ export interface TransactionData {
   userName: string;
   downloadUrl?: string | null;
   imageUrl?: string;
+  userPhotoURL: string;
   paymentDetails?: PaymentDetails;
   paymentMethod: string;
   deliveryAddress?: DeliveryAddress;

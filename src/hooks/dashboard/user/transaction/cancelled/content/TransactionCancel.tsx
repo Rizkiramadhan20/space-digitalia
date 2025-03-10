@@ -10,19 +10,19 @@ import { useAuth } from '@/utils/context/AuthContext'
 
 import toast from 'react-hot-toast'
 
-import TransactionCanceledSkeleton from '@/hooks/dashboard/user/transaction/canceled/TransactionCanceledSkelaton'
+import TransactionCanceledSkeleton from '@/hooks/dashboard/user/transaction/cancelled/TransactionCanceledSkelaton'
 
-import { Transaction } from '@/hooks/dashboard/user/transaction/canceled/lib/schema'
+import { Transaction } from '@/hooks/dashboard/user/transaction/cancelled/lib/schema'
 
-import TransactionList from '@/hooks/dashboard/user/transaction/canceled/content/TransactionListCancel'
+import TransactionList from '@/hooks/dashboard/user/transaction/cancelled/content/TransactionListCancel'
 
-import DeleteConfirmationModal from '@/hooks/dashboard/user/transaction/canceled/content/DeleteModal'
+import DeleteConfirmationModal from '@/hooks/dashboard/user/transaction/cancelled/content/DeleteModal'
 
-import TransactionDetailsModal from '@/hooks/dashboard/user/transaction/canceled/content/TransactionDetailsModal'
+import TransactionDetailsModal from '@/hooks/dashboard/user/transaction/cancelled/content/TransactionDetailsModal'
 
-import Header from '@/hooks/dashboard/user/transaction/canceled/content/HeaderCancel'
+import Header from '@/hooks/dashboard/user/transaction/cancelled/content/HeaderCancel'
 
-import EmptyState from '@/hooks/dashboard/user/transaction/canceled/content/EmpatyState'
+import EmptyState from '@/hooks/dashboard/user/transaction/cancelled/content/EmpatyState'
 
 export default function TransactionCanceledLayout() {
     const { user } = useAuth()

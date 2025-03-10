@@ -183,17 +183,38 @@ export default function TransactionFreeLayout() {
                             {/* Info Grid */}
                             <div className="space-y-3">
                                 {/* User Info */}
-                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                    <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
+                                <div className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 transition-all duration-200 rounded-lg">
+                                    <div className="relative flex-shrink-0 w-10 h-10">
+                                        {transaction.userPhotoURL ? (
+                                            <Image
+                                                src={transaction.userPhotoURL}
+                                                alt={transaction.userName}
+                                                fill
+                                                className="object-cover rounded-full ring-2 ring-white shadow-sm"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-indigo-50 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
+                                                <svg
+                                                    className="w-5 h-5 text-indigo-500"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth="2"
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors duration-200">
                                             {transaction.userName}
                                         </p>
-                                        <p className="text-sm text-gray-500 truncate">
+                                        <p className="text-xs text-gray-500 truncate">
                                             {transaction.userEmail}
                                         </p>
                                     </div>

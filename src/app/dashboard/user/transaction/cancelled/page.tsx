@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Metadata } from 'next'
 
-import TransactionCanceledLayout from "@/hooks/dashboard/user/transaction/canceled/TransactionCanceledLayout"
+import TransactionCanceledLayout from "@/hooks/dashboard/user/transaction/cancelled/TransactionCanceledLayout"
 
 export const metadata: Metadata = {
     title: 'Transaksi Dibatalkan | SPACE DIGITALIA',

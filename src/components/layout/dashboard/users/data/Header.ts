@@ -19,7 +19,7 @@ export const menuItems = [
       { label: "Transaksi Berbayar", href: "/dashboard/user/transaction/paid" },
       { label: "Belum Dibayar", href: "/dashboard/user/transaction/unpaid" },
       { label: "Dikirim", href: "/dashboard/user/transaction/shipped" },
-      { label: "Dibatalkan", href: "/dashboard/user/transaction/canceled" },
+      { label: "Dibatalkan", href: "/dashboard/user/transaction/cancelled" },
       { label: "Selesai", href: "/dashboard/user/transaction/completed" },
     ],
   },

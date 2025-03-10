@@ -325,16 +325,21 @@ export default function TransactionLayout() {
                             {/* User Info */}
                             <div className="pt-4 border-t border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <span className="text-indigo-600 font-medium text-sm">
-                                            {transaction.userName.charAt(0)}
-                                        </span>
+                                    {/* User Avatar */}
+                                    <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-indigo-100 shadow-sm">
+                                        <Image
+                                            src={transaction.userPhotoURL}
+                                            alt={transaction.userName}
+                                            fill
+                                            className="object-cover"
+                                        />
                                     </div>
+                                    {/* User Details */}
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
                                             {transaction.userName}
                                         </p>
-                                        <p className="text-xs text-gray-500 truncate">
+                                        <p className="text-xs text-gray-500 truncate group-hover:text-gray-600 transition-colors">
                                             {transaction.userEmail}
                                         </p>
                                     </div>
@@ -445,36 +450,62 @@ export default function TransactionLayout() {
                                 {/* Information Grid */}
                                 <div className="grid grid-cols-2 gap-6">
                                     {/* User Information */}
-                                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300">
-                                        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                            Informasi Pengguna
-                                        </h3>
-                                        <div className="space-y-4">
-                                            <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Nama</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-                                                        {selectedTransaction.userName}
-                                                    </span>
+                                    <div className="bg-gradient-to-br from-white to-indigo-50/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                                        {/* Background Pattern */}
+                                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+                                            <div className="absolute inset-0" style={{
+                                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                                            }} />
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="relative">
+                                            <h3 className="text-lg font-semibold mb-8 flex items-center gap-2">
+                                                <span className="bg-indigo-600 text-white p-2 rounded-lg shadow-md">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                </span>
+                                                <span className="bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+                                                    User Information
+                                                </span>
+                                            </h3>
+
+                                            <div className="flex items-center gap-6">
+                                                {/* User Photo */}
+                                                <div className="relative w-32 h-32 rounded-2xl overflow-hidden shadow-lg border-4 border-white">
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent" />
+                                                    <Image
+                                                        src={selectedTransaction.userPhotoURL}
+                                                        alt={selectedTransaction.userName}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
                                                 </div>
-                                            </div>
-                                            <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Email</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-                                                        {selectedTransaction.userEmail}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Users I</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 text-sm">
-                                                        {selectedTransaction.userId}
-                                                    </span>
+
+                                                {/* User Details */}
+                                                <div className="flex-1 space-y-4">
+                                                    <div className="space-y-1">
+                                                        <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
+                                                            FULL NAME
+                                                        </span>
+                                                        <div className="bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl shadow-sm border border-indigo-100/50">
+                                                            <span className="font-semibold text-gray-800">
+                                                                {selectedTransaction.userName}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-1">
+                                                        <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
+                                                            EMAIL ADDRESS
+                                                        </span>
+                                                        <div className="bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl shadow-sm border border-indigo-100/50">
+                                                            <span className="font-medium text-gray-600">
+                                                                {selectedTransaction.userEmail}
+                                                            </span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -549,6 +580,7 @@ export default function TransactionLayout() {
                                                     <span className="text-sm font-medium text-gray-500 block mb-1">Order ID</span>
                                                     <span className="font-mono font-semibold text-gray-800">{selectedTransaction.orderId}</span>
                                                 </div>
+
                                                 <div className="bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                                                     <span className="text-sm font-medium text-gray-500 block mb-1">Amount</span>
                                                     <span className="font-semibold text-gray-800">Rp {selectedTransaction.amount.toLocaleString()}</span>

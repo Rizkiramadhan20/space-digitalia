@@ -53,6 +53,7 @@ export interface Transaction {
   transactionId: string;
   updatedAt: Timestamp;
   userEmail: string;
+  userPhotoURL: string;
   userId: string;
   userName: string;
 }

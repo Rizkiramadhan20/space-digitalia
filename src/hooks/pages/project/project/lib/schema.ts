@@ -26,6 +26,7 @@ export interface ProjectType {
   updatedAt: Timestamp;
   delivery: number;
   downloads: number;
+  photoURL: string;
   images: string[];
   frameworks: Framework[];
   licenseDetails: {
@@ -43,6 +44,7 @@ export interface ProjectType {
   stock: number;
   typeCategory: string;
   typeTitle: string;
+  userPhotoURL: string;
   lastViewed: string;
 }
 
@@ -82,6 +84,7 @@ export interface PaymentData {
   deliveryMethod: "download" | "delivery";
   userEmail: string;
   userName: string;
+  userPhotoURL: string | null;
   downloadUrl?: string;
   imageUrl?: string;
   // Add address fields

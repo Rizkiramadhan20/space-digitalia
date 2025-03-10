@@ -347,16 +347,38 @@ export default function TransactionPaidLayout() {
                             <div className="space-y-3">
                                 {/* User Info */}
                                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                    <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
+                                    <div className="flex-shrink-0 w-10 h-10 relative">
+                                        {transaction.userPhotoURL ? (
+                                            <Image
+                                                src={transaction.userPhotoURL}
+                                                alt={transaction.userName}
+                                                fill
+                                                className="object-cover rounded-full ring-2 ring-white shadow-sm"
+                                                sizes="40px"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
+                                                <svg
+                                                    className="w-5 h-5 text-indigo-500"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth="2"
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors duration-200">
                                             {transaction.userName}
                                         </p>
-                                        <p className="text-sm text-gray-500 truncate">
+                                        <p className="text-xs text-gray-500 truncate mt-0.5">
                                             {transaction.userEmail}
                                         </p>
                                     </div>
@@ -580,10 +602,22 @@ export default function TransactionPaidLayout() {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
                                             <div className="col-span-2 bg-indigo-50 p-3 sm:p-4 rounded-xl">
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                        </svg>
+                                                    <div className="relative w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center overflow-hidden">
+                                                        {
+                                                            selectedTransaction.userPhotoURL ? (
+                                                                <Image
+                                                                    src={selectedTransaction.userPhotoURL}
+                                                                    alt={selectedTransaction.userName}
+                                                                    fill
+                                                                    sizes="32px"
+                                                                    className="object-cover"
+                                                                />
+                                                            ) : (
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                                </svg>
+                                                            )
+                                                        }
                                                     </div>
                                                     <div>
                                                         <p className="font-semibold text-gray-800">{selectedTransaction.deliveryAddress.fullName}</p>

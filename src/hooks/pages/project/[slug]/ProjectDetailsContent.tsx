@@ -336,6 +336,7 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                 updatedAt: Timestamp.now(),
                 userEmail: user?.email,
                 userName: user?.displayName,
+                userPhotoURL: user?.photoURL ?? null,
                 paymentDetails: {
                     transaction_status: "success",
                     status_message: "Free transaction completed successfully",

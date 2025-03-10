@@ -2,7 +2,7 @@ import React from 'react';
 
 import Image from 'next/image';
 
-import { TransactionDetailsModalProps } from '@/hooks/dashboard/user/transaction/canceled/lib/schema';
+import { TransactionDetailsModalProps } from '@/hooks/dashboard/user/transaction/cancelled/lib/schema';
 
 export default function TransactionDetailsModal({ transaction, onClose }: TransactionDetailsModalProps) {
     const handleClickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -200,7 +200,7 @@ export default function TransactionDetailsModal({ transaction, onClose }: Transa
                                 <div className="flex items-center p-3 rounded-lg hover:bg-gray-50/80 transition-colors duration-200">
                                     <dt className="flex-1 text-sm text-gray-600">Payment Type</dt>
                                     <dd className="inline-flex px-2.5 py-1 text-sm font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-100">
-                                        {transaction.paymentDetails.payment_type.toUpperCase()}
+                                        {transaction.paymentDetails?.payment_type?.toUpperCase() || 'N/A'}
                                     </dd>
                                 </div>
 

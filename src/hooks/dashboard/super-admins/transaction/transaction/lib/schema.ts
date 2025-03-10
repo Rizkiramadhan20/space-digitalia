@@ -38,6 +38,7 @@ export interface Transaction {
   paymentToken: string;
   projectId: string;
   projectTitle: string;
+  userPhotoURL: string;
   redirectUrl: string;
   status: string;
   statusDelivery: string;

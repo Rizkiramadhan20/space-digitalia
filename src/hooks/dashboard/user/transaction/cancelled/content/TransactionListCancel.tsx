@@ -1,8 +1,8 @@
 import React from 'react';
 
-import TransactionCard from '@/hooks/dashboard/user/transaction/canceled/content/TransactionCard';
+import TransactionCard from '@/hooks/dashboard/user/transaction/cancelled/content/TransactionCard';
 
-import { TransactionListProps } from '@/hooks/dashboard/user/transaction/canceled/lib/schema';
+import { TransactionListProps } from '@/hooks/dashboard/user/transaction/cancelled/lib/schema';
 
 export default function TransactionList({ transactions, onViewDetails, onDelete }: TransactionListProps) {
     return (

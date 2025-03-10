@@ -1,16 +1,16 @@
 import { Timestamp } from "firebase/firestore";
 
 export interface Transaction {
-  amount: number;
+  id: string;
+  status: string;
+  amount: string;
   createdAt: Timestamp;
-  deliveryAddress: null;
   deliveryMethod: string;
-  downloadUrl: string;
   imageUrl: string;
-  isProcessing: boolean;
   licenseType: string;
   linkTransaction: string;
   orderId: string;
+  downloadUrl: string;
   paymentDetails: {
     fraud_status: string;
     gross_amount: string;
@@ -21,15 +21,32 @@ export interface Transaction {
     transaction_id: string;
     transaction_status: string;
     transaction_time: string;
+    va_numbers: {
+      bank: string;
+      va_number: string;
+    }[];
   };
   paymentMethod: string;
+  paymentToken: string;
   projectId: string;
+  statusDelivery: string;
+  deliveryAddress: {
+    city: string;
+    details: string;
+    district: string;
+    fullName: string;
+    phone: string;
+    postalCode: string;
+    province: string;
+    streetAddress: string;
+  };
   projectTitle: string;
-  status: string;
   transactionId: string;
   updatedAt: Timestamp;
   userEmail: string;
-  userId: string;
-  userPhotoURL: string;
   userName: string;
+  review?: string;
+  ratedAt?: Date;
+  ratedBy?: string;
+  rating?: number;
 }

@@ -154,6 +154,7 @@ export async function POST(request: Request) {
       updatedAt: Timestamp.now(),
       userEmail: body.userEmail,
       userName: body.userName,
+      userPhotoURL: body.userPhotoURL,
       paymentDetails: {
         transaction_status: "success",
         status_message: "Free transaction completed successfully",

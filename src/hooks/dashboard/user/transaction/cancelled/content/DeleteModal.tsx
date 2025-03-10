@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DeleteConfirmationModalProps } from '@/hooks/dashboard/user/transaction/canceled/lib/schema';
+import { DeleteConfirmationModalProps } from '@/hooks/dashboard/user/transaction/cancelled/lib/schema';
 
 export default function DeleteConfirmationModal({ isDeleting, onCancel, onConfirm }: DeleteConfirmationModalProps) {
     return (

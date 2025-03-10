@@ -229,6 +229,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                 amount: Math.round(selectedLicense.price),
                 projectTitle: selectedPreview.title,
                 licenseType: selectedLicense.title,
+                userPhotoURL: user.photoURL || null,
                 deliveryMethod: deliveryMethod,
                 userEmail: user.email,
                 userName: user.displayName,

@@ -679,6 +679,78 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                                 </div>
                             )}
 
+                            {/* User Profile Card */}
+                            <motion.div
+                                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 gap-4 bg-gradient-to-br from-white/40 to-white/80 rounded-2xl border border-white/60 shadow-sm hover:shadow-md transition-all duration-300"
+                                variants={{
+                                    hidden: { opacity: 0, x: -20 },
+                                    visible: {
+                                        opacity: 1,
+                                        x: 0,
+                                        transition: { type: "spring", stiffness: 100 }
+                                    }
+                                }}
+                                whileHover={{ scale: 1.01 }}
+                            >
+                                <div className="flex items-center gap-5 w-full">
+                                    {transaction.userPhotoURL ? (
+                                        <motion.div
+                                            className="relative group"
+                                            whileHover={{ scale: 1.05 }}
+                                        >
+                                            <div className="relative w-14 h-14 rounded-full overflow-hidden ring-2 ring-white/80 ring-offset-2 ring-offset-white/40">
+                                                <Image
+                                                    src={transaction.userPhotoURL}
+                                                    alt={transaction.userName || "User photo"}
+                                                    fill
+                                                    className="object-cover transform transition-transform duration-300 group-hover:scale-110"
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            className="relative w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center ring-2 ring-white/80 ring-offset-2 ring-offset-white/40"
+                                            whileHover={{ scale: 1.05 }}
+                                        >
+                                            <span className="text-xl font-medium text-blue-600">
+                                                {transaction.userName?.charAt(0) || '?'}
+                                            </span>
+                                        </motion.div>
+                                    )}
+
+                                    <div className="flex flex-col flex-grow">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <motion.span
+                                                className="text-gray-900 font-semibold tracking-wide group-hover:text-blue-600 transition-colors duration-300"
+                                                whileHover={{ scale: 1.02 }}
+                                            >
+                                                {transaction.userName}
+                                            </motion.span>
+
+                                            {/* Verified badge if needed */}
+                                            <motion.div
+                                                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium"
+                                                whileHover={{ scale: 1.05 }}
+                                            >
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                                <span>Verified</span>
+                                            </motion.div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="text-gray-500 text-sm font-medium">
+                                                {transaction.userEmail}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+
                             {/* Transaction Details */}
                             <motion.div
                                 className="flex flex-col divide-y divide-gray-100"
@@ -695,10 +767,7 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                             >
                                 {/* Transaction Detail Items */}
                                 {[
-                                    { label: "Order ID", value: transaction.orderId, isMono: true },
                                     { label: "Transaction ID", value: transaction.transactionId, isMono: true },
-                                    { label: "User Name", value: transaction.userName },
-                                    { label: "Email", value: transaction.userEmail },
                                     {
                                         label: "Status",
                                         value: transaction.paymentDetails?.status_message || transaction.status,

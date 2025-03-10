@@ -261,6 +261,7 @@ export default function ProjectLayout() {
                 deliveryMethod: deliveryMethod,
                 userEmail: user.email,
                 userName: user.displayName,
+                userPhotoURL: user.photoURL ?? null,
                 imageUrl: selectedPreview.imageUrl,
                 downloadUrl: deliveryMethod === 'download' ? selectedLicense.downloadUrl : undefined,
                 // Add delivery address if delivery method is selected
@@ -477,6 +478,7 @@ export default function ProjectLayout() {
                     imageUrl: selectedPreview.imageUrl,
                     userEmail: user.email,
                     userName: user.displayName,
+                    userPhotoURL: user.photoURL ?? null, // Add this line
                     deliveryAddress: deliveryMethod === 'delivery' ? defaultAddress : null,
                 }),
             });
