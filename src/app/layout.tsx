@@ -1,8 +1,13 @@
-import { metadata } from "@/base/meta/Metadata";
+import { metadata } from "@/base/meta/metadata";
+
 import "@/base/style/globals.css";
+
 import Providers from "@/base/router/Provider";
+
 import Pathname from "@/base/router/Pathname";
+
 import { openSans } from "@/base/fonts/Fonts";
+
 import Script from "next/script";
 
 metadata.manifest = "/manifest.json";
@@ -15,7 +20,7 @@ export default function RootLayout({
   const GTM_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string;
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head>
         {/* Google Tag Manager */}
         {GTM_ID && (
@@ -27,28 +32,28 @@ export default function RootLayout({
         )}
 
         {/* JSON-LD Schema.org */}
-        <Script id="json-ld-product" type="application/ld+json" strategy="afterInteractive">
+        <Script id="json-ld-organization" type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Product",
+            "@type": "Organization",
             "name": "Space Digitalia",
             "description": "Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web. Kami menggabungkan kreativitas dengan teknologi terbaru untuk hasil terbaik.",
-            "brand": {
-              "@type": "Brand",
-              "name": "Space Digitalia"
+            "url": "https://spacedigitalia.my.id",
+            "logo": "https://spacedigitalia.my.id/favicon.ico",
+            "sameAs": [
+              // Tambahkan link sosial media Anda di sini
+              "https://instagram.com/spacedigitalia",
+              "https://facebook.com/spacedigitalia"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "ID"
             },
-            "offers": {
-              "@type": "Offer",
-              "price": "2000000",
-              "priceCurrency": "IDR"
-            },
-            "url": "https://spacedigitalia.my.id/project",
-            "image": "https://spacedigitalia.my.id/favicon.ico",
-            "category": "Digital Agency",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingCount": "100",
-              "ratingValue": "4.5"
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "Rizki Ramadhan",
+              "telephone": "+62-812-9863-2939",
+              "email": "spacedigitalia@gmail.com"
             }
           })}
         </Script>

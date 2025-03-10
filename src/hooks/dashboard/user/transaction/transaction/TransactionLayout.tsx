@@ -8,11 +8,21 @@ import { db } from '@/utils/firebase'
 
 import Image from 'next/image'
 
-import { PDFDownloadLink, TransactionPDF } from '@/hooks/dashboard/super-admins/transaction/transaction/Pdf'
-
-import { Filters, Transaction } from '@/hooks/dashboard/super-admins/transaction/transaction/lib/schema'
+import { Filters, Transaction } from '@/hooks/dashboard/user/transaction/transaction/lib/schema'
 
 import { useAuth } from '@/utils/context/AuthContext'
+
+import Link from 'next/link'
+
+import TransactionSkeleton from '@/hooks/dashboard/user/transaction/transaction/TransactionSkelaton'
+
+import { Pagination } from '@/base/helper/Pagination'
+
+import Filter from '@/hooks/dashboard/user/transaction/transaction/content/Filter'
+
+import { useModal } from '@/base/helper/useModal'
+
+import EmptyTransaction from '@/hooks/dashboard/user/transaction/transaction/content/empety'
 
 export default function TransactionLayout() {
     const { user } = useAuth()
@@ -21,10 +31,18 @@ export default function TransactionLayout() {
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [filters, setFilters] = useState<Filters>({
         status: [],
-        paymentMethod: [], // Will contain 'delivery' or 'download'
+        paymentMethod: [],
         paymentType: []
+    })
+    const [currentPage, setCurrentPage] = useState(0)
+    const itemsPerPage = 8 // Adjust this number as needed
+
+    useModal({
+        isOpen: isModalOpen,
+        onClose: () => setIsModalOpen(false)
     })
 
     const applyFilters = () => {
@@ -54,7 +72,7 @@ export default function TransactionLayout() {
     useEffect(() => {
         if (!user?.uid) return
 
-        const transactionsRef = collection(db, 'transactions')
+        const transactionsRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string)
         const userTransactionsQuery = query(
             transactionsRef,
             where('userId', '==', user.uid)
@@ -72,170 +90,44 @@ export default function TransactionLayout() {
 
             setTransactions(sortedTransactions)
             setFilteredTransactions(sortedTransactions)
+            setIsLoading(false)
         })
 
         return () => unsubscribe()
     }, [user?.uid])
 
-    useEffect(() => {
-        if (isModalOpen) {
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.body.style.overflow = 'unset'
-        }
+    // Calculate pagination
+    const paginatedTransactions = filteredTransactions.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+    )
 
-        return () => {
-            document.body.style.overflow = 'unset'
-        }
-    }, [isModalOpen])
+    const handlePageChange = ({ selected }: { selected: number }) => {
+        setCurrentPage(selected)
+        // Scroll to top of transaction grid
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
 
     // Replace FilterModal with inline filter section
     const FilterSection = () => (
-        <div className="bg-white/60 backdrop-blur-lg rounded-3xl shadow-xl mb-8 border border-gray-100/20">
-            <div className="p-6 space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Status Filter */}
-                    <div className="space-y-3">
-                        <label className="text-gray-700 font-semibold flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                            Status Transaksi
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                            {[
-                                { id: 'pending', icon: '🕒', label: 'Pending' },
-                                { id: 'success', icon: '✅', label: 'Success' },
-                                { id: 'cancelled', icon: '❌', label: 'Cancelled' }
-                            ].map(({ id, icon, label }) => (
-                                <div
-                                    key={id}
-                                    onClick={() => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            status: prev.status.includes(id) ? [] : [id]
-                                        }));
-                                    }}
-                                    className={`cursor-pointer px-4 py-2.5 rounded-2xl border-2 transition-all duration-300 flex items-center gap-2 flex-1 min-w-[120px]
-                                        ${filters.status.includes(id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 shadow-sm shadow-indigo-100'
-                                            : 'bg-white/50 border-transparent hover:border-gray-200 text-gray-600 hover:bg-gray-50/50'
-                                        }`}
-                                >
-                                    <span className="text-xl">{icon}</span>
-                                    <span className="font-medium">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Payment Method Filter */}
-                    <div className="space-y-3">
-                        <label className="text-gray-700 font-semibold flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                            Metode Pengiriman
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { id: 'delivery', icon: '🚚', label: 'Delivery' },
-                                { id: 'download', icon: '⬇️', label: 'Download' }
-                            ].map(({ id, icon, label }) => (
-                                <div
-                                    key={id}
-                                    onClick={() => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            paymentMethod: prev.paymentMethod.includes(id) ? [] : [id]
-                                        }));
-                                    }}
-                                    className={`cursor-pointer px-4 py-3 rounded-2xl border-2 transition-all duration-300 flex items-center gap-2
-                                        ${filters.paymentMethod.includes(id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 shadow-sm shadow-indigo-100'
-                                            : 'bg-white/50 border-transparent hover:border-gray-200 text-gray-600 hover:bg-gray-50/50'
-                                        }`}
-                                >
-                                    <span className="text-xl">{icon}</span>
-                                    <span className="font-medium">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Payment Type Filter */}
-                    <div className="space-y-3">
-                        <label className="text-gray-700 font-semibold flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                            Tipe Pembayaran
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { id: 'bank_transfer', icon: '🏦', label: 'Bank Transfer' },
-                                { id: 'echannel', icon: '💳', label: 'E-Channel' },
-                                { id: 'gopay', icon: '📱', label: 'GoPay' },
-                                { id: 'qris', icon: '📲', label: 'QRIS' },
-                                {
-                                    id: 'free',
-                                    icon: (
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                                        </svg>
-                                    ),
-                                    label: 'Free'
-                                }
-                            ].map(({ id, icon, label }) => (
-                                <div
-                                    key={id}
-                                    onClick={() => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            paymentType: prev.paymentType.includes(id) ? [] : [id]
-                                        }));
-                                    }}
-                                    className={`cursor-pointer px-4 py-3 rounded-2xl border-2 transition-all duration-300 flex items-center gap-2
-                                        ${filters.paymentType.includes(id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 shadow-sm shadow-indigo-100'
-                                            : 'bg-white/50 border-transparent hover:border-gray-200 text-gray-600 hover:bg-gray-50/50'
-                                        }`}
-                                >
-                                    <span className={`text-xl ${typeof icon === 'string' ? '' : 'text-current'}`}>
-                                        {icon}
-                                    </span>
-                                    <span className="font-medium">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Filter Actions */}
-                <div className="flex justify-end gap-4 pt-4 border-t border-gray-100">
-                    <button
-                        onClick={() => {
-                            setFilters({
-                                status: [],
-                                paymentMethod: [],
-                                paymentType: []
-                            });
-                            setFilteredTransactions(transactions);
-                        }}
-                        className="px-6 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center gap-2 font-medium"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Reset Filter
-                    </button>
-                    <button
-                        onClick={applyFilters}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white transition-all duration-300 flex items-center gap-2 font-medium shadow-lg shadow-indigo-100 hover:shadow-xl hover:shadow-indigo-200 transform hover:-translate-y-0.5"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Terapkan Filter
-                    </button>
-                </div>
-            </div>
-        </div>
+        <Filter
+            setFilters={setFilters}
+            filters={filters}
+            setFilteredTransactions={setFilteredTransactions}
+            transactions={transactions}
+            applyFilters={applyFilters}
+        />
     );
+
+    if (isLoading) {
+        return <TransactionSkeleton />
+    }
+
+    if (transactions.length === 0) {
+        return (
+            <EmptyTransaction />
+        )
+    }
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
@@ -243,9 +135,9 @@ export default function TransactionLayout() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="space-y-1">
                         <h1 className='text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent'>
-                            Transaction
+                            Transaksi
                         </h1>
-                        <p className='text-gray-500'>Manage and organize your transaction</p>
+                        <p className='text-gray-500'>Kelola dan atur transaksi Anda</p>
                     </div>
 
                     <button
@@ -255,7 +147,7 @@ export default function TransactionLayout() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
-                        {isFilterModalOpen ? 'Hide Filters' : 'Show Filters'}
+                        {isFilterModalOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
                     </button>
                 </div>
             </div>
@@ -265,7 +157,7 @@ export default function TransactionLayout() {
 
             {/* Transaction Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-                {filteredTransactions.map((transaction) => (
+                {paginatedTransactions.map((transaction) => (
                     <div
                         key={transaction.id}
                         className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm 
@@ -302,7 +194,7 @@ export default function TransactionLayout() {
 
                             {/* Amount */}
                             <div className="flex items-center justify-between bg-gray-50 p-3 rounded-xl">
-                                <span className="text-gray-600 text-sm">Amount</span>
+                                <span className="text-gray-600 text-sm">Harga</span>
                                 <span className="font-semibold text-gray-900">
                                     Rp {transaction.amount.toLocaleString()}
                                 </span>
@@ -317,9 +209,9 @@ export default function TransactionLayout() {
                                                 d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                                             />
                                         </svg>
-                                        Payment
+                                        Metode Pembayaran
                                     </span>
-                                    <span className="font-medium text-gray-900">{transaction.paymentMethod}</span>
+                                    <span className="font-medium text-gray-900 capitalize">{transaction.paymentMethod}</span>
                                 </div>
 
                                 <div className="flex items-center justify-between text-sm">
@@ -329,25 +221,39 @@ export default function TransactionLayout() {
                                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                                             />
                                         </svg>
-                                        License
+                                        Lisensi
                                     </span>
-                                    <span className="font-medium text-gray-900">{transaction.licenseType}</span>
+                                    <span className="font-medium text-gray-900 capitalize">{transaction.licenseType}</span>
                                 </div>
                             </div>
 
                             {/* User Info */}
                             <div className="pt-4 border-t border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <span className="text-indigo-600 font-medium text-sm">
-                                            {transaction.userName.charAt(0)}
-                                        </span>
+                                    {/* User Avatar/Initial */}
+                                    <div className="relative w-10 h-10 rounded-full shadow-sm overflow-hidden border-2 border-indigo-100">
+                                        {transaction.userPhotoURL ? (
+                                            <Image
+                                                src={transaction.userPhotoURL}
+                                                alt={transaction.userName}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+                                                <span className="text-white font-medium text-sm">
+                                                    {transaction.userName.charAt(0).toUpperCase()}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
+
+                                    {/* User Info */}
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
                                             {transaction.userName}
                                         </p>
-                                        <p className="text-xs text-gray-500 truncate">
+                                        <p className="text-xs text-gray-500 truncate group-hover:text-gray-600 transition-colors">
                                             {transaction.userEmail}
                                         </p>
                                     </div>
@@ -386,12 +292,21 @@ export default function TransactionLayout() {
                                         d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                                     />
                                 </svg>
-                                View Details
+                                Detail Transaksi
                             </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Add Pagination Component */}
+            {filteredTransactions.length > 0 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(filteredTransactions.length / itemsPerPage)}
+                    onPageChange={handlePageChange}
+                />
+            )}
 
             {/* Detail Modal */}
             {isModalOpen && selectedTransaction && (
@@ -458,36 +373,42 @@ export default function TransactionLayout() {
                                 {/* Information Grid */}
                                 <div className="grid grid-cols-2 gap-6">
                                     {/* User Information */}
-                                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300">
+                                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 h-fit">
                                         <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
                                             Informasi Pengguna
                                         </h3>
-                                        <div className="space-y-4">
-                                            <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Nama</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-                                                        {selectedTransaction.userName}
-                                                    </span>
+
+                                        {/* User Avatar/Photo */}
+                                        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div className="flex items-center gap-4">
+                                                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-100">
+                                                    {selectedTransaction.userPhotoURL ? (
+                                                        <Image
+                                                            src={selectedTransaction.userPhotoURL}
+                                                            alt={selectedTransaction.userName}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+                                                            <span className="text-white font-medium text-lg">
+                                                                {selectedTransaction.userName.charAt(0).toUpperCase()}
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </div>
-                                            <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Email</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
-                                                        {selectedTransaction.userEmail}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Users I</span>
-                                                    <span className="font-medium text-gray-800 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 text-sm">
-                                                        {selectedTransaction.userId}
-                                                    </span>
+                                                <div className="flex-1">
+                                                    <div className="space-y-1">
+                                                        <h4 className="font-semibold text-gray-900">
+                                                            {selectedTransaction.userName}
+                                                        </h4>
+                                                        <p className="text-sm text-gray-500">
+                                                            {selectedTransaction.userEmail}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -645,20 +566,21 @@ export default function TransactionLayout() {
 
                                             {/* Location Map Link */}
                                             <div className="bg-gray-50/50 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">Lokasi</span>
-                                                    <a
-                                                        href={`https://maps.google.com/?q=${selectedTransaction.deliveryAddress.district}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-indigo-600 hover:text-indigo-700 font-medium text-sm flex items-center gap-1"
-                                                    >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        </svg>
-                                                        View on Maps
-                                                    </a>
+                                                <div className="space-y-2">
+                                                    <span className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors block">
+                                                        Lokasi Pengiriman
+                                                    </span>
+                                                    <div className="relative w-full h-[300px] rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                                                        <iframe
+                                                            title="Location Map"
+                                                            width="100%"
+                                                            height="100%"
+                                                            style={{ border: 0 }}
+                                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=106.62206172943115%2C-6.576112400000001%2C106.64206172943115%2C-6.572112400000001&layer=mapnik&marker=${selectedTransaction.deliveryAddress.district}`}
+                                                            allowFullScreen
+                                                            className="absolute inset-0"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -689,30 +611,14 @@ export default function TransactionLayout() {
                                                 </a>
                                             )
                                         }
-                                        {selectedTransaction && (
-                                            <PDFDownloadLink
-                                                document={<TransactionPDF transaction={selectedTransaction} />}
-                                                fileName={`transaction-${selectedTransaction.orderId}.pdf`}
-                                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-sm hover:shadow-green-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                                            >
-                                                {({ loading }) =>
-                                                    loading ?
-                                                        <>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                            </svg>
-                                                            Generating PDF...
-                                                        </> :
-                                                        <>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                            </svg>
-                                                            Export as PDF
-                                                        </>
-                                                }
-                                            </PDFDownloadLink>
-                                        )}
-                                        <a
+                                        <Link href={selectedTransaction.paymentDetails.pdf_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-sm hover:shadow-green-100 hover:shadow-lg transform hover:-translate-y-0.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Download PDF
+                                        </Link>
+
+                                        <Link
                                             href={selectedTransaction.linkTransaction}
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -722,7 +628,7 @@ export default function TransactionLayout() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                             </svg>
                                             Transaction Link
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
 

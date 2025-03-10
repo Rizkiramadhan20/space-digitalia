@@ -71,8 +71,8 @@ export const updateTransactionStatus = async (
 
 export const cancelTransaction = async (transactionId: string) => {
   try {
-    const collectionPath =
-      process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS || "transactions";
+    const collectionPath = process.env
+      .NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string;
     const transactionRef = doc(db, collectionPath, transactionId);
 
     await updateDoc(transactionRef, {

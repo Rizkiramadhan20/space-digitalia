@@ -8,59 +8,44 @@ import { db } from '@/utils/firebase'
 
 import Image from 'next/image'
 
-import { PDFDownloadLink, TransactionPDF } from '@/hooks/dashboard/super-admins/transaction/transaction/Pdf'
-
-import { Filters, Transaction } from '@/hooks/dashboard/super-admins/transaction/transaction/lib/schema'
+import { Transaction } from '@/hooks/dashboard/user/transaction/shipped/lib/schema'
 
 import { useAuth } from '@/utils/context/AuthContext'
 
 import TransactionShippedSkeleton from '@/hooks/dashboard/user/transaction/shipped/TransactionShippedSkelaton'
 
+import EmptyShippedTransaction from '@/hooks/dashboard/user/transaction/shipped/content/empety'
+
+import { useModal } from '@/base/helper/useModal'
+
+import { Pagination } from '@/base/helper/Pagination'
+
+import Link from 'next/link'
+
 export default function TransactionShippedLayout() {
     const { user } = useAuth()
     const [transactions, setTransactions] = useState<Transaction[]>([])
-    const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const [filters, setFilters] = useState<Filters>({
-        status: [],
-        paymentMethod: [], // Will contain 'delivery' or 'download'
-        paymentType: []
+
+    // Add pagination state
+    const [currentPage, setCurrentPage] = useState(0)
+    const itemsPerPage = 8 // Adjust this number as needed
+
+    // Use the useModal hook
+    useModal({
+        isOpen: isModalOpen,
+        onClose: () => setIsModalOpen(false)
     })
-
-    const applyFilters = () => {
-        // First filter for transactions with statusDelivery, not cancelled, and not completed
-        let filtered = transactions.filter(transaction =>
-            transaction.statusDelivery &&
-            transaction.status !== 'cancelled' &&
-            transaction.statusDelivery !== 'completed'
-        );
-
-        // Then apply other filters
-        if (filters.status.length > 0) {
-            filtered = filtered.filter(transaction =>
-                filters.status.includes(transaction.status)
-            );
-        }
-
-        if (filters.paymentMethod.length > 0) {
-            filtered = filtered.filter(transaction =>
-                filters.paymentMethod.includes(transaction.deliveryMethod)
-            );
-        }
-
-        setFilteredTransactions(filtered);
-    }
 
     useEffect(() => {
         if (!user?.uid) {
-            setIsLoading(false)  // Set loading to false if there's no user
+            setIsLoading(false)
             return
         }
 
-        const transactionsRef = collection(db, 'transactions')
+        const transactionsRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string)
         const userTransactionsQuery = query(
             transactionsRef,
             where('userId', '==', user.uid)
@@ -84,260 +69,34 @@ export default function TransactionShippedLayout() {
                 );
 
             setTransactions(shippedTransactions)
-            setFilteredTransactions(shippedTransactions)
             setIsLoading(false)
         }, (error) => {
             console.error("Error fetching transactions:", error)
-            setIsLoading(false)  // Set loading to false on error
+            setIsLoading(false)
         })
 
         return () => unsubscribe()
     }, [user?.uid])
 
-    useEffect(() => {
-        if (isModalOpen) {
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.body.style.overflow = 'unset'
-        }
+    // Calculate pagination values
+    const offset = currentPage * itemsPerPage
+    const paginatedTransactions = transactions.slice(offset, offset + itemsPerPage)
+    const pageCount = Math.ceil(transactions.length / itemsPerPage)
 
-        return () => {
-            document.body.style.overflow = 'unset'
-        }
-    }, [isModalOpen])
-
-    // Replace FilterModal with inline filter section
-    const FilterSection = () => (
-        <div className="bg-white/60 backdrop-blur-lg rounded-3xl shadow-xl mb-8 border border-gray-100/20">
-            <div className="p-6 space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Status Filter */}
-                    <div className="space-y-3">
-                        <label className="text-gray-700 font-semibold flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                            Status Transaksi
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                            {[
-                                { id: 'pending', icon: '🕒', label: 'Pending' },
-                                { id: 'success', icon: '✅', label: 'Success' },
-                                { id: 'failed', icon: '❌', label: 'Failed' }
-                            ].map(({ id, icon, label }) => (
-                                <div
-                                    key={id}
-                                    onClick={() => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            status: prev.status.includes(id) ? [] : [id]
-                                        }));
-                                    }}
-                                    className={`cursor-pointer px-4 py-2.5 rounded-2xl border-2 transition-all duration-300 flex items-center gap-2 flex-1 min-w-[120px]
-                                        ${filters.status.includes(id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 shadow-sm shadow-indigo-100'
-                                            : 'bg-white/50 border-transparent hover:border-gray-200 text-gray-600 hover:bg-gray-50/50'
-                                        }`}
-                                >
-                                    <span className="text-xl">{icon}</span>
-                                    <span className="font-medium">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Payment Method Filter */}
-                    <div className="space-y-3">
-                        <label className="text-gray-700 font-semibold flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                            Metode Pengiriman
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { id: 'delivery', icon: '🚚', label: 'Delivery' },
-                                { id: 'download', icon: '⬇️', label: 'Download' }
-                            ].map(({ id, icon, label }) => (
-                                <div
-                                    key={id}
-                                    onClick={() => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            paymentMethod: prev.paymentMethod.includes(id) ? [] : [id]
-                                        }));
-                                    }}
-                                    className={`cursor-pointer px-4 py-3 rounded-2xl border-2 transition-all duration-300 flex items-center gap-2
-                                        ${filters.paymentMethod.includes(id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 shadow-sm shadow-indigo-100'
-                                            : 'bg-white/50 border-transparent hover:border-gray-200 text-gray-600 hover:bg-gray-50/50'
-                                        }`}
-                                >
-                                    <span className="text-xl">{icon}</span>
-                                    <span className="font-medium">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Payment Type Filter */}
-                    <div className="space-y-3">
-                        <label className="text-gray-700 font-semibold flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                            Tipe Pembayaran
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { id: 'bank_transfer', icon: '🏦', label: 'Bank Transfer' },
-                                { id: 'echannel', icon: '💳', label: 'E-Channel' },
-                                { id: 'gopay', icon: '📱', label: 'GoPay' },
-                                { id: 'qris', icon: '📲', label: 'QRIS' },
-                                {
-                                    id: 'free',
-                                    icon: (
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                                        </svg>
-                                    ),
-                                    label: 'Free'
-                                }
-                            ].map(({ id, icon, label }) => (
-                                <div
-                                    key={id}
-                                    onClick={() => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            paymentType: prev.paymentType.includes(id) ? [] : [id]
-                                        }));
-                                    }}
-                                    className={`cursor-pointer px-4 py-3 rounded-2xl border-2 transition-all duration-300 flex items-center gap-2
-                                        ${filters.paymentType.includes(id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 shadow-sm shadow-indigo-100'
-                                            : 'bg-white/50 border-transparent hover:border-gray-200 text-gray-600 hover:bg-gray-50/50'
-                                        }`}
-                                >
-                                    <span className={`text-xl ${typeof icon === 'string' ? '' : 'text-current'}`}>
-                                        {icon}
-                                    </span>
-                                    <span className="font-medium">{label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Filter Actions */}
-                <div className="flex justify-end gap-4 pt-4 border-t border-gray-100">
-                    <button
-                        onClick={() => {
-                            setFilters({
-                                status: [],
-                                paymentMethod: [],
-                                paymentType: []
-                            });
-                            setFilteredTransactions(transactions);
-                        }}
-                        className="px-6 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center gap-2 font-medium"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Reset Filter
-                    </button>
-                    <button
-                        onClick={applyFilters}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white transition-all duration-300 flex items-center gap-2 font-medium shadow-lg shadow-indigo-100 hover:shadow-xl hover:shadow-indigo-200 transform hover:-translate-y-0.5"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Terapkan Filter
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-
+    // Handle page change
+    const handlePageChange = ({ selected }: { selected: number }) => {
+        setCurrentPage(selected)
+        // Scroll to top of the page
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
 
     if (isLoading) {
         return <TransactionShippedSkeleton />;
     }
 
-    if (filteredTransactions.length === 0) {
+    if (transactions.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[70vh] p-4">
-                {/* Decorative background */}
-                <div className="absolute inset-0 grid grid-cols-2 -space-x-52 opacity-20 dark:opacity-5">
-                    <div className="blur-[106px] h-56 bg-gradient-to-br from-indigo-100 to-purple-100"></div>
-                    <div className="blur-[106px] h-32 bg-gradient-to-r from-cyan-100 to-sky-100"></div>
-                </div>
-
-                <div className="relative flex flex-col items-center text-center">
-                    {/* Modern icon with animation */}
-                    <div className="relative mb-6">
-                        <div className="absolute inset-0 bg-indigo-50 rounded-full animate-pulse"></div>
-                        <div className="relative p-6 bg-white rounded-full shadow-2xl">
-                            <svg
-                                className="w-12 h-12 sm:w-16 sm:h-16 text-indigo-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.5"
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                                />
-                            </svg>
-                        </div>
-                    </div>
-
-                    {/* Text content */}
-                    <h3 className="mb-3 text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                        Belum Ada Transaksi
-                    </h3>
-                    <p className="max-w-md mb-6 text-base sm:text-lg text-gray-500">
-                        Saat ini belum ada transaksi yang sedang dalam proses pengiriman.
-                    </p>
-
-                    {/* Action button */}
-                    <button
-                        onClick={() => window.location.href = '/dashboard/user'}
-                        className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 text-white transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:from-indigo-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        <svg
-                            className="w-5 h-5 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                            />
-                        </svg>
-                        Kembali ke Dashboard
-                    </button>
-                </div>
-
-                {/* Decorative elements */}
-                <div className="absolute bottom-0 left-0 right-0 hidden sm:block">
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent opacity-40"></div>
-                    <div className="grid grid-cols-3 gap-8 px-8 py-6 text-sm text-gray-500">
-                        <div className="flex items-center justify-center">
-                            <div className="w-2 h-2 mr-2 rounded-full bg-indigo-500"></div>
-                            Transaksi Aman
-                        </div>
-                        <div className="flex items-center justify-center">
-                            <div className="w-2 h-2 mr-2 rounded-full bg-indigo-500"></div>
-                            Pengiriman Terpantau
-                        </div>
-                        <div className="flex items-center justify-center">
-                            <div className="w-2 h-2 mr-2 rounded-full bg-indigo-500"></div>
-                            Dukungan 24/7
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <EmptyShippedTransaction />
         );
     }
 
@@ -347,29 +106,16 @@ export default function TransactionShippedLayout() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="space-y-1">
                         <h1 className='text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent'>
-                            Transaction
+                            Pesanan Dikirim
                         </h1>
-                        <p className='text-gray-500'>Manage and organize your transaction</p>
+                        <p className='text-gray-500'>Kelola dan urutkan pesanan Anda yang telah dikirim</p>
                     </div>
-
-                    <button
-                        onClick={() => setIsFilterModalOpen(!isFilterModalOpen)}
-                        className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                        </svg>
-                        {isFilterModalOpen ? 'Hide Filters' : 'Show Filters'}
-                    </button>
                 </div>
             </div>
 
-            {/* Show/Hide Filter Section */}
-            {isFilterModalOpen && <FilterSection />}
-
             {/* Transaction Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-                {filteredTransactions.map((transaction) => (
+                {paginatedTransactions.map((transaction) => (
                     <div
                         key={transaction.id}
                         className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm 
@@ -406,7 +152,7 @@ export default function TransactionShippedLayout() {
 
                             {/* Amount */}
                             <div className="flex items-center justify-between bg-gray-50 p-3 rounded-xl">
-                                <span className="text-gray-600 text-sm">Amount</span>
+                                <span className="text-gray-600 text-sm">Harga</span>
                                 <span className="font-semibold text-gray-900">
                                     Rp {transaction.amount.toLocaleString()}
                                 </span>
@@ -423,7 +169,7 @@ export default function TransactionShippedLayout() {
                                         </svg>
                                         Payment
                                     </span>
-                                    <span className="font-medium text-gray-900">{transaction.paymentMethod}</span>
+                                    <span className="font-medium text-gray-900 capitalize">{transaction.paymentMethod}</span>
                                 </div>
 
                                 <div className="flex items-center justify-between text-sm">
@@ -435,20 +181,35 @@ export default function TransactionShippedLayout() {
                                         </svg>
                                         License
                                     </span>
-                                    <span className="font-medium text-gray-900">{transaction.licenseType}</span>
+                                    <span className="font-medium text-gray-900 capitalize">{transaction.licenseType}</span>
                                 </div>
                             </div>
 
                             {/* User Info */}
                             <div className="pt-4 border-t border-gray-100">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <span className="text-indigo-600 font-medium text-sm">
-                                            {transaction.userName.charAt(0)}
-                                        </span>
+                                <div className="flex items-center gap-4">
+                                    {/* User Avatar */}
+                                    <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-indigo-100 shadow-sm">
+                                        {transaction.userPhotoURL ? (
+                                            <Image
+                                                src={transaction.userPhotoURL}
+                                                alt={transaction.userName}
+                                                fill
+                                                className="object-cover"
+                                                sizes="40px"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-indigo-50 to-white flex items-center justify-center">
+                                                <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            </div>
+                                        )}
                                     </div>
+
+                                    {/* User Info */}
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-semibold text-gray-800 truncate group-hover:text-indigo-600 transition-colors">
                                             {transaction.userName}
                                         </p>
                                         <p className="text-xs text-gray-500 truncate">
@@ -496,6 +257,13 @@ export default function TransactionShippedLayout() {
                     </div>
                 ))}
             </div>
+
+            {/* Add Pagination Component */}
+            <Pagination
+                currentPage={currentPage}
+                totalPages={pageCount}
+                onPageChange={handlePageChange}
+            />
 
             {/* Detail Modal */}
             {isModalOpen && selectedTransaction && (
@@ -796,59 +564,25 @@ export default function TransactionShippedLayout() {
                                 )}
 
                                 {/* Links & Actions */}
-                                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300">
+                                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 w-fit">
                                     <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
                                         Aksi Cepat
                                     </h3>
-                                    <div className="flex flex-wrap gap-4">
-                                        <a
-                                            href={selectedTransaction.downloadUrl || ''}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            Download Project
-                                        </a>
-                                        {selectedTransaction && (
-                                            <PDFDownloadLink
-                                                document={<TransactionPDF transaction={selectedTransaction} />}
-                                                fileName={`transaction-${selectedTransaction.orderId}.pdf`}
-                                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-sm hover:shadow-green-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                                            >
-                                                {({ loading }) =>
-                                                    loading ?
-                                                        <>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                            </svg>
-                                                            Generating PDF...
-                                                        </> :
-                                                        <>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                            </svg>
-                                                            Export as PDF
-                                                        </>
-                                                }
-                                            </PDFDownloadLink>
-                                        )}
-                                        <a
+                                    <div className="flex">
+                                        <Link
                                             href={selectedTransaction.linkTransaction}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-sm hover:shadow-blue-100 hover:shadow-lg transform hover:-translate-y-0.5"
+                                            className="inline-flex items-center justify-center w-full sm:w-auto gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                             </svg>
-                                            Transaction Link
-                                        </a>
+                                            Lihat Detail Transaksi
+                                        </Link>
                                     </div>
                                 </div>
 

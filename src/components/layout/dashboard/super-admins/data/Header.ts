@@ -121,8 +121,8 @@ export const menuItems = [
       { label: "Free", href: "/dashboard/super-admins/transaction/free" },
 
       {
-        label: "Canceled",
-        href: "/dashboard/super-admins/transaction/canceled",
+        label: "Cancelled",
+        href: "/dashboard/super-admins/transaction/cancelled",
       },
 
       {

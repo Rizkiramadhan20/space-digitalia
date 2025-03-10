@@ -1,23 +1,8 @@
 import { Timestamp } from "firebase/firestore";
 
-export interface DeliveryAddress {
-  city: string;
-  details: string;
-  district: string;
-  fullName: string;
-  phone: string;
-  postalCode: string;
-  province: string;
-  streetAddress: string;
-}
-
-export interface VaNumber {
-  bank: string;
-  va_number: string;
-}
-
 export interface PaymentDetails {
-  bca_va_number: string;
+  bill_key?: string;
+  biller_code?: string;
   finish_redirect_url: string;
   fraud_status: string;
   gross_amount: string;
@@ -32,12 +17,18 @@ export interface PaymentDetails {
   va_numbers: VaNumber[];
 }
 
+export interface VaNumber {
+  bank: string;
+  va_number: string;
+}
+
 export interface Transaction {
+  id: string;
   amount: number;
   createdAt: Timestamp;
   deliveryAddress: DeliveryAddress;
   deliveryMethod: string;
-  downloadUrl: null | string;
+  downloadUrl: string | null;
   imageUrl: string;
   licenseType: string;
   linkTransaction: string;
@@ -47,6 +38,7 @@ export interface Transaction {
   paymentToken: string;
   projectId: string;
   projectTitle: string;
+  userPhotoURL: string;
   redirectUrl: string;
   status: string;
   statusDelivery: string;
@@ -55,5 +47,15 @@ export interface Transaction {
   userEmail: string;
   userId: string;
   userName: string;
-  userPhotoURL: string;
+}
+
+export interface DeliveryAddress {
+  city: string;
+  details: string;
+  district: string;
+  fullName: string;
+  phone: string;
+  postalCode: string;
+  province: string;
+  streetAddress: string;
 }

@@ -41,7 +41,6 @@ export interface Transaction {
   deliveryAddress?: DeliveryAddress;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  userPhotoURL: string;
 }
 
 export interface DeleteConfirmationModalProps {

@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
-import { Transaction } from '../lib';
-import { handleContinuePayment, updateTransactionStatus } from '../lib/TransactionServices';
 
-interface TransactionCardProps {
-    transaction: Transaction;
-    onView: (transaction: Transaction) => void;
-    onCancel: () => void;
-    isLoading: boolean;
-}
+import Image from 'next/image';
+
+import { TransactionCardProps } from '@/hooks/dashboard/user/transaction/unpaid/lib/index';
+
+import { handleContinuePayment, updateTransactionStatus } from '@/hooks/dashboard/user/transaction/unpaid/lib/TransactionServices';
 
 export const TransactionCard: React.FC<TransactionCardProps> = ({
     transaction,
@@ -64,17 +60,29 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({
                     {/* Info Grid */}
                     <div className="space-y-3">
                         {/* User Info */}
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                            <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                            <div className="relative flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                {transaction.userPhotoURL ? (
+                                    <Image
+                                        src={transaction.userPhotoURL}
+                                        alt={transaction.userName}
+                                        fill
+                                        className="object-cover rounded-full"
+                                        sizes="40px"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
+                                <p className="text-sm font-semibold text-gray-900 truncate">
                                     {transaction.userName}
                                 </p>
-                                <p className="text-sm text-gray-500 truncate">
+                                <p className="text-xs text-gray-500 truncate">
                                     {transaction.userEmail}
                                 </p>
                             </div>

@@ -54,6 +54,7 @@ export interface Transaction {
   downloadUrl?: string | null;
   redirectUrl?: string;
   pdfUrl?: string;
+  userPhotoURL?: string;
 }
 
 export interface MidtransResult {
@@ -68,4 +69,17 @@ export interface MidtransResult {
   gross_amount: string;
   fraud_status: string;
   va_numbers: VirtualAccountNumber[];
+}
+
+export interface TransactionCardProps {
+  transaction: Transaction;
+  onView: (transaction: Transaction) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+export interface TransactionModalProps {
+  transaction: Transaction;
+  isOpen: boolean;
+  onClose: () => void;
 }

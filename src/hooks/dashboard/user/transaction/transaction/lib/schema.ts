@@ -37,6 +37,7 @@ export interface Transaction {
   paymentMethod: string;
   paymentToken: string;
   projectId: string;
+  userPhotoURL: string;
   projectTitle: string;
   redirectUrl: string;
   status: string;
@@ -44,7 +45,6 @@ export interface Transaction {
   transactionId: string;
   updatedAt: Timestamp;
   userEmail: string;
-  userId: string;
   userName: string;
 }
 

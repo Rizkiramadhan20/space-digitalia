@@ -1,6 +1,16 @@
 User-agent: *
+Allow: /
 Disallow: /api/
 Disallow: /dashboard/
-Allow: /
+Disallow: /_next/
+Disallow: /static/
 
+# Allow media files
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.webp$
+
+# Sitemap
 Sitemap: https://spacedigitalia.my.id/sitemap.xml

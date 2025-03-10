@@ -1,6 +1,8 @@
 import React from 'react';
+
 import Image from 'next/image';
-import { Transaction } from '../lib';
+
+import { TransactionModalProps } from '@/hooks/dashboard/user/transaction/unpaid/lib/index';
 
 // Helper Components
 const InfoSection: React.FC<{ label: string; value: string }> = ({ label, value }) => (
@@ -17,11 +19,6 @@ const AddressItem: React.FC<{ label: string; value: string }> = ({ label, value 
     </div>
 );
 
-interface TransactionModalProps {
-    transaction: Transaction;
-    isOpen: boolean;
-    onClose: () => void;
-}
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
     transaction,

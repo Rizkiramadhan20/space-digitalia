@@ -31,4 +31,5 @@ export interface Transaction {
   userEmail: string;
   userId: string;
   userName: string;
+  userPhotoURL: string;
 }

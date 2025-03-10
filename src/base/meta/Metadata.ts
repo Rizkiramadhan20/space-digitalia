@@ -3,8 +3,9 @@ const BASE_URL = "https://spacedigitalia.my.id";
 export const viewport = {
   width: "device-width",
   initialScale: 1.0,
-  maximumScale: 1.0,
-  userScalable: "no",
+  maximumScale: 5.0,
+  userScalable: "yes",
+  viewportFit: "cover",
 };
 
 export const metadata = {
@@ -13,7 +14,12 @@ export const metadata = {
   description:
     "Space Digitalia menyediakan layanan digital terbaik untuk kebutuhan bisnis Anda. Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web.",
   favicon: "/favicon.ico",
-  authors: [{ name: "Rizki Ramadhan" }],
+  authors: [
+    {
+      name: "Rizki Ramadhan",
+      url: "https://github.com/Rineta2",
+    },
+  ],
   sitemap: "/sitemap.xml",
   keywords: [
     "Space Digitalia",
@@ -29,6 +35,19 @@ export const metadata = {
     "Cibatok Web Studio",
     "Ciampea Web Company",
     "Bogor Digital Agency",
+  ],
+
+  links: {
+    canonical: BASE_URL,
+    alternate: [{ url: "https://www.spacedigitalia.my.id", hreflang: "id" }],
+  },
+
+  link: [
+    {
+      rel: "alternate",
+      href: "https://www.spacedigitalia.my.id",
+      hreflang: "id",
+    },
   ],
 
   icons: {
@@ -65,6 +84,10 @@ export const metadata = {
       process.env.NEXT_PUBLIC_GOOGLE_SEARCH_CONSOLE_ID,
   },
 
+  generator: "Next.js",
+
+  category: "Digital Agency",
+
   openGraph: {
     type: "website",
     title: "Space Digitalia",
@@ -73,12 +96,14 @@ export const metadata = {
     url: BASE_URL,
     siteName: "Space Digitalia",
     locale: "id_ID",
+    alternateLocale: "en_US",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Space Digitalia - Digital Agency",
+        type: "image/jpeg",
       },
     ],
   },
@@ -91,6 +116,14 @@ export const metadata = {
     creator: "@rizki_ramadhan",
     site: "@rizki_ramadhan",
     images: ["/og-image.jpg"],
+    domain: "spacedigitalia.my.id",
+    app: {
+      name: "twitter_app",
+      id: {
+        iphone: "",
+        android: "",
+      },
+    },
   },
 
   verification: {
@@ -103,9 +136,15 @@ export const metadata = {
     noarchive: false,
     noimageindex: false,
     nosnippet: false,
+    maxSnippet: -1,
+    maxImagePreview: "large",
+    maxVideoPreview: -1,
     googleBot: {
       index: true,
       follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
