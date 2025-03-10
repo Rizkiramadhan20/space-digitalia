@@ -20,11 +20,9 @@ import DeleteConfirmationModal from '@/hooks/dashboard/user/transaction/canceled
 
 import TransactionDetailsModal from '@/hooks/dashboard/user/transaction/canceled/content/TransactionDetailsModal'
 
+import Header from '@/hooks/dashboard/user/transaction/canceled/content/HeaderCancel'
+
 import EmptyState from '@/hooks/dashboard/user/transaction/canceled/content/EmpatyState'
-
-import { useModal } from '@/base/helper/useModal'
-
-import { Pagination } from '@/base/helper/Pagination'
 
 export default function TransactionCanceledLayout() {
     const { user } = useAuth()
@@ -33,19 +31,17 @@ export default function TransactionCanceledLayout() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 10; // You can adjust this number
 
     useEffect(() => {
         const fetchCanceledTransactions = async () => {
-            if (!user?.uid) return // Early return if no user
+            if (!user?.uid) return
 
             try {
                 const transactionRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string);
                 const q = query(
                     transactionRef,
                     where('status', '==', 'cancelled'),
-                    where('userId', '==', user.uid) // Add filter for user's transactions
+                    where('userId', '==', user.uid)
                 );
                 const querySnapshot = await getDocs(q);
 
@@ -54,13 +50,11 @@ export default function TransactionCanceledLayout() {
                     ...doc.data()
                 })) as Transaction[];
 
-                // Sort transactions by createdAt in descending order
                 const sortedTransactions = transactions.sort((a, b) =>
                     b.createdAt.toMillis() - a.createdAt.toMillis()
                 );
 
                 setCanceledTransactions(sortedTransactions);
-                setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching canceled transactions:', error);
             } finally {
@@ -71,12 +65,6 @@ export default function TransactionCanceledLayout() {
         fetchCanceledTransactions();
     }, [user?.uid]);
 
-    useModal({
-        isOpen: isModalOpen,
-        onClose: () => setIsModalOpen(false)
-    });
-
-    // Update delete handler
     const handleDelete = async (transactionId: string) => {
         if (!transactionId) return;
 
@@ -85,15 +73,12 @@ export default function TransactionCanceledLayout() {
             const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, transactionId);
             await deleteDoc(transactionRef);
 
-            // Update local state
             setCanceledTransactions(prev => prev.filter(t => t.id !== transactionId));
             setIsModalOpen(false);
 
-            // Close delete confirmation modal
             const modal = document.getElementById('delete_confirm_modal') as HTMLDialogElement;
             if (modal) modal.close();
 
-            // Show success toast
             toast.success('Transaction deleted successfully');
         } catch (error) {
             console.error('Error deleting transaction:', error);
@@ -103,40 +88,18 @@ export default function TransactionCanceledLayout() {
         }
     };
 
-    // Add pagination calculation
-    const paginatedTransactions = canceledTransactions.slice(
-        currentPage * itemsPerPage,
-        (currentPage + 1) * itemsPerPage
-    );
-
-    const handlePageChange = (selectedItem: { selected: number }) => {
-        setCurrentPage(selectedItem.selected);
-        window.scrollTo(0, 0); // Scroll to top when page changes
-    };
-
     if (isLoading) return <TransactionCanceledSkeleton />
 
     if (!canceledTransactions || canceledTransactions.length === 0) {
-        return (
-            <EmptyState />
-        );
+        return <EmptyState />
     }
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="space-y-1">
-                        <h1 className='text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent'>
-                            Canceled Transaction
-                        </h1>
-                        <p className='text-gray-500'>Manage and organize your canceled transaction</p>
-                    </div>
-                </div>
-            </div>
+            <Header />
 
             <TransactionList
-                transactions={paginatedTransactions}
+                transactions={canceledTransactions}
                 onViewDetails={(transaction) => {
                     setSelectedTransaction(transaction);
                     setIsModalOpen(true);
@@ -146,12 +109,6 @@ export default function TransactionCanceledLayout() {
                     const modal = document.getElementById('delete_confirm_modal') as HTMLDialogElement;
                     if (modal) modal.showModal();
                 }}
-            />
-
-            <Pagination
-                currentPage={currentPage}
-                totalPages={Math.ceil(canceledTransactions.length / itemsPerPage)}
-                onPageChange={handlePageChange}
             />
 
             {isModalOpen && selectedTransaction && (

@@ -80,6 +80,7 @@ export const cancelTransaction = async (transactionId: string) => {
       updatedAt: Timestamp.now(),
       "paymentDetails.transaction_status": "cancelled",
       "paymentDetails.status_message": "Transaction cancelled by user",
+      statusDelivery: "cancelled",
     });
   } catch (error) {
     throw error;
