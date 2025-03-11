@@ -50,3 +50,24 @@ export interface Transaction {
   ratedBy?: string;
   rating?: number;
 }
+
+export interface ViewRatingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  rating: number;
+  review: string;
+  projectTitle?: string;
+  setIsRatingModalOpen: (isOpen: boolean) => void;
+  setViewingRating: (
+    rating: { rating: number; review: string; projectTitle: string } | null
+  ) => void;
+}
+
+export interface RatingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (rating: number, review: string) => void;
+  projectTitle?: string;
+  initialRating?: number;
+  initialReview?: string;
+}

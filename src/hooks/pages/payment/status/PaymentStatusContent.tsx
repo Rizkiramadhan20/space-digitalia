@@ -550,47 +550,15 @@ export default function PaymentStatusContent({ transactionId }: PaymentStatusCon
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
                         >
-                            {/* Download button for both paid and free transactions */}
-                            {((transaction.status === 'success' || transaction.paymentMethod === "free") &&
-                                transaction.deliveryMethod === "download" &&
-                                transaction.downloadUrl) && (
-                                    <motion.a
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        href={transaction.downloadUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-emerald-500 rounded-xl overflow-hidden transition-all duration-300 hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/25"
-                                    >
-                                        {/* Shine Effect */}
-                                        <div className="absolute inset-0 w-1/4 h-full bg-white/20 skew-x-[25deg] transform -translate-x-32 group-hover:translate-x-96 transition-transform duration-1000"></div>
-                                        {/* Button Content */}
-                                        <div className="relative flex items-center space-x-3">
-                                            <span>Download Project</span>
-                                            <motion.svg
-                                                className="w-6 h-6"
-                                                initial={{ y: 0 }}
-                                                animate={{ y: [0, -2, 0] }}
-                                                transition={{ duration: 1.5, repeat: Infinity }}
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </motion.svg>
-                                        </div>
-                                    </motion.a>
-                                )}
-
                             <motion.div
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <Link
                                     href={transaction.paymentMethod === "free"
-                                        ? `${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction/free`
+                                        ? `${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction/completed`
                                         : transaction.status === 'success'
-                                            ? `${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction/paid`
+                                            ? `${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction/completed`
                                             : `${process.env.NEXT_PUBLIC_URL!}/dashboard/user/transaction/unpaid`
                                     }
                                     className="group relative inline-flex w-full items-center justify-center px-8 py-4 text-lg font-medium text-white bg-blue-500 rounded-xl overflow-hidden transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/25"

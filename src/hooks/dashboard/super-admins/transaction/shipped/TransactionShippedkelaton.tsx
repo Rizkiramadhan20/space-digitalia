@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function TransactionFreeSkeleton() {
+export default function TransactionShippedSkeleton() {
     return (
         <section className='min-h-full px-0 sm:px-4'>
             {/* Header Section */}

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function EmptyFreeTransaction() {
+export default function EmptyShippedTransaction() {
     return (
         <div className="flex flex-col items-center justify-center min-h-[70vh] p-4">
             {/* Decorative background */}
@@ -32,15 +32,15 @@ export default function EmptyFreeTransaction() {
 
                 {/* Text content */}
                 <h3 className="mb-3 text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                    Belum Ada Transaksi Gratis
+                    Belum Ada Transaksi Dikirim
                 </h3>
                 <p className="max-w-md mb-6 text-base sm:text-lg text-gray-500">
-                    Saat ini belum ada transaksi gratis yang sedang dalam proses.
+                    Saat ini belum ada transaksi yang sedang dalam proses pengiriman.
                 </p>
 
                 {/* Action button */}
                 <button
-                    onClick={() => window.location.href = '/dashboard/user'}
+                    onClick={() => window.location.href = '/dashboard/super-admins/transaction'}
                     className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 text-white transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:from-indigo-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                     <svg
@@ -56,7 +56,7 @@ export default function EmptyFreeTransaction() {
                             d="M7 16l-4-4m0 0l4-4m-4 4h18"
                         />
                     </svg>
-                    Kembali ke Dashboard
+                    Kembali ke Daftar Transaksi
                 </button>
             </div>
 

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { collection, getDocs, query, doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, getDocs, query } from 'firebase/firestore'
 
 import { db } from '@/utils/firebase'
 
@@ -13,6 +13,8 @@ import { Transaction } from '@/hooks/dashboard/super-admins/transaction/paid/lib
 import TransactionPaidSkeleton from '@/hooks/dashboard/super-admins/transaction/paid/TransactionPaidSkelaton'
 
 import { Pagination } from '@/base/helper/Pagination'
+
+import { useModal } from '@/base/helper/useModal'
 
 export default function TransactionPaidLayout() {
     const [successTransactions, setSuccessTransactions] = useState<Transaction[]>([]);
@@ -33,9 +35,6 @@ export default function TransactionPaidLayout() {
     // Add pagination states
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 9; // Show 9 items per page (3x3 grid)
-
-    // Add new state for handling status update
-    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const fetchSuccessTransactions = async () => {
@@ -93,27 +92,20 @@ export default function TransactionPaidLayout() {
             });
         }
 
-        // Status filter
+        // Delivery method filter
         if (selectedStatus !== 'all') {
             filtered = filtered.filter(transaction =>
-                transaction.paymentDetails.transaction_status === selectedStatus
+                transaction.deliveryMethod === selectedStatus
             );
         }
 
         setFilteredTransactions(filtered);
     }, [successTransactions, searchQuery, dateRange, selectedStatus]);
 
-    useEffect(() => {
-        if (isModalOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isModalOpen]);
+    useModal({
+        isOpen: isModalOpen,
+        onClose: () => setIsModalOpen(false)
+    });
 
     // Handle click outside modal
     const handleClickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -154,35 +146,6 @@ export default function TransactionPaidLayout() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Add function to handle status update
-    const handleStatusUpdate = async (newStatus: string) => {
-        if (!selectedTransaction) return;
-
-        setIsUpdating(true);
-        try {
-            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, selectedTransaction.orderId);
-            await updateDoc(transactionRef, {
-                statusDelivery: newStatus,
-                updatedAt: serverTimestamp()
-            });
-
-            // Update local state
-            setSuccessTransactions(prev => prev.map(tx =>
-                tx.orderId === selectedTransaction.orderId
-                    ? { ...tx, statusDelivery: newStatus }
-                    : tx
-            ));
-
-            // Update selected transaction
-            setSelectedTransaction(prev => prev ? { ...prev, statusDelivery: newStatus } : null);
-
-        } catch (error) {
-            console.error('Error updating status:', error);
-        } finally {
-            setIsUpdating(false);
-        }
-    };
-
     if (isLoading) {
         return <TransactionPaidSkeleton />;
     }
@@ -218,13 +181,12 @@ export default function TransactionPaidLayout() {
                             <div className="space-y-3">
                                 <label className="text-gray-700 font-semibold flex items-center gap-2">
                                     <span className="h-1.5 w-1.5 bg-indigo-600 rounded-full"></span>
-                                    Transaction Status
+                                    Delivery Method
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {[
-                                        { id: 'settlement', icon: '✅', label: 'Settlement' },
-                                        { id: 'pending', icon: '🕒', label: 'Pending' },
-                                        { id: 'cancel', icon: '❌', label: 'Cancelled' }
+                                        { id: 'download', icon: '⬇️', label: 'Download' },
+                                        { id: 'delivery', icon: '🚚', label: 'Delivery' }
                                     ].map(({ id, icon, label }) => (
                                         <div
                                             key={id}
@@ -552,41 +514,24 @@ export default function TransactionPaidLayout() {
                                     </div>
                                     <div className="bg-gray-50 p-3 sm:p-4 rounded-xl hover:bg-gray-100 transition-colors duration-200">
                                         <span className="text-sm font-medium text-gray-500 block mb-1">Status Delivery</span>
-                                        {
-                                            selectedTransaction.statusDelivery ?
-                                                <div className="relative">
-                                                    <select
-                                                        value={selectedTransaction.statusDelivery || 'pending'}
-                                                        onChange={(e) => handleStatusUpdate(e.target.value)}
-                                                        disabled={isUpdating}
-                                                        className={`w-full px-3 py-2 rounded-lg border ${isUpdating
-                                                            ? 'bg-gray-100 cursor-not-allowed'
-                                                            : 'bg-white hover:border-indigo-500 focus:border-indigo-500'
-                                                            } transition-colors duration-200`}
-                                                    >
-                                                        {[
-                                                            { value: 'pending', label: '🕒 Pending' },
-                                                            { value: 'processing', label: '⚙️ Processing' },
-                                                            { value: 'shipping', label: '🚚 Shipping' },
-                                                            { value: 'delivered', label: '📦 Delivered' },
-                                                            { value: 'completed', label: '✅ Completed' },
-                                                            { value: 'cancelled', label: '❌ Cancelled' }
-                                                        ].map((status) => (
-                                                            <option key={status.value} value={status.value}>
-                                                                {status.label}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    {isUpdating && (
-                                                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-500 border-t-transparent"></div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                :
-                                                <span className="font-semibold text-red-500">N/A</span>
-                                        }
-
+                                        {selectedTransaction.statusDelivery ? (
+                                            <span className="font-medium text-gray-800">
+                                                {(() => {
+                                                    const status = selectedTransaction.statusDelivery;
+                                                    const statusIcons = {
+                                                        pending: '🕒',
+                                                        processing: '⚙️',
+                                                        shipping: '🚚',
+                                                        delivered: '📦',
+                                                        completed: '✅',
+                                                        cancelled: '❌'
+                                                    };
+                                                    return `${statusIcons[status as keyof typeof statusIcons]} ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+                                                })()}
+                                            </span>
+                                        ) : (
+                                            <span className="font-semibold text-red-500">N/A</span>
+                                        )}
                                     </div>
                                 </div>
 

@@ -110,23 +110,31 @@ export const menuItems = [
     href: "/dashboard/super-admins/transaction",
     subItems: [
       {
-        label: "Daftar Transaction",
+        label: "Daftar Transaksi",
         href: "/dashboard/super-admins/transaction",
       },
 
-      { label: "Unpaid", href: "/dashboard/super-admins/transaction/unpaid" },
-
-      { label: "Paid", href: "/dashboard/super-admins/transaction/paid" },
-
-      { label: "Free", href: "/dashboard/super-admins/transaction/free" },
+      {
+        label: "Belum Dibayar",
+        href: "/dashboard/super-admins/transaction/unpaid",
+      },
 
       {
-        label: "Cancelled",
+        label: "Sudah Dibayar",
+        href: "/dashboard/super-admins/transaction/paid",
+      },
+
+      { label: "Dikirim", href: "/dashboard/super-admins/transaction/shipped" },
+
+      { label: "Gratis", href: "/dashboard/super-admins/transaction/free" },
+
+      {
+        label: "Dibatalkan",
         href: "/dashboard/super-admins/transaction/cancelled",
       },
 
       {
-        label: "Completed",
+        label: "Selesai",
         href: "/dashboard/super-admins/transaction/completed",
       },
     ],
