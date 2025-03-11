@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import { metadata as baseMetadata } from "@/base/meta/metadata";
+import { metadata as baseMetadata } from "@/base/meta/Metadata";
 
 import { db } from "@/utils/firebase";
 

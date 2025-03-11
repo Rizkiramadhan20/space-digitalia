@@ -1,4 +1,4 @@
-import { metadata } from "@/base/meta/metadata";
+import { metadata } from "@/base/meta/Metadata";
 
 import "@/base/style/globals.css";
 
