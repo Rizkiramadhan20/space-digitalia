@@ -65,3 +65,61 @@ export interface Filters {
   paymentMethod: string[]; // This will now store 'delivery' or 'download'
   paymentType: string[];
 }
+
+export interface TransactionHeaderProps {
+  isFilterModalOpen: boolean;
+  setIsFilterModalOpen: (value: boolean) => void;
+}
+
+export interface TransactionStatsProps {
+  filteredTransactions: Transaction[];
+  transactions: Transaction[];
+}
+
+export interface TransactionGridProps {
+  paginatedTransactions: Transaction[];
+  setSelectedTransaction: (transaction: Transaction) => void;
+  setIsModalOpen: (isOpen: boolean) => void;
+}
+
+export interface ProjectOverviewProps {
+  transaction: Transaction;
+}
+
+export interface UserInformationProps {
+  transaction: Transaction;
+}
+
+export interface LicenseAndDeliveryProps {
+  transaction: Transaction;
+}
+
+export interface DeliveryInformationProps {
+  transaction: Transaction;
+}
+
+export interface FilterProps {
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  filters: Filters;
+  transactions: Transaction[];
+  setFilteredTransactions: (transactions: Transaction[]) => void;
+  applyFilters: () => void;
+}
+
+export interface TransactionModalProps {
+  selectedTransaction: Transaction;
+  handleClickOutside: (e: React.MouseEvent<HTMLDivElement>) => void;
+  setIsModalOpen: (isOpen: boolean) => void;
+}
+
+export interface PaymentDetailsProps {
+  transaction: Transaction;
+}
+
+export interface QuickActionsProps {
+  transaction: Transaction;
+}
+
+export interface TimestampsProps {
+  transaction: Transaction;
+}
