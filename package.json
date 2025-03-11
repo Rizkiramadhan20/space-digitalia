@@ -77,17 +77,17 @@
   ],
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "lint": "next lint"
   },
   "files": [
-    "/sitemap.xml",
-    "/robots.txt",
-    "/favicon.ico"
+    "/public/sitemap.xml",
+    "/public/robots.txt",
+    "/public/favicon.ico"
   ],
   "dependencies": {
     "@hookform/resolvers": "^4.1.1",
@@ -105,10 +105,9 @@
     "imagekit": "^6.0.0",
     "leaflet": "^1.9.4",
     "midtrans-client": "^1.4.2",
-    "next": "15.1.7",
+    "next": "^15.2.2",
     "next-pwa": "^5.6.0",
     "next-share": "^0.27.0",
-    "next-sitemap": "^4.2.3",
     "popmotion": "^11.0.5",
     "react": "^19.0.0",
     "react-countup": "^6.5.3",

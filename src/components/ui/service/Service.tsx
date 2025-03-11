@@ -8,7 +8,7 @@ import { FetchService } from '@/components/ui/service/lib/FetchService'
 
 import { ServiceType } from '@/components/ui/service/lib/schema'
 
-import ServiceSkeleton from '@/hooks/dashboard/super-admins/layout/service/ServiceSkelaton';
+import ServiceSkeleton from '@/components/ui/service/ServiceSkelaton';
 
 import ServicePaths from '@/components/ui/service/content/ServicePaths';
 
@@ -58,7 +58,7 @@ export default function Service() {
 
     return (
         <section className='min-h-full px-4 xl:px-10 py-6 sm:py-8'>
-            <div className="container mx-auto max-w-7xl">
+            <div className="container mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
