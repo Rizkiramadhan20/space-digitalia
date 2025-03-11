@@ -21,12 +21,13 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/assets/*": ["./src/base/*"],
+      "@/base/*": ["./src/base/*"],
       "@/public/*": ["./public/*"]
     },
     "typeRoots": ["./node_modules/@types", "src/types"],
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "baseUrl": "."
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "public", "src/base"]
+  "exclude": ["node_modules", "public"]
 }
