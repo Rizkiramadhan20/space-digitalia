@@ -13,7 +13,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     onPageChange,
 }) => {
     return (
-        <div className="py-6 px-4">
+        <div className="py-6 px-4 mt-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-2 text-sm">
                     <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 font-medium">

@@ -1,4 +1,10 @@
 import type { NextConfig } from "next";
+import withBundleAnalyzer from "@next/bundle-analyzer";
+import withPWA from "next-pwa";
+
+const analyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -8,14 +14,12 @@ const nextConfig: NextConfig = {
       "avatars.githubusercontent.com",
     ],
   },
-
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@react-pdf/renderer": require.resolve("@react-pdf/renderer"),
-    };
-    return config;
+  pwa: {
+    dest: "public",
+    register: true,
+    skipWaiting: true,
+    disable: process.env.NODE_ENV === "development",
   },
 };
 
-export default nextConfig;
+export default analyzer(withPWA(nextConfig));

@@ -4,26 +4,43 @@ import React, { useEffect, useState } from 'react'
 
 import { db } from '@/utils/firebase'
 
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore'
 
 import Image from 'next/image'
-
-import Link from 'next/link'
 
 import { Transaction } from '@/hooks/dashboard/super-admins/transaction/complated/lib/schema'
 
 import { useModal } from '@/base/helper/useModal'
 
+import TransactionComplatedSkelaton from '@/hooks/dashboard/super-admins/transaction/complated/TransactionComplatedSkelaton'
+
+import { format } from 'date-fns'
+
+// Add this interface to define the rating structure
+interface Rating {
+    rating: number;
+    userId: string;
+    transactionId: string;
+    review: string;
+    userPhotoURL: string;
+    userName?: string;
+    createdAt?: Timestamp;
+}
+
 export default function ComplatedLayout() {
     const [completedTransactions, setCompletedTransactions] = useState<Transaction[]>([])
+    const [projectRatings, setProjectRatings] = useState<{ [key: string]: Rating }>({})
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [showFilters, setShowFilters] = useState(false)
     const [licenseTypes, setLicenseTypes] = useState<string[]>([])
+    const [isLoading, setIsLoading] = useState(true)
     const [filters, setFilters] = useState({
         licenseType: '',
         fromDate: '',
     })
+    const [selectedRating, setSelectedRating] = useState<Rating | null>(null)
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false)
 
     useModal({
         isOpen: isModalOpen,
@@ -49,18 +66,38 @@ export default function ComplatedLayout() {
                     ...doc.data()
                 })) as Transaction[];
 
-                // Extract unique license types from transactions
-                const uniqueLicenseTypes = [...new Set(transactions.map(t => t.licenseType))];
-                setLicenseTypes(uniqueLicenseTypes);
+                // Fetch ratings from projects collection
+                const ratingsData: { [key: string]: Rating } = {}
 
-                setCompletedTransactions(transactions);
+                for (const transaction of transactions) {
+                    if (transaction.projectId) {
+                        const ratingsRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT as string, transaction.projectId, process.env.NEXT_PUBLIC_COLLECTIONS_RATINGS as string)
+                        const ratingsSnapshot = await getDocs(ratingsRef)
+
+                        if (!ratingsSnapshot.empty) {
+                            // Get the first rating document
+                            ratingsData[transaction.id] = ratingsSnapshot.docs[0].data() as Rating
+                        }
+                    }
+                }
+
+                setProjectRatings(ratingsData)
+                const uniqueLicenseTypes = [...new Set(transactions.map(t => t.licenseType))]
+                setLicenseTypes(uniqueLicenseTypes)
+                setCompletedTransactions(transactions)
             } catch (error) {
                 console.error('Error fetching completed transactions:', error)
+            } finally {
+                setIsLoading(false)
             }
         }
 
         fetchCompletedTransactions()
     }, [])
+
+    if (isLoading) {
+        return <TransactionComplatedSkelaton />
+    }
 
     const handleOpenModal = (transaction: Transaction) => {
         setSelectedTransaction(transaction)
@@ -87,6 +124,20 @@ export default function ComplatedLayout() {
 
         return matches;
     });
+
+    const handleViewRatings = (transactionId: string) => {
+        const rating = projectRatings[transactionId]
+        if (rating) {
+            setSelectedRating(rating)
+            setIsRatingModalOpen(true)
+        }
+    }
+
+    const getRatingDisplay = (transactionId: string) => {
+        const rating = projectRatings[transactionId]
+        if (!rating) return 'No Rating'
+        return `Rating: ${rating.rating}`
+    }
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
@@ -169,45 +220,111 @@ export default function ComplatedLayout() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                 {filteredTransactions.map((transaction: Transaction) => (
-                    <div key={transaction.id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                        <div className="relative h-48 overflow-hidden">
-                            <Image
-                                src={transaction.imageUrl}
-                                alt={transaction.projectTitle}
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
+                    <div key={transaction.id} className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                        {/* Top Status Bar */}
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-emerald-500" />
 
-                        <div className="p-6 space-y-4">
-                            <div className="space-y-2">
-                                <h2 className="text-xl font-semibold text-gray-800 line-clamp-1">
+                        {/* Main Content */}
+                        <div className="p-5">
+                            {/* Header with Status */}
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="px-3 py-1.5 text-xs font-medium bg-green-50 text-green-700 rounded-full border border-green-100">
+                                    {transaction.statusDelivery}
+                                </span>
+                                <span className="px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">
+                                    {transaction.licenseType}
+                                </span>
+                            </div>
+
+                            {/* Project Image and Title */}
+                            <div className="space-y-4">
+                                <div className="aspect-video relative rounded-xl overflow-hidden">
+                                    <Image
+                                        src={transaction.imageUrl}
+                                        alt={transaction.projectTitle}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                </div>
+                                <h2 className="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors duration-300">
                                     {transaction.projectTitle}
                                 </h2>
-                                <div className="flex flex-wrap gap-2">
-                                    <span className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
-                                        {transaction.statusDelivery}
-                                    </span>
-                                    <span className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
-                                        {transaction.licenseType}
+                            </div>
+
+                            {/* User Profile Section */}
+                            <div className="mt-4 p-3 bg-gray-50 rounded-xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                                        {
+                                            transaction.userPhotoURL ? (
+                                                <Image
+                                                    src={transaction.userPhotoURL}
+                                                    alt={transaction.userName}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-gray-200 animate-[shimmer_1.5s_infinite]">
+                                                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                            {transaction.userName}
+                                        </p>
+                                        <p className="text-xs text-gray-500 truncate">
+                                            {transaction.userEmail}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Transaction Info */}
+                            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                                <div className="flex items-center gap-2 text-gray-600">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+
+                                    <span>{format(transaction.createdAt.toDate(), 'dd MMM yyyy')}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-gray-600 justify-end">
+                                    <span>
+                                        {new Intl.NumberFormat('id-ID', {
+                                            style: 'currency',
+                                            currency: 'IDR',
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0
+                                        }).format(Number(transaction.amount))}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <Link
-                                    href={transaction.linkTransaction}
-                                    className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
-                                    rel='noopener noreferrer'
-                                    target='_blank'
+                            {/* Actions */}
+                            <div className="mt-6 flex items-center gap-3">
+                                <button
+                                    onClick={() => handleViewRatings(transaction.id)}
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-200"
                                 >
-                                    Lihat Transaksi
-                                </Link>
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                    {getRatingDisplay(transaction.id)}
+                                </button>
                                 <button
                                     onClick={() => handleOpenModal(transaction)}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                                 >
-                                    Lihat Detail
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    View Details
                                 </button>
                             </div>
                         </div>
@@ -430,6 +547,121 @@ export default function ComplatedLayout() {
                     <button
                         onClick={() => setIsModalOpen(false)}
                         className="cursor-default absolute inset-0 w-full h-full bg-black/50"
+                    />
+                </form>
+            </dialog>
+
+            {/* Rating Modal */}
+            <dialog
+                id="rating_details_modal"
+                className="modal"
+                open={isRatingModalOpen}
+            >
+                <div className="modal-box w-11/12 max-w-2xl bg-gradient-to-b from-white to-gray-50/50 backdrop-blur-xl p-0 rounded-2xl overflow-hidden border border-gray-100 shadow-2xl">
+                    {selectedRating && (
+                        <>
+                            {/* Header with gradient background */}
+                            <div className="relative p-6 bg-gradient-to-r from-indigo-500 to-purple-600">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                                        <svg className="w-6 h-6 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                        </svg>
+                                        Rating Details
+                                    </h3>
+                                    <button
+                                        onClick={() => setIsRatingModalOpen(false)}
+                                        className="btn btn-circle btn-sm bg-white/10 hover:bg-white/20 border-0 text-white"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                {/* Decorative elements */}
+                                <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-transparent pointer-events-none" />
+                                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-white/0 via-white/20 to-white/0" />
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-6 space-y-6">
+                                {/* User Info Card */}
+                                <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative h-16 w-16 rounded-xl overflow-hidden border-2 border-white shadow-lg">
+                                            <Image
+                                                src={selectedRating.userPhotoURL}
+                                                alt={selectedRating.userName || 'User'}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                                {selectedRating.userName}
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
+                                                    Verified Purchase
+                                                </span>
+                                            </h4>
+                                            <p className="text-sm text-gray-500 mt-0.5 font-medium">
+                                                Transaction ID: {selectedRating.transactionId}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Rating Card */}
+                                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-100/50 shadow-sm">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, index) => (
+                                                <svg
+                                                    key={index}
+                                                    className={`w-7 h-7 transform transition-transform duration-200 hover:scale-110 ${index < selectedRating.rating
+                                                        ? 'text-amber-400'
+                                                        : 'text-gray-200'
+                                                        }`}
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            ))}
+                                        </div>
+                                        <span className="text-2xl font-bold text-amber-600">
+                                            {selectedRating.rating.toFixed(1)}
+                                        </span>
+                                    </div>
+
+                                    {/* Review */}
+                                    {selectedRating.review && (
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-amber-100/50 shadow-sm mt-2">
+                                            <p className="text-gray-700 whitespace-pre-wrap text-lg leading-relaxed">
+                                                {selectedRating.review}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Timestamps with modern styling */}
+                                {selectedRating.createdAt && (
+                                    <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-full w-fit">
+                                        <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Posted on: {selectedRating.createdAt.toDate().toLocaleString()}
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Modern Backdrop with Blur */}
+                <form method="dialog" className="modal-backdrop">
+                    <button
+                        onClick={() => setIsRatingModalOpen(false)}
+                        className="cursor-default absolute inset-0 w-full h-full bg-gray-900/50 backdrop-blur-sm"
                     />
                 </form>
             </dialog>

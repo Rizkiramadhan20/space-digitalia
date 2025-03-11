@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore'
+import { collection, query, where, getDocs } from 'firebase/firestore'
 
 import { db } from '@/utils/firebase'
 
@@ -10,62 +10,35 @@ import Image from 'next/image'
 
 import { toast } from "react-hot-toast"
 
-// Interface untuk data transaksi
-interface Transaction {
-    id: string;
-    amount: number;
-    createdAt: Timestamp;
-    deliveryMethod: string;
-    imageUrl: string;
-    licenseType: string;
-    linkTransaction: string;
-    orderId: string;
-    paymentMethod: string;
-    projectId: string;
-    projectTitle: string;
-    status: string;
-    userPhotoURL: string;
-    statusDelivery: null | string;
-    updatedAt: Timestamp;
-    userEmail: string;
-    userId: string;
-    userName: string;
-    deliveryAddress: {
-        address: string;
-        city: string;
-        postalCode: string;
-        province: string;
-        country: string;
-        details: string;
-        district: string;
-        fullName: string;
-        phone: string;
-        streetAddress: string;
-    }
-    paymentDetails: {
-        bca_va_number: string;
-        finish_redirect_url: string;
-        fraud_status: string;
-        gross_amount: string;
-        order_id: string;
-        payment_type: string;
-        pdf_url: string;
-        status_code: string;
-        status_message: string;
-        transaction_id: string;
-        transaction_status: string;
-        transaction_time: string;
-        va_numbers: Array<{
-            bank: string;
-            va_number: string;
-        }>;
-    }
-}
+import TransactionUnpaidSkeleton from '@/hooks/dashboard/super-admins/transaction/unpaid/TransactionUnpaidSkelaton'
+
+import EmptyUnpaidTransaction from '@/hooks/dashboard/super-admins/transaction/unpaid/content/empety'
+
+import { Transaction } from '@/hooks/dashboard/super-admins/transaction/unpaid/lib/schema'
+
+import { useModal } from '@/base/helper/useModal';
+
+import { useModalWithClose } from '@/base/helper/ModalWithClose';
+
+import { Pagination } from '@/base/helper/Pagination';
 
 export default function TransactionUnpaidLayout() {
     const [pendingTransactions, setPendingTransactions] = useState<Transaction[]>([]);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage] = useState(9); // Show 9 items per page (3x3 grid)
+
+    const { handleClickOutside } = useModalWithClose({
+        isOpen: isModalOpen,
+        onClose: () => setIsModalOpen(false)
+    });
+
+    useModal({
+        isOpen: isModalOpen,
+        onClose: () => setIsModalOpen(false)
+    });
 
     useEffect(() => {
         const fetchPendingTransactions = async () => {
@@ -87,47 +60,33 @@ export default function TransactionUnpaidLayout() {
                 setPendingTransactions(sortedTransactions);
             } catch (error) {
                 console.error('Error fetching pending transactions:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchPendingTransactions();
     }, []);
 
-    useEffect(() => {
-        if (isModalOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isModalOpen]);
-
-    // Handle click outside modal
-    const handleClickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            setIsModalOpen(false);
-        }
+    const handlePageChange = (selectedItem: { selected: number }) => {
+        setCurrentPage(selectedItem.selected);
+        // Scroll to top of the page when changing pages
+        window.scrollTo(0, 0);
     };
 
-    // Handle Esc key press
-    useEffect(() => {
-        const handleEscKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                setIsModalOpen(false);
-            }
-        };
+    // Calculate pagination values
+    const indexOfLastItem = (currentPage + 1) * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTransactions = pendingTransactions.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(pendingTransactions.length / itemsPerPage);
 
-        if (isModalOpen) {
-            document.addEventListener('keydown', handleEscKey);
-        }
+    if (isLoading) {
+        return <TransactionUnpaidSkeleton />
+    }
 
-        return () => {
-            document.removeEventListener('keydown', handleEscKey);
-        };
-    }, [isModalOpen]);
+    if (pendingTransactions.length === 0) {
+        return <EmptyUnpaidTransaction />
+    }
 
     return (
         <section className='min-h-full px-0 sm:px-4'>
@@ -139,20 +98,11 @@ export default function TransactionUnpaidLayout() {
                         </h1>
                         <p className='text-gray-500'>Manage and organize your unpaid transaction</p>
                     </div>
-
-                    <button
-                        className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-indigo-100 hover:shadow-lg transform hover:-translate-y-0.5"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                        </svg>
-                        Filter
-                    </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pendingTransactions.map((transaction) => (
+                {currentTransactions.map((transaction) => (
                     <div key={transaction.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                         {/* Image Container */}
                         <div className="relative h-48 w-full">
@@ -271,6 +221,12 @@ export default function TransactionUnpaidLayout() {
                     </div>
                 ))}
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
 
             {isModalOpen && selectedTransaction && (
                 <div
@@ -422,12 +378,12 @@ export default function TransactionUnpaidLayout() {
                                         <div className="col-span-1 sm:col-span-2 bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                             <dt className="text-sm text-gray-500 mb-1">Transaction Status</dt>
                                             <dd className="flex items-center gap-2">
-                                                <span className={`w-2 h-2 rounded-full ${selectedTransaction.paymentDetails.transaction_status === 'success' ? 'bg-green-500' :
-                                                    selectedTransaction.paymentDetails.transaction_status === 'pending' ? 'bg-yellow-500' :
+                                                <span className={`w-2 h-2 rounded-full ${selectedTransaction.paymentDetails?.transaction_status === 'success' ? 'bg-green-500' :
+                                                    selectedTransaction.paymentDetails?.transaction_status === 'pending' ? 'bg-yellow-500' :
                                                         'bg-red-500'
                                                     }`}></span>
                                                 <span className="text-sm font-semibold text-gray-900">
-                                                    {selectedTransaction.paymentDetails.status_message}
+                                                    {selectedTransaction.paymentDetails?.status_message || 'Status not available'}
                                                 </span>
                                             </dd>
                                         </div>
@@ -436,7 +392,7 @@ export default function TransactionUnpaidLayout() {
                                         <div className="col-span-1 sm:col-span-2 bg-indigo-50 rounded-lg p-4 border border-indigo-100">
                                             <dt className="text-sm text-indigo-600 mb-1">Amount</dt>
                                             <dd className="text-2xl font-bold text-indigo-700">
-                                                Rp {parseInt(selectedTransaction.paymentDetails.gross_amount).toLocaleString('id-ID')}
+                                                Rp {parseInt(selectedTransaction.paymentDetails?.gross_amount || '0').toLocaleString('id-ID')}
                                             </dd>
                                         </div>
 
@@ -444,7 +400,7 @@ export default function TransactionUnpaidLayout() {
                                         <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                             <dt className="text-sm text-gray-500 mb-1">Payment Method</dt>
                                             <dd className="text-sm font-semibold text-gray-900 capitalize">
-                                                {selectedTransaction.paymentDetails.payment_type.replace(/_/g, ' ')}
+                                                {(selectedTransaction.paymentDetails?.payment_type || 'Not specified').replace(/_/g, ' ')}
                                             </dd>
                                         </div>
 
@@ -452,12 +408,15 @@ export default function TransactionUnpaidLayout() {
                                         <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                             <dt className="text-sm text-gray-500 mb-1">Transaction Time</dt>
                                             <dd className="text-sm font-semibold text-gray-900">
-                                                {new Date(selectedTransaction.paymentDetails.transaction_time).toLocaleString('id-ID')}
+                                                {selectedTransaction.paymentDetails?.transaction_time ?
+                                                    new Date(selectedTransaction.paymentDetails.transaction_time).toLocaleString('id-ID') :
+                                                    'Not available'
+                                                }
                                             </dd>
                                         </div>
 
                                         {/* VA Numbers */}
-                                        {selectedTransaction.paymentDetails.va_numbers?.map((va, index) => (
+                                        {selectedTransaction.paymentDetails?.va_numbers?.map((va, index) => (
                                             <div key={index} className="col-span-1 sm:col-span-2 bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                                 <dt className="text-sm text-gray-500 mb-1">Virtual Account ({va.bank.toUpperCase()})</dt>
                                                 <dd className="flex items-center gap-3">
@@ -479,23 +438,23 @@ export default function TransactionUnpaidLayout() {
                                         <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                             <dt className="text-sm text-gray-500 mb-1">Order ID</dt>
                                             <dd className="text-sm font-mono font-medium text-gray-900">
-                                                {selectedTransaction.paymentDetails.order_id}
+                                                {selectedTransaction.paymentDetails?.order_id || 'Not available'}
                                             </dd>
                                         </div>
 
                                         <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                             <dt className="text-sm text-gray-500 mb-1">Transaction ID</dt>
                                             <dd className="text-sm font-mono font-medium text-gray-900">
-                                                {selectedTransaction.paymentDetails.transaction_id}
+                                                {selectedTransaction.paymentDetails?.transaction_id || 'Not available'}
                                             </dd>
                                         </div>
 
                                         {/* Fraud Status */}
                                         <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
                                             <dt className="text-sm text-gray-500 mb-1">Fraud Status</dt>
-                                            <dd className={`text-sm font-medium ${selectedTransaction.paymentDetails.fraud_status === 'accept' ? 'text-green-600' : 'text-red-600'
+                                            <dd className={`text-sm font-medium ${selectedTransaction.paymentDetails?.fraud_status === 'accept' ? 'text-green-600' : 'text-red-600'
                                                 }`}>
-                                                {selectedTransaction.paymentDetails.fraud_status.toUpperCase()}
+                                                {(selectedTransaction.paymentDetails?.fraud_status || 'UNKNOWN').toUpperCase()}
                                             </dd>
                                         </div>
 
@@ -503,28 +462,32 @@ export default function TransactionUnpaidLayout() {
                                         <div className="col-span-1 sm:col-span-2 mt-2">
                                             <dt className="text-sm text-gray-500 mb-3">Quick Actions</dt>
                                             <dd className="flex flex-wrap gap-3">
-                                                <a
-                                                    href={selectedTransaction.paymentDetails.pdf_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
-                                                >
-                                                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                                    </svg>
-                                                    Download Invoice PDF
-                                                </a>
-                                                <a
-                                                    href={selectedTransaction.paymentDetails.finish_redirect_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-100 hover:border-indigo-200 transition-all duration-200"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                    </svg>
-                                                    View Status Page
-                                                </a>
+                                                {selectedTransaction.paymentDetails?.pdf_url && (
+                                                    <a
+                                                        href={selectedTransaction.paymentDetails.pdf_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                                                    >
+                                                        <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        </svg>
+                                                        Download Invoice PDF
+                                                    </a>
+                                                )}
+                                                {selectedTransaction.paymentDetails?.finish_redirect_url && (
+                                                    <a
+                                                        href={selectedTransaction.paymentDetails.finish_redirect_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-100 hover:border-indigo-200 transition-all duration-200"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
+                                                        View Status Page
+                                                    </a>
+                                                )}
                                             </dd>
                                         </div>
                                     </dl>
