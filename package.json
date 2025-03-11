@@ -84,7 +84,6 @@
     "lint": "next lint",
     "postbuild": "next-sitemap"
   },
-  "type": "module",
   "files": [
     "/sitemap.xml",
     "/robots.txt",
