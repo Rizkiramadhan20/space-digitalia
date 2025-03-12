@@ -66,15 +66,20 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
     const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
 
     // Add new state for social verification
-    const [showSocialVerification, setShowSocialVerification] = useState(false);
-    const [socialVerified, setSocialVerified] = useState({
+    const [socialVerification, setSocialVerification] = useState({
         instagram: false,
         tiktok: false
     });
 
+    // Add verification check helper
+    const allSocialsVerified = () => socialVerification.tiktok && socialVerification.instagram;
+
     // Add hooks
     const { user } = useAuth();
     const router = useRouter();
+
+    // Add state for social modal
+    const [showSocialModal, setShowSocialModal] = useState(false);
 
     useEffect(() => {
         const unsubscribe = FetchTypeTitle(typeTitle, (data) => {
@@ -395,15 +400,27 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
     };
 
     const handleFreeTransaction = async () => {
-        // Check if social verification is needed and not completed
-        if (selectedLicense?.price === 0 && (!socialVerified.instagram || !socialVerified.tiktok)) {
-            setShowSocialVerification(true);
-            return;
-        }
-
         try {
             if (!selectedPreview || !selectedLicense || !deliveryMethod || !user) {
                 toast.error('Please complete all required selections');
+                return;
+            }
+
+            // Show social media modal first
+            setShowSocialModal(true);
+
+        } catch {
+            toast.error('Failed to process transaction');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    // Update processFreeTransaction
+    const processFreeTransaction = async () => {
+        try {
+            if (!selectedPreview || !selectedLicense || !user) {
+                toast.error('Missing required information');
                 return;
             }
 
@@ -423,6 +440,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                     imageUrl: selectedPreview.imageUrl,
                     userEmail: user.email,
                     userName: user.displayName,
+                    userPhotoURL: user.photoURL ?? null,
                     deliveryAddress: deliveryMethod === 'delivery' ? defaultAddress : null,
                 }),
             });
@@ -433,20 +451,22 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                 toast.success('Transaction successful!');
                 router.push(data.redirectUrl);
             } else {
-                toast.error(data.error || 'Transaction failed');
+                throw new Error(data.error || 'Transaction failed');
             }
-        } catch {
-            toast.error('Failed to process transaction');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to process transaction');
+            console.error('Free transaction error:', error);
         } finally {
             setIsProcessing(false);
+            setShowSocialModal(false);
         }
     };
 
-    const handleTransaction = () => {
+    const handleTransaction = async () => {
         if (selectedLicense?.price === 0) {
-            handleFreeTransaction();
+            await handleFreeTransaction();
         } else {
-            handlePayment();
+            await handlePayment();
         }
     };
 
@@ -477,14 +497,11 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
 
     // Add social verification handler
     const handleSocialVerification = (platform: 'instagram' | 'tiktok') => {
-        setSocialVerified(prev => ({
+        setSocialVerification(prev => ({
             ...prev,
             [platform]: true
         }));
     };
-
-    // Add verification check
-    const isSocialVerified = socialVerified.instagram && socialVerified.tiktok;
 
     if (isLoading) {
         return <ProjectTypeTitleSkelaton />
@@ -1053,7 +1070,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                                             onClick={() => setDeliveryMethod('download')}
                                                             className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300
                                                                 ${deliveryMethod === 'download'
-                                                                    ? 'bg-gradient-to-br from-cyan-500 to-indigo-500 border-transparent'
+                                                                    ? 'bg-gradient-to-br from-cyan-500 to-indigo-500 border-transparent shadow-lg shadow-cyan-500/20'
                                                                     : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
                                                                 }`}
                                                         >
@@ -1061,8 +1078,8 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                                                 <div className="flex flex-col items-center gap-3">
                                                                     <div className={`p-3 rounded-xl ${deliveryMethod === 'download'
                                                                         ? 'bg-white/20'
-                                                                        : 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20'
-                                                                        } transition-colors duration-300`}>
+                                                                        : 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 group-hover:from-cyan-500/30 group-hover:to-indigo-500/30'
+                                                                        } transition-all duration-300`}>
                                                                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                                                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1079,7 +1096,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                                                 </div>
                                                             </div>
                                                             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 
-                                                                opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                                                opacity-0 group-hover:opacity-100 transition-all duration-300" />
                                                         </button>
 
                                                         {selectedPreview.licenseTitle.toLowerCase() !== 'free' && (
@@ -1087,22 +1104,140 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                                                 onClick={() => setDeliveryMethod('delivery')}
                                                                 className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300
                                                                     ${deliveryMethod === 'delivery'
-                                                                        ? 'bg-gradient-to-br from-cyan-500 to-indigo-500 border-transparent'
+                                                                        ? 'bg-gradient-to-br from-cyan-500 to-indigo-500 border-transparent shadow-lg shadow-cyan-500/20'
                                                                         : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
                                                                     }`}
                                                             >
-                                                                {/* Similar structure as download button */}
-                                                                {/* ... rest of the delivery button code ... */}
+                                                                <div className="relative z-10 p-5">
+                                                                    <div className="flex flex-col items-center gap-3">
+                                                                        <div className={`p-3 rounded-xl ${deliveryMethod === 'delivery'
+                                                                            ? 'bg-white/20'
+                                                                            : 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 group-hover:from-cyan-500/30 group-hover:to-indigo-500/30'
+                                                                            } transition-all duration-300`}>
+                                                                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div className="text-center">
+                                                                            <p className={`text-sm font-medium ${deliveryMethod === 'delivery' ? 'text-white' : 'text-gray-300'}`}>
+                                                                                Delivery
+                                                                            </p>
+                                                                            <p className={`text-xs mt-1 ${deliveryMethod === 'delivery' ? 'text-white/80' : 'text-gray-400'}`}>
+                                                                                {selectedLicense?.deliveryDays || '3-5'} days delivery
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 
+                                                                    opacity-0 group-hover:opacity-100 transition-all duration-300" />
                                                             </button>
                                                         )}
                                                     </div>
 
+                                                    {/* Add Delivery Address Section */}
+                                                    {deliveryMethod === 'delivery' && (
+                                                        <div className="space-y-4 p-6 rounded-2xl bg-gradient-to-br from-gray-800/40 to-gray-800/20 backdrop-blur-xl 
+                                                            border-2 border-gray-700/30 hover:border-indigo-500/30 transition-all duration-300">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="p-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20">
+                                                                        <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <span className="text-sm font-medium text-cyan-400">Delivery Address</span>
+                                                                </div>
+                                                                {defaultAddress && (
+                                                                    <Link
+                                                                        href="/account/address"
+                                                                        className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-2"
+                                                                    >
+                                                                        <span>Change</span>
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                        </svg>
+                                                                    </Link>
+                                                                )}
+                                                            </div>
+
+                                                            {defaultAddress ? (
+                                                                <div className="mt-6 space-y-4">
+                                                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30">
+                                                                        <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 to-indigo-500/10">
+                                                                            <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h4 className="text-white font-medium">{defaultAddress.fullName}</h4>
+                                                                            <p className="text-gray-400 text-sm">{defaultAddress.phone}</p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/30 space-y-2">
+                                                                        <div className="flex items-start gap-4">
+                                                                            <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 to-indigo-500/10">
+                                                                                <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                                                </svg>
+                                                                            </div>
+                                                                            <div className="flex-1 space-y-1">
+                                                                                <p className="text-gray-300">{defaultAddress.streetAddress}</p>
+                                                                                <p className="text-gray-300">{defaultAddress.district}, {defaultAddress.city}</p>
+                                                                                <p className="text-gray-300">{defaultAddress.province}, {defaultAddress.postalCode}</p>
+                                                                                {defaultAddress.details && (
+                                                                                    <p className="text-gray-400 text-sm mt-2 pt-2 border-t border-gray-700/30">
+                                                                                        {defaultAddress.details}
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex flex-col items-center justify-center py-8">
+                                                                    <div className="p-4 rounded-full bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 mb-4">
+                                                                        <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <p className="text-gray-400 mb-6">No default address found</p>
+                                                                    <Link
+                                                                        href="/account/address"
+                                                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl
+                                                                            bg-gradient-to-r from-cyan-500 to-indigo-500 
+                                                                            hover:from-cyan-600 hover:to-indigo-600
+                                                                            text-white font-medium transition-all duration-300
+                                                                            shadow-lg shadow-cyan-500/20"
+                                                                    >
+                                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                                                            />
+                                                                        </svg>
+                                                                        Add Delivery Address
+                                                                    </Link>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
                                                     {/* Payment Button */}
                                                     <button
                                                         onClick={handleTransaction}
-                                                        disabled={isProcessing || !deliveryMethod}
+                                                        disabled={isProcessing || !deliveryMethod || (deliveryMethod === 'delivery' && !defaultAddress)}
                                                         className={`relative w-full overflow-hidden rounded-2xl transition-all duration-300
-                                                            ${isProcessing || !deliveryMethod
+                                                            ${isProcessing || !deliveryMethod || (deliveryMethod === 'delivery' && !defaultAddress)
                                                                 ? 'bg-gray-800/40 cursor-not-allowed'
                                                                 : 'bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600'
                                                             }`}
@@ -1216,13 +1351,13 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
             )}
 
             {/* Add Social Verification Modal */}
-            {showSocialVerification && (
+            {showSocialModal && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 bg-black/95 backdrop-blur-md z-[1000] flex items-center justify-center"
-                    onClick={() => setShowSocialVerification(false)}
+                    onClick={() => setShowSocialModal(false)}
                 >
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
@@ -1246,7 +1381,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                     rel="noopener noreferrer"
                                     onClick={() => handleSocialVerification('instagram')}
                                     className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border 
-                                        transition-all duration-300 ${socialVerified.instagram
+                                        transition-all duration-300 ${socialVerification.instagram
                                             ? 'bg-pink-600/20 border-pink-500/50 text-pink-400'
                                             : 'bg-gray-800/30 border-gray-700/30 hover:border-pink-500/30 text-gray-300 hover:text-pink-400'
                                         }`}
@@ -1257,7 +1392,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                         </svg>
                                         <span className="font-medium">Follow on Instagram</span>
                                     </div>
-                                    {socialVerified.instagram && (
+                                    {socialVerification.instagram && (
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
@@ -1271,7 +1406,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                     rel="noopener noreferrer"
                                     onClick={() => handleSocialVerification('tiktok')}
                                     className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border 
-                                        transition-all duration-300 ${socialVerified.tiktok
+                                        transition-all duration-300 ${socialVerification.tiktok
                                             ? 'bg-black border-white/50 text-white'
                                             : 'bg-gray-800/30 border-gray-700/30 hover:border-white/30 text-gray-300 hover:text-white'
                                         }`}
@@ -1282,7 +1417,7 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                         </svg>
                                         <span className="font-medium">Follow on TikTok</span>
                                     </div>
-                                    {socialVerified.tiktok && (
+                                    {socialVerification.tiktok && (
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
@@ -1292,19 +1427,19 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
 
                             <button
                                 onClick={() => {
-                                    if (isSocialVerified) {
-                                        setShowSocialVerification(false);
-                                        handleFreeTransaction();
+                                    if (allSocialsVerified()) {
+                                        setShowSocialModal(false);
+                                        processFreeTransaction();
                                     }
                                 }}
                                 className={`w-full mt-6 px-6 py-3 rounded-xl font-medium transition-all duration-300
-                                    ${isSocialVerified
+                                    ${allSocialsVerified()
                                         ? 'bg-primary text-white hover:bg-primary/90'
                                         : 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
                                     }`}
-                                disabled={!isSocialVerified}
+                                disabled={!allSocialsVerified()}
                             >
-                                {isSocialVerified ? 'Continue to Download' : 'Follow Both Platforms to Continue'}
+                                {allSocialsVerified() ? 'Continue to Download' : 'Follow Both Platforms to Continue'}
                             </button>
                         </div>
                     </motion.div>

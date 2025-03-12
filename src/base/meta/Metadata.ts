@@ -8,56 +8,6 @@ export const viewport = {
   themeColor: "#f5f5f5",
 };
 
-export const openGraph = {
-  title: "Space Digitalia - Jasa Pembuatan Website Profesional",
-  description:
-    "Kami menyediakan layanan pembuatan website berkualitas tinggi dengan harga terjangkau untuk UMKM",
-  url: BASE_URL,
-  siteName: "Space Digitalia",
-
-  images: [
-    {
-      url: "/favicon.ico",
-      width: 1920,
-      height: 1080,
-    },
-  ],
-
-  locale: "id_ID",
-  type: "website",
-  site: "@rizki_ramadhan",
-  creator: "@rizki_ramadhan",
-  card: "summary_large_image",
-  robots: {
-    index: true,
-    follow: true,
-    noarchive: true,
-    nocache: true,
-  },
-  other: {
-    "theme-color": "#f5f5f5",
-    "mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-capable": "yes",
-  },
-
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SEARCH_CONSOLE_ID,
-  },
-
-  authors: [{ name: "Rizki Ramadhan" }],
-  keywords: ["Space Digitalia", "Space", "Digitalia", "Rizki Ramadhan"],
-  icons: {
-    icon: [
-      {
-        url: "/favicon.ico",
-      },
-    ],
-  },
-  manifest: "/manifest.json",
-  metadataBase: new URL(BASE_URL),
-  canonical: BASE_URL,
-};
-
 export const metadata = {
   title: "Space Digitalia",
   description:

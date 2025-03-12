@@ -84,7 +84,6 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${openSans.variable} antialiased`}>
-        {/* Google Tag Manager (noscript) */}
         {GTM_ID && (
           <noscript>
             <iframe

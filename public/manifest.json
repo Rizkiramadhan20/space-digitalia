@@ -5,18 +5,18 @@
   "start_url": "/",
   "icons": [
     {
-      "src": "/logo.jpg",
+      "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "/logo.jpg",
-      "type": "image/png",
+      "src": "/favicon.ico",
+      "type": "image/x-icon",
       "sizes": "192x192"
     },
     {
-      "src": "/logo.jpg",
-      "type": "image/png",
+      "src": "/favicon.ico",
+      "type": "image/x-icon",
       "sizes": "512x512"
     }
   ],
@@ -29,7 +29,7 @@
     {
       "name": "Space Digitalia",
       "url": "/",
-      "icons": [{ "src": "/logo.jpg", "sizes": "64x64" }]
+      "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
     }
   ],
   "sitemap.xml": "https://spacedigitalia.my.id/sitemap.xml",
@@ -48,7 +48,7 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/home.png",
+      "src": "/home.png",
       "sizes": "1280x720",
       "type": "image/png"
     }

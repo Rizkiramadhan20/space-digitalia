@@ -66,13 +66,6 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
     const [deliveryMethod, setDeliveryMethod] = useState<'download' | 'delivery' | ''>('');
     const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
 
-    // Add new state for social verification
-    const [showSocialVerification, setShowSocialVerification] = useState(false);
-    const [socialVerified, setSocialVerified] = useState({
-        instagram: false,
-        tiktok: false
-    });
-
     // Add hooks
     const { user } = useAuth();
     const router = useRouter();
@@ -395,15 +388,30 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
     };
 
     const handleFreeTransaction = async () => {
-        // Check if social verification is needed and not completed
-        if (selectedLicense?.price === 0 && (!socialVerified.instagram || !socialVerified.tiktok)) {
-            setShowSocialVerification(true);
-            return;
-        }
-
         try {
             if (!selectedPreview || !selectedLicense || !deliveryMethod || !user) {
                 toast.error('Please complete all required selections');
+                return;
+            }
+
+            setIsProcessing(true);
+
+            // Call processFreeTransaction
+            await processFreeTransaction();
+
+        } catch (error) {
+            toast.error('Failed to process transaction');
+            console.error('Free transaction error:', error);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    // Update processFreeTransaction
+    const processFreeTransaction = async () => {
+        try {
+            if (!selectedPreview || !selectedLicense || !user) {
+                toast.error('Missing required information');
                 return;
             }
 
@@ -423,6 +431,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                     imageUrl: selectedPreview.imageUrl,
                     userEmail: user.email,
                     userName: user.displayName,
+                    userPhotoURL: user.photoURL ?? null,
                     deliveryAddress: deliveryMethod === 'delivery' ? defaultAddress : null,
                 }),
             });
@@ -433,10 +442,11 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                 toast.success('Transaction successful!');
                 router.push(data.redirectUrl);
             } else {
-                toast.error(data.error || 'Transaction failed');
+                throw new Error(data.error || 'Transaction failed');
             }
-        } catch {
-            toast.error('Failed to process transaction');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to process transaction');
+            console.error('Free transaction error:', error);
         } finally {
             setIsProcessing(false);
         }
@@ -474,17 +484,6 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
             setIsProcessing(false);
         };
     }, []);
-
-    // Add social verification handler
-    const handleSocialVerification = (platform: 'instagram' | 'tiktok') => {
-        setSocialVerified(prev => ({
-            ...prev,
-            [platform]: true
-        }));
-    };
-
-    // Add verification check
-    const isSocialVerified = socialVerified.instagram && socialVerified.tiktok;
 
     if (isLoading) {
         return <ProjectTypeSkelaton />
@@ -1124,11 +1123,113 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                                                         : 'bg-gray-800/30 border-gray-700/30 hover:border-indigo-500/50'
                                                                     }`}
                                                             >
-                                                                {/* Similar structure as download button */}
-                                                                {/* ... rest of the delivery button code ... */}
+                                                                <div className="relative z-10 p-5">
+                                                                    <div className="flex flex-col items-center gap-3">
+                                                                        <div className={`p-3 rounded-xl ${deliveryMethod === 'delivery'
+                                                                            ? 'bg-white/20'
+                                                                            : 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20'
+                                                                            } transition-colors duration-300`}>
+                                                                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                                                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div className="text-center">
+                                                                            <p className={`text-sm font-medium ${deliveryMethod === 'delivery' ? 'text-white' : 'text-gray-300'}`}>
+                                                                                Delivery
+                                                                            </p>
+                                                                            <p className={`text-xs mt-1 ${deliveryMethod === 'delivery' ? 'text-white/80' : 'text-gray-400'}`}>
+                                                                                3-5 days delivery
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 
+                                                                    opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                                             </button>
                                                         )}
                                                     </div>
+
+                                                    {/* Delivery Address Section */}
+                                                    {deliveryMethod === 'delivery' && (
+                                                        <div className="space-y-4 p-6 rounded-2xl bg-gradient-to-br from-gray-800/40 to-gray-800/20 backdrop-blur-xl border-2 border-gray-700/30 hover:border-indigo-500/30 transition-all duration-300">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="p-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20">
+                                                                        <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <span className="text-sm font-medium text-cyan-400">Delivery Address</span>
+                                                                </div>
+                                                                {defaultAddress && (
+                                                                    <Link
+                                                                        href="/account/address"
+                                                                        className="text-xs px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 font-medium hover:bg-indigo-500/30 transition-colors duration-300"
+                                                                    >
+                                                                        Change Address
+                                                                    </Link>
+                                                                )}
+                                                            </div>
+
+                                                            {defaultAddress ? (
+                                                                <div className="space-y-3">
+                                                                    <div className="flex items-start gap-3">
+                                                                        <div className="p-2 rounded-xl bg-gradient-to-r from-cyan-500/10 to-indigo-500/10">
+                                                                            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="text-white font-medium">{defaultAddress.fullName}</p>
+                                                                            <p className="text-gray-400 text-sm">{defaultAddress.phone}</p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="flex items-start gap-3">
+                                                                        <div className="p-2 rounded-xl bg-gradient-to-r from-cyan-500/10 to-indigo-500/10">
+                                                                            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div className="space-y-1">
+                                                                            <p className="text-gray-300">{defaultAddress.streetAddress}</p>
+                                                                            <p className="text-gray-400 text-sm">
+                                                                                {defaultAddress.district}, {defaultAddress.city}
+                                                                            </p>
+                                                                            <p className="text-gray-400 text-sm">
+                                                                                {defaultAddress.province}, {defaultAddress.postalCode}
+                                                                            </p>
+                                                                            {defaultAddress.details && (
+                                                                                <p className="text-gray-400 text-sm italic">
+                                                                                    Note: {defaultAddress.details}
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
+                                                                    <div className="p-3 rounded-full bg-gradient-to-r from-cyan-500/10 to-indigo-500/10">
+                                                                        <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <p className="text-gray-300 font-medium">No delivery address found</p>
+                                                                        <p className="text-gray-400 text-sm">Please add a delivery address in your profile</p>
+                                                                    </div>
+                                                                    <Link
+                                                                        href="/account/address"
+                                                                        className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-xl text-white text-sm font-medium hover:from-cyan-600 hover:to-indigo-600 transition-all duration-300"
+                                                                    >
+                                                                        Add Address
+                                                                    </Link>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
 
                                                     {/* Payment Button */}
                                                     <button
@@ -1243,102 +1344,6 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            )}
-
-            {/* Add Social Verification Modal */}
-            {showSocialVerification && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-black/95 backdrop-blur-md z-[1000] flex items-center justify-center"
-                    onClick={() => setShowSocialVerification(false)}
-                >
-                    <motion.div
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.95, opacity: 0 }}
-                        transition={{ type: "spring", duration: 0.5 }}
-                        className="w-full max-w-md p-6 bg-gradient-to-b from-gray-900/80 to-black/80 rounded-2xl shadow-2xl border border-gray-800/50 backdrop-blur-xl"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="text-center space-y-4">
-                            <h3 className="text-2xl font-bold text-white">Follow Us!</h3>
-                            <p className="text-gray-400">
-                                To download this free resource, please follow us on social media first
-                            </p>
-
-                            <div className="space-y-4 mt-6">
-                                {/* Instagram Button */}
-                                <a
-                                    href="https://www.instagram.com/spacedigitalia"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={() => handleSocialVerification('instagram')}
-                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border 
-                                        transition-all duration-300 ${socialVerified.instagram
-                                            ? 'bg-pink-600/20 border-pink-500/50 text-pink-400'
-                                            : 'bg-gray-800/30 border-gray-700/30 hover:border-pink-500/30 text-gray-300 hover:text-pink-400'
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                                        </svg>
-                                        <span className="font-medium">Follow on Instagram</span>
-                                    </div>
-                                    {socialVerified.instagram && (
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </a>
-
-                                {/* TikTok Button */}
-                                <a
-                                    href="https://www.tiktok.com/@spacedigitalia"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={() => handleSocialVerification('tiktok')}
-                                    className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border 
-                                        transition-all duration-300 ${socialVerified.tiktok
-                                            ? 'bg-black border-white/50 text-white'
-                                            : 'bg-gray-800/30 border-gray-700/30 hover:border-white/30 text-gray-300 hover:text-white'
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                                        </svg>
-                                        <span className="font-medium">Follow on TikTok</span>
-                                    </div>
-                                    {socialVerified.tiktok && (
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </a>
-                            </div>
-
-                            <button
-                                onClick={() => {
-                                    if (isSocialVerified) {
-                                        setShowSocialVerification(false);
-                                        handleFreeTransaction();
-                                    }
-                                }}
-                                className={`w-full mt-6 px-6 py-3 rounded-xl font-medium transition-all duration-300
-                                    ${isSocialVerified
-                                        ? 'bg-primary text-white hover:bg-primary/90'
-                                        : 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
-                                    }`}
-                                disabled={!isSocialVerified}
-                            >
-                                {isSocialVerified ? 'Continue to Download' : 'Follow Both Platforms to Continue'}
-                            </button>
                         </div>
                     </motion.div>
                 </motion.div>
