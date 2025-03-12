@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://putri-mandeh.vercel.app/sitemap.xml
+Sitemap: https://spacedigitalia.my.id/sitemap.xml

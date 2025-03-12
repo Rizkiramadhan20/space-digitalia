@@ -2,6 +2,11 @@
   "name": "space-digitalia",
   "title": "Space Digitalia",
   "homepage": "https://spacedigitalia.my.id",
+  "author": {
+    "name": "Rizki Ramadhan",
+    "url": "https://spacedigitalia.my.id",
+    "email": "spacedigitalia@gmail.com"
+  },
   "description": "Space Digitalia menyediakan layanan digital terbaik untuk kebutuhan bisnis Anda. Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web.",
   "keywords": [
     "Space Digitalia",
