@@ -9,7 +9,7 @@ export const viewport = {
 };
 
 export const openGraph = {
-  title: "Space Digitalia",
+  title: "Space Digitalia - Jasa Pembuatan Website Profesional",
   description:
     "Kami menyediakan layanan pembuatan website berkualitas tinggi dengan harga terjangkau untuk UMKM",
   url: BASE_URL,
@@ -17,7 +17,7 @@ export const openGraph = {
 
   images: [
     {
-      url: "/src/app/favicon.ico",
+      url: "/favicon.ico",
       width: 1920,
       height: 1080,
     },
@@ -49,7 +49,7 @@ export const openGraph = {
   icons: {
     icon: [
       {
-        url: "/src/app/favicon.ico",
+        url: "/favicon.ico",
       },
     ],
   },
@@ -127,14 +127,14 @@ export const metadata = {
   icons: {
     icon: [
       {
-        url: "/src/app/favicon.ico",
+        url: "/favicon.ico",
         sizes: "64x64 32x32 24x24 16x16",
         type: "image/x-icon",
       },
     ],
-    apple: "/src/app/favicon.ico",
-    shortcut: "/src/app/favicon.ico",
-    appleTouchIcon: "/src/app/favicon.ico",
+    apple: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    appleTouchIcon: "/favicon.ico",
   },
 
   manifest: "/manifest.json",
@@ -152,17 +152,18 @@ export const metadata = {
 
   openGraph: {
     type: "website",
-    title: "Space Digitalia",
-    description: "Space Digitalia",
+    title: "Space Digitalia - Jasa Pembuatan Website Profesional",
+    description:
+      "Kami menyediakan layanan pembuatan website berkualitas tinggi dengan harga terjangkau untuk UMKM",
     url: BASE_URL,
     siteName: "Space Digitalia",
     locale: "id_ID",
     images: [
       {
-        url: "/src/app/favicon.ico",
+        url: "/favicon.ico",
         width: 1920,
         height: 1080,
-        alt: "Icon for Space Digitalia",
+        alt: "Space Digitalia - Jasa Pembuatan Website Profesional",
       },
     ],
   },
@@ -173,7 +174,7 @@ export const metadata = {
     description: "Space Digitalia",
     creator: "@rizki_ramadhan",
     site: "@rizki_ramadhan",
-    images: ["/src/app/favicon.ico"],
+    images: ["/favicon.ico"],
   },
 
   verification: {
