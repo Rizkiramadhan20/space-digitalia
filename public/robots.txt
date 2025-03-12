@@ -1,16 +1,5 @@
-# Global rules
 User-agent: *
 Allow: /
-Allow: /sitemap.xml
 Disallow: /api/
-Disallow: /_next/
-Disallow: /*.json$
-Disallow: /*_buildManifest.js$
-Disallow: /*_ssgManifest.js$
-Disallow: /*.js$
 
-# Host
-Host: https://spacedigitalia.my.id
-
-# Sitemaps
-Sitemap: https://spacedigitalia.my.id/sitemap.xml
+Sitemap: https://putri-mandeh.vercel.app/sitemap.xml
