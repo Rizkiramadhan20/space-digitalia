@@ -144,7 +144,6 @@ export const menuItems = [
     icon: TbReportAnalytics,
     label: "Rekap",
     href: "/dashboard/super-admins/rekap",
-    subItems: [{ label: "Rekap", href: "/dashboard/super-admins/rekap" }],
   },
 
   {

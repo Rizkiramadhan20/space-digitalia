@@ -1,8 +1,6 @@
 {
   "short_name": "Space Digitalia",
   "name": "Space Digitalia",
-  "description": "Space Digitalia menyediakan layanan digital terbaik untuk kebutuhan bisnis Anda. Spesialis dalam SEO, Desain UI/UX, serta Pengembangan Aplikasi Mobile dan Web.",
-  "start_url": "/",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -11,37 +9,25 @@
     },
     {
       "src": "/favicon.ico",
-      "type": "image/x-icon",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
       "src": "/favicon.ico",
-      "type": "image/x-icon",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
-  "orientation": "portrait",
-  "scope": "/",
-  "shortcuts": [
-    {
-      "name": "Space Digitalia",
-      "url": "/",
-      "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
-    }
-  ],
-  "sitemap.xml": "https://spacedigitalia.my.id/sitemap.xml",
   "prefer_related_applications": false,
   "categories": [
     "space",
     "digitalia",
     "web design",
     "web development",
-    "web agency",
-    "web studio",
-    "web company",
     "web agency",
     "web studio",
     "web company"
@@ -52,5 +38,6 @@
       "sizes": "1280x720",
       "type": "image/png"
     }
-  ]
+  ],
+  "description": "Space Digitalia"
 }

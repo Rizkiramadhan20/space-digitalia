@@ -90,9 +90,9 @@
     "lint": "next lint"
   },
   "files": [
-    "/public/sitemap.xml",
-    "/public/robots.txt",
-    "/public/favicon.ico"
+    "/sitemap.xml",
+    "/robots.txt",
+    "/favicon.ico"
   ],
   "dependencies": {
     "@hookform/resolvers": "^4.1.1",
@@ -115,7 +115,9 @@
     "next-share": "^0.27.0",
     "popmotion": "^11.0.5",
     "react": "^19.0.0",
+    "react-chartjs-2": "^5.3.0",
     "react-countup": "^6.5.3",
+    "react-datepicker": "^8.2.1",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-hot-toast": "^2.5.2",
@@ -124,7 +126,6 @@
     "react-leaflet": "^5.0.0",
     "react-paginate": "^8.3.0",
     "react-quill-new": "^3.3.3",
-    "recharts": "^2.15.1",
     "tailwind-scrollbar-hide": "^2.0.0",
     "zod": "^3.24.2"
   },
