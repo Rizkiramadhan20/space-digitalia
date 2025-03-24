@@ -150,10 +150,6 @@ export const menuItems = [
     icon: IoMdContact,
     label: "Contact",
     href: "/dashboard/super-admins/contact",
-    subItems: [
-      { label: "Read", href: "/dashboard/super-admins/contact/read" },
-      { label: "Unread", href: "/dashboard/super-admins/contact/unread" },
-    ],
   },
 
   {

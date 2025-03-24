@@ -23,13 +23,20 @@ export const socialMedia = [
 export const contactFormSchema = z.object({
   fullName: z
     .string()
-    .min(2, "Nama harus terdiri dari setidaknya 2 karakter")
-    .max(50, "Nama harus kurang dari 50 karakter"),
-  email: z.string().email("Silakan masukkan alamat email yang valid"),
+    .min(3, "Nama minimal 3 karakter")
+    .max(50, "Nama maksimal 50 karakter"),
+  email: z
+    .string()
+    .email("Format email tidak valid"),
+  phoneNumber: z
+    .string()
+    .min(10, "Nomor telepon minimal 10 digit")
+    .max(15, "Nomor telepon maksimal 15 digit")
+    .regex(/^[+]?[\d\s-]+$/, "Format nomor telepon tidak valid"),
   message: z
     .string()
-    .min(10, "Pesan harus terdiri dari setidaknya 10 karakter")
-    .max(1000, "Pesan harus kurang dari 1000 karakter"),
+    .min(10, "Pesan minimal 10 karakter")
+    .max(1000, "Pesan maksimal 1000 karakter"),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;
