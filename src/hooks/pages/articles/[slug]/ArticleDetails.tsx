@@ -8,11 +8,7 @@ import { ArticleType } from '@/hooks/pages/articles/articles/lib/schema'
 
 import Link from 'next/link'
 
-import { format } from 'date-fns'
-
 import Image from 'next/image'
-
-import ShareButtons from '@/hooks/pages/articles/[slug]/ShareButton'
 
 import { database } from '@/utils/firebase'
 
@@ -21,6 +17,14 @@ import { ref, set, onValue, get } from 'firebase/database'
 import ArticleSkeleton from '@/hooks/pages/articles/[slug]/ArticleDetailsSkelaton'
 
 import { formatSlug } from '@/base/helper/formatSlug'
+
+import ArticleNotFound from '@/hooks/pages/articles/[slug]/ArticleNotFound'
+
+import Breadcrumb from '@/hooks/pages/articles/[slug]/ui/content/Breadcrumb'
+
+import ArticleHeader from '@/hooks/pages/articles/[slug]/ui/content/ArticleHeader'
+
+import RelatedArticles from '@/hooks/pages/articles/[slug]/ui/content/RelatedArticles'
 
 export default function ArticleDetails({ slug }: { slug: string }) {
     const [articleData, setArticleData] = useState<ArticleType[]>([])
@@ -93,7 +97,7 @@ export default function ArticleDetails({ slug }: { slug: string }) {
     const filteredArticle = articleData.find(item => item.slug === slug)
 
     if (!filteredArticle) {
-        return <div>Article not found</div>
+        return <ArticleNotFound />
     }
 
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -102,90 +106,17 @@ export default function ArticleDetails({ slug }: { slug: string }) {
         <section className='min-h-full bg-gradient-to-b from-gray-50/50 to-white'>
             <div className="container mx-auto px-4 lg:px-8 xl:px-10 py-2 lg:py-12 max-w-7xl">
                 <div className="mb-8 lg:mb-12">
-                    <ol className="flex flex-wrap items-center gap-2 sm:gap-0 text-xs lg:text-sm text-gray-600">
-                        <li className="flex items-center">
-                            <Link href='/' className="flex items-center hover:text-blue-600 transition-colors">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    className="h-4 w-4 stroke-current mr-1">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                                </svg>
-                                <span>Home</span>
-                            </Link>
-                            <span className="mx-2">/</span>
-                        </li>
-
-                        <li className="flex items-center">
-                            <Link href='/articles' className="flex items-center hover:text-blue-600 transition-colors">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    className="h-4 w-4 stroke-current mr-1">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                                </svg>
-                                <span>Articles</span>
-                            </Link>
-                            <span className="mx-2">/</span>
-                        </li>
-                        <li className="flex items-center">
-                            <span className="flex items-center text-gray-800">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    className="h-4 w-4 stroke-current mr-1">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                <span className="font-medium">{filteredArticle.slug}</span>
-                            </span>
-                        </li>
-                    </ol>
+                    <Breadcrumb slug={slug} tags={filteredArticle.tags} />
                 </div>
 
-                <div className="space-y-8 mb-12">
-                    <h1 className='text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight tracking-tight'>{filteredArticle.title}</h1>
-
-                    <div className='flex flex-wrap items-center gap-4'>
-                        <div className='text-sm text-indigo-700 bg-indigo-50 px-4 py-2 rounded-full capitalize font-medium hover:bg-indigo-100 transition-colors'>
-                            {filteredArticle.category}
-                        </div>
-                        <span className='text-sm text-gray-600 font-medium flex items-center gap-2'>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {format(new Date(filteredArticle.createdAt), 'MMMM dd, yyyy')}
-                        </span>
-                        <span className='text-sm text-gray-600 font-medium flex items-center gap-2'>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            {viewCount} views
-                        </span>
-                    </div>
-
-                    <ShareButtons
-                        url={currentUrl}
-                        title={filteredArticle.title}
-                        description={`Check out this article: ${filteredArticle.title}`}
-                        media={filteredArticle.thumbnail}
-                    />
-                </div>
+                <ArticleHeader
+                    title={filteredArticle.title}
+                    category={filteredArticle.category}
+                    createdAt={filteredArticle.createdAt}
+                    viewCount={viewCount}
+                    thumbnail={filteredArticle.thumbnail}
+                    currentUrl={currentUrl}
+                />
 
                 <div className="w-full md:h-[600px] h-[400px] relative rounded-3xl overflow-hidden mb-16 shadow-2xl shadow-gray-200/60">
                     <Image
@@ -299,52 +230,10 @@ export default function ArticleDetails({ slug }: { slug: string }) {
                                     </div>
                                 </div>
                             </div>
-
-                            {relatedArticles.filter(article => article.slug !== slug).length > 0 && (
-                                <div className='bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl rounded-3xl p-8 border border-gray-200/60'>
-                                    <h3 className='text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2'>
-                                        Related Articles
-                                    </h3>
-
-                                    <div className='space-y-2'>
-                                        {relatedArticles
-                                            .filter(article => article.slug !== slug)
-                                            .map((article) => (
-                                                <Link
-                                                    href={`/articles/${formatSlug(article.tags[0])}/${formatSlug(article.slug)}`}
-                                                    key={article.slug}
-                                                    className='group block p-3 -mx-3 rounded-2xl hover:bg-gray-50/80 transition-all duration-300'
-                                                >
-                                                    <div className='flex gap-5 items-center'>
-                                                        <div className='relative w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden ring-1 ring-gray-100'>
-                                                            <Image
-                                                                src={article.thumbnail}
-                                                                alt={article.title}
-                                                                fill
-                                                                className='object-cover transition-all duration-500 group-hover:scale-110'
-                                                            />
-                                                        </div>
-
-                                                        <div className='flex-1 space-y-2'>
-                                                            <h4 className='text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-indigo-600 transition-colors'>
-                                                                {article.title}
-                                                            </h4>
-
-                                                            <div className='flex items-center gap-3 text-xs text-gray-500'>
-                                                                <span className='flex items-center gap-1.5'>
-                                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                                    </svg>
-                                                                    {format(new Date(article.createdAt), 'MMM dd, yyyy')}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            ))}
-                                    </div>
-                                </div>
-                            )}
+                            <RelatedArticles
+                                articles={relatedArticles}
+                                currentSlug={slug}
+                            />
                         </div>
                     </div>
                 </div>

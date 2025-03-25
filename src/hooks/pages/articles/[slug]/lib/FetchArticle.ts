@@ -35,9 +35,8 @@ export function FetchRelatedArticles(
   slug: string,
   callback: (articles: ArticleType[]) => void
 ) {
-  // Mengambil 4 artikel terbaru (1 artikel saat ini + 3 artikel terkait)
   const q = query(
-    collection(db, "articles"),
+    collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_ARTICLES as string),
     orderBy("createdAt", "desc"),
     limit(4)
   );

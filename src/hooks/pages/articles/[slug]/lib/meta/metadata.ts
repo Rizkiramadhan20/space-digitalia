@@ -48,11 +48,41 @@ export async function generateMetadata({
   // Get the article data
   const article = await getArticle(slug);
 
+  // If article is not found, return 404 metadata
+  if (!article) {
+    return {
+      title: "Article Not Found | Space Digitalia",
+      description: "Maaf, artikel yang Anda cari tidak ditemukan.",
+      openGraph: {
+        ...baseMetadata.openGraph,
+        title: "Article Not Found | Space Digitalia",
+        description: "Maaf, artikel yang Anda cari tidak ditemukan.",
+        url: url,
+        siteName: "Space Digitalia",
+        locale: "id_ID",
+        images: [
+          {
+            url: "/favicon.ico",
+            width: 1920,
+            height: 1080,
+            alt: "Article Not Found",
+          },
+        ],
+      },
+      twitter: {
+        ...baseMetadata.twitter,
+        title: "Article Not Found | Space Digitalia",
+        description: "Maaf, artikel yang Anda cari tidak ditemukan.",
+        images: ["/favicon.ico"],
+      },
+    };
+  }
+
   // Use article data if available, otherwise fallback to generic metadata
   const title = article?.title || `${slug} | Space Digitalia`;
   const description =
     article?.description || `Baca artikel ${slug} di Space Digitalia`;
-  const imageUrl = article?.imageUrl?.[0] || "/icon.png";
+  const imageUrl = article?.imageUrl?.[0] || "/favicon.ico";
 
   // Add script to push data to dataLayer
   const script = {
