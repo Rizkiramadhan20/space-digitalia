@@ -1,4 +1,4 @@
-const BASE_URL = "https://spacedigitalia.my.id/";
+const BASE_URL = process.env.NEXT_PUBLIC_URL as string;
 
 export const viewport = {
   width: "device-width",
@@ -87,6 +87,13 @@ export const metadata = {
     appleTouchIcon: "/favicon.ico",
   },
 
+  tags: [
+    {
+      name: "Space Digitalia",
+      content: "Space Digitalia",
+    },
+  ],
+
   manifest: "/manifest.json",
 
   metadataBase: new URL(BASE_URL),
@@ -129,6 +136,7 @@ export const metadata = {
 
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SEARCH_CONSOLE_ID,
+    googleTagManager: process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID,
   },
 
   robots: {

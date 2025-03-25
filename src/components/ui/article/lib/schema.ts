@@ -16,3 +16,14 @@ export interface ArticleType {
     role: string;
   };
 }
+
+
+// Top Article
+export interface TopArticleProps {
+  article: ArticleType;
+}
+
+// Article Card
+export interface ArticleCardProps {
+  article: ArticleType;
+}

@@ -3,272 +3,47 @@
 		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 	<loc>https://spacedigitalia.my.id/</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/about</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/services</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/project</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/articles</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/contact</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/auth/signin</loc>
-	<lastmod>2025-03-25T00:31:21+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:21+01:00</lastmod>
 	<priority>0.8</priority>
 </url>
 <url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/profile/address</loc>
-	<lastmod>2025-03-25T00:31:27+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
 	<loc>https://spacedigitalia.my.id/auth/signup</loc>
-	<lastmod>2025-03-25T00:31:28+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:28+01:00</lastmod>
 	<priority>0.8</priority>
 </url>
 <url>
 	<loc>https://spacedigitalia.my.id/auth/forgot-password</loc>
-	<lastmod>2025-03-25T00:31:28+01:00</lastmod>
+	<lastmod>2024-03-25T00:31:28+01:00</lastmod>
 	<priority>0.8</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.8</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/layout/home</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/layout/featured</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/layout/service</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/layout/company</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/layout/testimonials</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/about</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/about/team</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/service</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/service/count-testimonial</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/project</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/project/category</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/project/type</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/project/license</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/project/framework</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/article</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/article/category</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/article/tags</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction/unpaid</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction/paid</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction/shipped</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction/free</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction/cancelled</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/transaction/completed</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/rekap</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/accounts/admins</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/accounts/user</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/settings/profile</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/super-admins/settings/security</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/admins</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.8</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/admins/project</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/admins/article</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/admins/settings/profile</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/admins/settings/security</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.8</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/transaction</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/transaction/paid</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/transaction/unpaid</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/transaction/shipped</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/transaction/cancelled</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/transaction/completed</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/profile</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.6</priority>
-</url>
-<url>
-	<loc>https://spacedigitalia.my.id/dashboard/user/profile/security</loc>
-	<lastmod>2025-03-25T00:31:30+01:00</lastmod>
-	<priority>0.4</priority>
 </url>
 </urlset>
