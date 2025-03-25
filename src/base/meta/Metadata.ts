@@ -9,69 +9,24 @@ export const viewport = {
 };
 
 export const metadata = {
-  title: "Space Digitalia",
+  title: "Space Digitalia - Jasa Pembuatan Website Profesional",
   description:
-    "Kami menyediakan layanan pembuatan website berkualitas tinggi dengan harga terjangkau untuk UMKM",
+    "Butuh website profesional dengan harga terjangkau? Space Digitalia siap membantu UMKM dan bisnis Anda tampil online dengan desain modern, cepat, dan SEO-friendly!",
+
   authors: [{ name: "Rizki Ramadhan" }],
+
   keywords: [
-    "Space Digitalia",
-    "Space",
-    "Digitalia",
-    "Rizki Ramadhan",
+    "Jasa Pembuatan Website",
     "Web Design",
     "Web Development",
-    "Web Agency",
-    "Web Studio",
-    "Web Company",
-    "Web Agency",
-    "Web Studio",
-    "Company Profile",
-    "Jasa Membuat Website",
-    "Jasa Membuat Landing Page",
-    "Jasa Membuat Website Company Profile",
-    "Jasa Membuat Website Toko Online",
-    "Jasa Membuat Website Blog",
-    "Jasa Membuat Website Portfolio",
-    "Jasa Membuat Website Landing Page",
-    "Jasa Membuat Website Landing Page Company Profile",
-    "Jasa Membuat Website Landing Page Toko Online",
-    "Jasa Membuat Website Landing Page Blog",
-    "Jasa Membuat Website Landing Page Portfolio",
-    "Jasa Membuat Website Landing Page Landing Page Company Profile",
-    "Jasa Membuat Website Landing Page Landing Page Toko Online",
-    "Jasa Membuat Website Landing Page Landing Page Blog",
-    "Jasa Membuat Website Landing Page Landing Page Portfolio",
-    "Jasa Membuat Website Landing Page Landing Page Landing Page Company Profile",
-    "Jasa Membuat Website Landing Page Landing Page Landing Page Toko Online",
-    "Jasa Membuat Website Landing Page Landing Page Landing Page Blog",
-    "Leuwiliang",
-    "Leuwiliang Digitalia",
-    "Leuwiliang Web Design",
-    "Leuwiliang Web Development",
-    "Leuwiliang Web Agency",
-    "Leuwiliang Web Studio",
-    "Leuwiliang Web Company",
-    "Cibatok",
-    "Cibatok Digitalia",
-    "Cibatok Web Design",
-    "Cibatok Web Development",
-    "Cibatok Web Agency",
-    "Cibatok Web Studio",
-    "Cibatok Web Company",
-    "Ciampea",
-    "Ciampea Digitalia",
-    "Ciampea Web Design",
-    "Ciampea Web Development",
-    "Ciampea Web Agency",
-    "Ciampea Web Studio",
-    "Ciampea Web Company",
-    "Bogor",
-    "Bogor Digitalia",
-    "Bogor Web Design",
-    "Bogor Web Development",
+    "Jasa Website UMKM",
+    "Landing Page",
+    "Website Company Profile",
+    "Website Toko Online",
     "Bogor Web Agency",
-    "Bogor Web Studio",
-    "Bogor Web Company",
+    "Leuwiliang Web Studio",
+    "Ciampea Web Developer",
+    "Cibatok Website",
   ],
 
   icons: {
@@ -90,7 +45,7 @@ export const metadata = {
   tags: [
     {
       name: "Space Digitalia",
-      content: "Space Digitalia",
+      content: "Jasa Pembuatan Website Profesional",
     },
   ],
 
@@ -111,27 +66,28 @@ export const metadata = {
     type: "website",
     title: "Space Digitalia - Jasa Pembuatan Website Profesional",
     description:
-      "Kami menyediakan layanan pembuatan website berkualitas tinggi dengan harga terjangkau untuk UMKM",
+      "Butuh website profesional dengan harga terjangkau? Space Digitalia siap membantu UMKM dan bisnis Anda tampil online dengan desain modern, cepat, dan SEO-friendly!",
     url: BASE_URL,
     siteName: "Space Digitalia",
     locale: "id_ID",
     images: [
       {
-        url: "/favicon.ico",
-        width: 1920,
-        height: 1080,
-        alt: "Space Digitalia - Jasa Pembuatan Website Profesional",
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Jasa Pembuatan Website Space Digitalia",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Space Digitalia",
-    description: "Space Digitalia",
+    title: "Space Digitalia - Jasa Pembuatan Website Profesional",
+    description:
+      "Butuh website profesional dengan harga terjangkau? Space Digitalia siap membantu UMKM dan bisnis Anda tampil online dengan desain modern, cepat, dan SEO-friendly!",
     creator: "@rizki_ramadhan",
     site: "@rizki_ramadhan",
-    images: ["/favicon.ico"],
+    images: ["/og-image.jpg"], // Pastikan ini sesuai
   },
 
   verification: {
@@ -142,8 +98,6 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
-    noarchive: true,
-    nocache: true,
   },
 
   alternates: {

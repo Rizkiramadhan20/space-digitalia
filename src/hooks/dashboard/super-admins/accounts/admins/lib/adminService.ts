@@ -13,7 +13,9 @@ export const adminService = {
       orderBy("createdAt", "desc")
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => doc.data() as UserAccount);
+    return querySnapshot.docs
+      .map((doc) => doc.data() as UserAccount)
+      .filter((user) => ["super-admins", "admins"].includes(user.role));
   },
 
   createUser: async (userData: Omit<UserFormData, "uid">) => {

@@ -9,7 +9,11 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["ik.imagekit.io", "lh3.googleusercontent.com"],
+    domains: [
+      "ik.imagekit.io",
+      "lh3.googleusercontent.com",
+      "avatars.githubusercontent.com"
+    ],
   },
 };
 

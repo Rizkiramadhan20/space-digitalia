@@ -11,7 +11,7 @@ import {
 
 import { formatPhoneNumberForDisplay } from '@/hooks/dashboard/super-admins/accounts/user/lib/Formatter'
 
-import { AddUserModalProps, DeleteModalProps, StatusModalProps } from '@/hooks/dashboard/super-admins/accounts/user/lib/users'
+import { AddUserModalProps, DeleteModalProps, StatusModalProps } from '@/hooks/dashboard/super-admins/accounts/user/types/users'
 
 export const AddUserModal: React.FC<AddUserModalProps> = ({
     showAddModal,

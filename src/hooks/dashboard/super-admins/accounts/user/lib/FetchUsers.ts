@@ -12,7 +12,7 @@ import { db } from "@/utils/firebase";
 
 import { Role } from "@/utils/context/interface/Auth";
 
-import { UserAccount } from "@/hooks/dashboard/super-admins/accounts/user/lib/users";
+import { UserAccount } from "@/hooks/dashboard/super-admins/accounts/user/types/users";
 
 export const useUsers = () => {
   const [users, setUsers] = useState<UserAccount[]>([]);
