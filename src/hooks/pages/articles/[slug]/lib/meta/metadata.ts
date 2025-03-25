@@ -43,7 +43,7 @@ export async function generateMetadata({
   params,
 }: MetadataProps): Promise<Metadata> {
   const { slug } = params;
-  const url = `${process.env.NEXT_PUBLIC_URL}/articles/${slug}`;
+  const url = `articles/${slug}`;
 
   // Get the article data
   const article = await getArticle(slug);

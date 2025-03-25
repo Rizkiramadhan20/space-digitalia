@@ -76,6 +76,10 @@ export default function ArticleDetails({ slug }: { slug: string }) {
 
         recordView()
 
+        FetchRelatedArticles(slug, (articles: ArticleType[]) => {
+            setRelatedArticles(articles)
+        })
+
         return () => {
             unsubscribe()
             viewCountUnsubscribe()
@@ -93,10 +97,6 @@ export default function ArticleDetails({ slug }: { slug: string }) {
     }
 
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-
-    FetchRelatedArticles(slug, (articles: ArticleType[]) => {
-        setRelatedArticles(articles)
-    })
 
     return (
         <section className='min-h-full bg-gradient-to-b from-gray-50/50 to-white'>
@@ -311,7 +311,7 @@ export default function ArticleDetails({ slug }: { slug: string }) {
                                             .filter(article => article.slug !== slug)
                                             .map((article) => (
                                                 <Link
-                                                    href={`/articles/${formatSlug(article.tags[0])}/${article.slug}`}
+                                                    href={`/articles/${formatSlug(article.tags[0])}/${formatSlug(article.slug)}`}
                                                     key={article.slug}
                                                     className='group block p-3 -mx-3 rounded-2xl hover:bg-gray-50/80 transition-all duration-300'
                                                 >
