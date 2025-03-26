@@ -31,7 +31,7 @@ export default function TopArticle({ article }: TopArticleProps) {
             <Link href={`/articles/${formatSlug(article.category)}/${formatSlug(article.slug)}`} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <motion.div
-                        className="relative h-[200px] sm:h-[400px] lg:h-full w-full overflow-hidden"
+                        className="relative h-[200px] sm:h-[450px] w-full overflow-hidden"
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.6 }}
                     >
