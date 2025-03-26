@@ -6,6 +6,8 @@ import ProjectLayout from '@/hooks/pages/project/project/ProjectLayout'
 
 import HeroProject from '@/hooks/pages/project/project/ui/HeroProject'
 
+import { GoogleTagManager } from '@next/third-parties/google'
+
 export const metadata: Metadata = {
     title: "Project | Space Digitalia",
     description: "Project dan karya terbaik Space Digitalia dalam pengembangan website, aplikasi mobile, dan desain UI/UX. Lihat hasil kerja kami di sini.",
@@ -28,6 +30,7 @@ export const metadata: Metadata = {
 export default function Project() {
     return (
         <Fragment>
+            <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string} />
             <HeroProject />
             <ProjectLayout />
         </Fragment>

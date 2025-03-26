@@ -8,6 +8,8 @@ import Pathname from "@/base/router/Pathname";
 
 import { openSans } from "@/base/fonts/Fonts";
 
+import { GoogleTagManager } from '@next/third-parties/google'
+
 metadata.manifest = "/manifest.json";
 
 export { metadata };
@@ -30,6 +32,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string} />
         <Providers>
           <Pathname>
             {children}
