@@ -26,9 +26,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://firebase.googleapis.com" />
         <link rel="preconnect" href="https://firestore.googleapis.com" />
         <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
-
+        <link rel="preconnect" href="https://app.midtrans.com" />
         <link rel="preload" href="/styles/critical.css" as="style" />
-
         <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
