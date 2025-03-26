@@ -13,3 +13,11 @@ export interface Button {
   link: string;
   text: string;
 }
+
+export interface HeroContentProps {
+  item: HomeType;
+}
+
+export interface HeroImageProps {
+  image: HomeType;
+}

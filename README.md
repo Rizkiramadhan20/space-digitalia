@@ -1,5 +1,13 @@
 # 🚀 Space Digitalia
 
+<div align="center">
+  <img src="/public/home.png" alt="Space Digitalia Homepage" width="700px" />
+  <p><em>Homepage</em></p>
+  
+  <img src="/public/project.png" alt="Space Digitalia Projects" width="700px" />
+  <p><em>Projects page</em></p>
+</div>
+
 ## About
 
 Space Digitalia is a modern web platform built with Next.js. We offer professional web development services specializing in creating modern, responsive, and high-performance websites and applications.
@@ -36,6 +44,6 @@ Check out our project at [https://spacedigitalia.my.id/project](https://spacedig
 
 ## 📞 Contact
 
-Website: [https://spacedigitalia.my.id](https://spacedigitalia.my.id)  
-Email: [contact@spacedigitalia.my.id](mailto:spacedigitalia@gmail.com)  
-Phone: [whatsapp](https://wa.me/+6281398632939)
+Website: [Space Digitalia](https://spacedigitalia.my.id)  
+Email: [spacedigitalia@gmail.com](mailto:spacedigitalia@gmail.com)  
+Whatsapp: [Contact Me](https://wa.me/+6281398632939)

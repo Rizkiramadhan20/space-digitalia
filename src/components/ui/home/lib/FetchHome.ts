@@ -2,7 +2,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 import { db } from "@/utils/firebase";
 
-import { HomeType } from "@/components/ui/home/lib/schema";
+import { HomeType } from "@/components/ui/home/types/schema";
 
 export function FetchHome(callback: (home: HomeType[]) => void) {
   const q = query(

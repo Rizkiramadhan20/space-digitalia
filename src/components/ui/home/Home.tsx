@@ -6,7 +6,7 @@ import { FetchHome } from '@/components/ui/home/lib/FetchHome'
 
 import HomeSkelaton from '@/components/ui/home/HomeSkelaton'
 
-import { HomeType } from '@/components/ui/home/lib/schema'
+import { HomeType } from '@/components/ui/home/types/schema'
 
 import BackgroundEffects from '@/components/ui/home/content/Background'
 
