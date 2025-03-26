@@ -14,17 +14,21 @@ import Article from '@/components/ui/article/Article'
 
 import Testimonials from '@/components/ui/testimonials/Testimonials'
 
+import NotificationWrapper from '@/components/NotificationWrapper'
+
 export default function page() {
   return (
     <Fragment>
       <main className='overflow-hidden'>
-        <Home />
-        <Featured />
-        <Service />
-        <Project />
-        <Article />
-        <Company />
-        <Testimonials />
+        <NotificationWrapper>
+          <Home />
+          <Featured />
+          <Service />
+          <Project />
+          <Article />
+          <Company />
+          <Testimonials />
+        </NotificationWrapper>
       </main>
     </Fragment>
   )

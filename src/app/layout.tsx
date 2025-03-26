@@ -20,8 +20,6 @@ metadata.manifest = "/manifest.json";
 
 export { metadata };
 
-import NotificationWrapper from '@/components/NotificationWrapper';
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -49,13 +47,11 @@ export default function RootLayout({
             }}
           />
         )}
-        <NotificationWrapper>
-          <Providers>
-            <Pathname>
-              {children}
-            </Pathname>
-          </Providers>
-        </NotificationWrapper>
+        <Providers>
+          <Pathname>
+            {children}
+          </Pathname>
+        </Providers>
       </body>
     </html>
   );

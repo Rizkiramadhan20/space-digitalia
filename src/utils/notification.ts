@@ -32,7 +32,7 @@ export const subscribeToNewContent = (callback: (content: Project | Article) => 
                 if ('Notification' in window) {
                     new Notification('Project Baru di Space Digitalia', {
                         body: `Project baru telah ditambahkan: ${project.title}`,
-                        icon: '/logo.png',
+                        icon: '/favicon.ico',
                     });
                 }
             }
@@ -49,7 +49,7 @@ export const subscribeToNewContent = (callback: (content: Project | Article) => 
                 if ('Notification' in window) {
                     new Notification('Artikel Baru di Space Digitalia', {
                         body: `Artikel baru telah ditambahkan: ${article.title}`,
-                        icon: '/logo.png',
+                        icon: '/favicon.ico',
                     });
                 }
             }

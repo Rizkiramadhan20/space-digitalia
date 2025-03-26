@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
+import { subscribeToNewContent } from '@/utils/notification';
+
 export default function NotificationPrompt() {
     const [showPrompt, setShowPrompt] = useState(false);
 
@@ -23,6 +25,9 @@ export default function NotificationPrompt() {
 
             if (permission === 'granted') {
                 setShowPrompt(false);
+                subscribeToNewContent((content) => {
+                    console.log('New content added:', content);
+                });
             }
         } catch (error) {
             console.error('Error requesting notification permission:', error);
