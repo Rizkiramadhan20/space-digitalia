@@ -32,14 +32,14 @@ export default function ServiceItem({ item, index }: ServiceItemProps) {
                         className='w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover'
                     />
                     <div>
-                        <h3 className='font-bold text-xl sm:text-2xl mb-2 sm:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600'>
+                        <h2 className='font-bold text-xl sm:text-2xl mb-2 sm:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600'>
                             {item.profile.title}
-                        </h3>
+                        </h2>
                         <p className='text-base sm:text-lg text-gray-600'>{item.profile.text}</p>
                     </div>
                 </motion.div>
 
-                <motion.h1
+                <motion.h3
                     initial={{ opacity: 0, x: index % 2 === 1 ? 30 : -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
@@ -47,7 +47,7 @@ export default function ServiceItem({ item, index }: ServiceItemProps) {
                     className='font-bold text-3xl sm:text-4xl md:text-5xl leading-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600'
                 >
                     {item.title}
-                </motion.h1>
+                </motion.h3>
 
                 <motion.p
                     initial={{ opacity: 0, x: index % 2 === 1 ? 30 : -30 }}

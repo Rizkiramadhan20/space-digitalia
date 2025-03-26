@@ -18,6 +18,12 @@ export default function RootLayout({
 
   return (
     <html lang="id" suppressHydrationWarning>
+      <head>
+        {/* Preload critical resources */}
+        <link rel="preload" href="/fonts/open-sans.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        {/* Add preconnect for external domains */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+      </head>
       <body className={`${openSans.variable} antialiased`}>
         <Providers>
           <Pathname>

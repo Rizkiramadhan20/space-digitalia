@@ -14,7 +14,55 @@ const nextConfig: NextConfig = {
       "lh3.googleusercontent.com",
       "avatars.githubusercontent.com"
     ],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
   },
+  reactStrictMode: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+  experimental: {
+    optimizePackageImports: [
+      'react-icons',
+      'date-fns',
+      'lodash',
+      '@mui/material',
+      '@mui/icons-material',
+      'framer-motion'
+    ],
+    serverActions: {
+      bodySizeLimit: '2mb',
+      allowedOrigins: ['https://spacedigitalia.my.id', 'localhost:3000']
+    },
+  },
+  output: 'standalone',
+  compress: true,
+  scripts: {
+    strategy: 'afterInteractive',
+  },
+  poweredByHeader: false,
+  headers: async () => [
+    {
+      source: '/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=3600, must-revalidate',
+        }
+      ],
+    },
+    {
+      source: '/_next/static/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        }
+      ],
+    },
+  ],
 };
 
 export default withBundleAnalyzer(nextConfig);
