@@ -5,3 +5,7 @@ export interface FeaturedType {
   imageUrl: string;
   createdAt: string;
 }
+
+export interface FeaturedItemProps {
+  item: FeaturedType
+}

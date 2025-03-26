@@ -9,7 +9,7 @@ import {
 
 import { db } from "@/utils/firebase";
 
-import { ProjectType } from "@/components/ui/project/lib/schema";
+import { ProjectType } from "@/components/ui/project/types/project";
 
 export function FetchProject(callback: (service: ProjectType[]) => void) {
   const q = query(

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { ProjectType } from "@/components/ui/project/lib/schema";
+import { ProjectType } from "@/components/ui/project/types/project";
 
 import { FetchProject } from "@/components/ui/project/lib/FetchProject";
 
@@ -103,27 +103,27 @@ export const getProjectColumns = (
 ) => {
   const firstProjects = isMobile
     ? [
-        ...projects.slice(0, 3),
-        ...projects.slice(0, 3),
-        ...projects.slice(0, 3),
-      ]
+      ...projects.slice(0, 3),
+      ...projects.slice(0, 3),
+      ...projects.slice(0, 3),
+    ]
     : [
-        ...projects.slice(0, Math.ceil(projects.length / 2)),
-        ...projects.slice(0, Math.ceil(projects.length / 2)),
-        ...projects.slice(0, Math.ceil(projects.length / 2)),
-      ];
+      ...projects.slice(0, Math.ceil(projects.length / 2)),
+      ...projects.slice(0, Math.ceil(projects.length / 2)),
+      ...projects.slice(0, Math.ceil(projects.length / 2)),
+    ];
 
   const secondProjects = isMobile
     ? [
-        ...projects.slice(3, 6),
-        ...projects.slice(3, 6),
-        ...projects.slice(3, 6),
-      ]
+      ...projects.slice(3, 6),
+      ...projects.slice(3, 6),
+      ...projects.slice(3, 6),
+    ]
     : [
-        ...projects.slice(Math.ceil(projects.length / 2)),
-        ...projects.slice(Math.ceil(projects.length / 2)),
-        ...projects.slice(Math.ceil(projects.length / 2)),
-      ];
+      ...projects.slice(Math.ceil(projects.length / 2)),
+      ...projects.slice(Math.ceil(projects.length / 2)),
+      ...projects.slice(Math.ceil(projects.length / 2)),
+    ];
 
   return { firstProjects, secondProjects };
 };

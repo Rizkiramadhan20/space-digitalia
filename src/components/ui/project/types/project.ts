@@ -57,3 +57,55 @@ export interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+export interface GalleryProps {
+  images: string[];
+  title: string;
+  inView: boolean;
+}
+
+export interface Author {
+  name: string;
+  role: string;
+  photoURL: string;
+}
+
+export interface AuthorCardProps {
+  author: Author;
+  inView: boolean;
+}
+
+export interface StatsGridProps {
+  downloads: number;
+  stock: number;
+  sold: number;
+  delivery: string | number;
+}
+
+export interface LicenseDetail {
+  price: number;
+}
+
+export interface PriceCardProps {
+  licenseDetails: LicenseDetail[];
+}
+
+export interface TechnologiesCardProps {
+  frameworks: Framework[];
+}
+
+export interface DetailButtonProps {
+  typeCategory: string;
+  typeTitle: string;
+  slug: string;
+}
+
+export interface UrlBarProps {
+  linkPreview: string;
+}
+
+export interface ProjectDescriptionProps {
+  description: string;
+  content: string;
+  inView: boolean;
+}

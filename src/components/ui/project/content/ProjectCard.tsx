@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 import { createPortal } from 'react-dom';
 
-import { ProjectCardProps } from "@/components/ui/project/lib/schema";
+import { ProjectCardProps } from "@/components/ui/project/types/project";
 
 import { ProjectModal } from "@/components/ui/project/content/ProjectModal";
 

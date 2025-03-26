@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 
-import { ProjectType } from '@/components/ui/project/lib/schema'
+import { ProjectType } from '@/components/ui/project/types/project'
 
 import { FetchProjectDetails } from '@/hooks/pages/project/[slug]/lib/FetchProject'
 

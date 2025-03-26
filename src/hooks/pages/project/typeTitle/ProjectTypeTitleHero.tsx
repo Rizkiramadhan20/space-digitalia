@@ -14,7 +14,7 @@ import banner from '@/base/assets/pages/project/bg.jpg'
 
 import { FetchTypeTitle } from '@/hooks/pages/project/typeTitle/lib/FetchTypeTitle'
 
-import { ProjectType } from '@/components/ui/project/lib/schema'
+import { ProjectType } from '@/components/ui/project/types/project'
 
 import ProjectTypeTitleSkelaton from '@/hooks/pages/project/typeTitle/ProjectTypeTitleSkelaton'
 

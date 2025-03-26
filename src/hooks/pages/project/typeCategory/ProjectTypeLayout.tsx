@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 
 import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
 
-import { ProjectType } from '@/components/ui/project/lib/schema'
+import { ProjectType } from '@/components/ui/project/types/project'
 
 import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
 

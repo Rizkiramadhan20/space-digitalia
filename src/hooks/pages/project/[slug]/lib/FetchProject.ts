@@ -2,7 +2,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 import { db } from "@/utils/firebase";
 
-import { ProjectType } from "@/components/ui/project/lib/schema";
+import { ProjectType } from "@/components/ui/project/types/project";
 
 export function FetchProjectDetails(
   slug: string,

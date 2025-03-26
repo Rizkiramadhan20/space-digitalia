@@ -4,7 +4,7 @@ import { db } from "@/utils/firebase";
 
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-import { ProjectType } from "@/components/ui/project/lib/schema";
+import { ProjectType } from "@/components/ui/project/types/project";
 
 function capitalizeWords(str: string): string {
   return str
@@ -71,13 +71,13 @@ export async function getProjectMetadata({
       description,
       images: project?.imageUrl
         ? [
-            {
-              url: project.imageUrl,
-              width: 1200,
-              height: 630,
-              alt: `${categoryDisplay} Projects`,
-            },
-          ]
+          {
+            url: project.imageUrl,
+            width: 1200,
+            height: 630,
+            alt: `${categoryDisplay} Projects`,
+          },
+        ]
         : [],
       type: "website",
     },

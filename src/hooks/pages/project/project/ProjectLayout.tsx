@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 
 import { toast } from 'react-hot-toast';
 
-import { ProjectType } from '@/components/ui/project/lib/schema';
+import { ProjectType } from '@/components/ui/project/types/project';
 
 import { FetchProject } from '@/hooks/pages/project/project/lib/FetchProject';
 

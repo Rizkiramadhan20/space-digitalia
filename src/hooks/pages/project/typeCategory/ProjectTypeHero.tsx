@@ -14,7 +14,7 @@ import banner from '@/base/assets/pages/project/bg.jpg'
 
 import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
 
-import { ProjectType } from '@/components/ui/project/lib/schema'
+import { ProjectType } from '@/components/ui/project/types/project'
 
 import ProjectTypeSkelaton from '@/hooks/pages/project/typeCategory/ProjectTypeSkelaton'
 
