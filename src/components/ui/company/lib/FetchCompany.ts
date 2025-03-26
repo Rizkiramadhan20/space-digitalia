@@ -2,7 +2,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 import { db } from "@/utils/firebase";
 
-import { CompanyType } from "@/components/ui/company/lib/schema";
+import { CompanyType } from "@/components/ui/company/types/company";
 
 export function FetchCompany(callback: (company: CompanyType[]) => void) {
   const q = query(

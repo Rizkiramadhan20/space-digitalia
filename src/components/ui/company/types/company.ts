@@ -3,3 +3,7 @@ export interface CompanyType {
   imageUrl: string;
   createdAt: string;
 }
+
+export interface CompanyGridProps {
+  companies: CompanyType[]
+}
