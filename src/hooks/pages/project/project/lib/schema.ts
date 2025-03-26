@@ -22,8 +22,8 @@ export interface ProjectType {
     uid: string;
   };
   content: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Timestamp | Date;
+  updatedAt: Timestamp | Date;
   delivery: number;
   downloads: number;
   photoURL: string;

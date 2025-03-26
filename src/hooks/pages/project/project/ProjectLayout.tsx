@@ -1619,4 +1619,3 @@ export default function ProjectLayout() {
         </Fragment>
     )
 }
-

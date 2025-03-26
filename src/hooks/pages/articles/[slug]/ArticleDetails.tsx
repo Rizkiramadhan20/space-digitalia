@@ -47,34 +47,73 @@ export default function ArticleDetails({ slug }: { slug: string }) {
         })
 
         const recordView = async () => {
+            // Check if this article has been viewed in this session
+            const sessionKey = `article_view_${slug}`
+            if (sessionStorage.getItem(sessionKey)) {
+                return // Skip if already viewed in this session
+            }
+
             try {
-                const response = await fetch('https://ipapi.co/json/')
+                const response = await fetch('/api/ip-info')
                 const data = await response.json()
-                const ipAddress = data.ip.replace(/\./g, '_')
 
-                const ipViewRef = ref(database, `${process.env.NEXT_PUBLIC_ARTICLE_VIEWS}/${slug}/ips/${ipAddress}`)
-                const ipViewSnapshot = await get(ipViewRef)
+                const ipIdentifier = data.ip ? data.ip.replace(/\./g, '_') : 'unknown'
+                const visitorRef = ref(database, `${process.env.NEXT_PUBLIC_ARTICLE_VIEWS}/${slug}/visitors/${ipIdentifier}`)
+                const visitorSnapshot = await get(visitorRef)
 
-                if (!ipViewSnapshot.exists()) {
-                    await set(ipViewRef, {
-                        timestamp: new Date().toISOString(),
-                        city: data.city,
-                        region: data.region,
-                        country: data.country_name,
-                        latitude: data.latitude,
-                        longitude: data.longitude,
-                        isp: data.org,
-                        timezone: data.timezone
+                if (!visitorSnapshot.exists()) {
+                    // Only increment total and save visitor data if this IP hasn't viewed before
+                    await set(visitorRef, {
+                        first_visit: new Date().toISOString(),
+                        last_visit: new Date().toISOString(),
+                        city: data.city || 'unknown',
+                        region: data.region || 'unknown',
+                        country: data.country_name || 'unknown',
+                        latitude: data.latitude || 0,
+                        longitude: data.longitude || 0,
+                        isp: data.org || 'unknown',
+                        timezone: data.timezone || 'unknown',
+                        visit_count: 1
                     })
 
                     // Increment total views
-                    const totalViewsRef = ref(database, `${process.env.NEXT_PUBLIC_ARTICLE_VIEWS}/${slug}/total`)
-                    const totalViewsSnapshot = await get(totalViewsRef)
-                    const currentViews = totalViewsSnapshot.val() || 0
-                    await set(totalViewsRef, currentViews + 1)
+                    const totalRef = ref(database, `${process.env.NEXT_PUBLIC_ARTICLE_VIEWS}/${slug}/total`)
+                    const totalSnapshot = await get(totalRef)
+                    await set(totalRef, (totalSnapshot.val() || 0) + 1)
+                } else {
+                    // Just update the last visit time and increment visit count
+                    const currentData = visitorSnapshot.val()
+                    await set(visitorRef, {
+                        ...currentData,
+                        last_visit: new Date().toISOString(),
+                        visit_count: (currentData.visit_count || 0) + 1
+                    })
                 }
+
+                // Mark as viewed in this session
+                sessionStorage.setItem(sessionKey, 'true')
+
             } catch (error) {
                 console.error('Error recording view:', error)
+                // Handle anonymous view if IP detection fails
+                const anonymousRef = ref(database, `${process.env.NEXT_PUBLIC_ARTICLE_VIEWS}/${slug}/visitors/anonymous`)
+                const anonymousSnapshot = await get(anonymousRef)
+
+                if (!anonymousSnapshot.exists()) {
+                    await set(anonymousRef, {
+                        first_visit: new Date().toISOString(),
+                        last_visit: new Date().toISOString(),
+                        visit_count: 1
+                    })
+
+                    // Increment total views for anonymous visitors
+                    const totalRef = ref(database, `${process.env.NEXT_PUBLIC_ARTICLE_VIEWS}/${slug}/total`)
+                    const totalSnapshot = await get(totalRef)
+                    await set(totalRef, (totalSnapshot.val() || 0) + 1)
+                }
+
+                // Mark as viewed in this session
+                sessionStorage.setItem(sessionKey, 'true')
             }
         }
 
