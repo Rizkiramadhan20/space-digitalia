@@ -19,10 +19,15 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        {/* Preload critical resources */}
         <link rel="preload" href="/fonts/open-sans.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        {/* Add preconnect for external domains */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://firebase.googleapis.com" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+
+        <link rel="preload" href="/styles/critical.css" as="style" />
+
+        <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
         <Providers>

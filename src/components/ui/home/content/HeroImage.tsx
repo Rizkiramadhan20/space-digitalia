@@ -29,8 +29,10 @@ export default function HeroImage({ image }: HeroImageProps) {
                 className='object-cover w-full h-full'
                 priority
                 sizes="(min-width: 1280px) 80vw, 100vw"
-                quality={100}
+                quality={85}
                 loading="eager"
+                placeholder="blur"
+                blurDataURL={`data:image/svg+xml;base64,...`}
             />
         </motion.div>
     );

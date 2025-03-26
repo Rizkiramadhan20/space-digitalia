@@ -152,6 +152,7 @@ export default function Footer() {
                                     className="text-gray-400 hover:text-white hover:scale-110 transition-all duration-300"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label={`Visit Space Digitalia on ${social.name}`}
                                 >
                                     <social.icon className="text-2xl" />
                                 </Link>

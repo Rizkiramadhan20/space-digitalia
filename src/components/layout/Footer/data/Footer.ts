@@ -29,21 +29,25 @@ export const footerNavLinks = [
 
 export const footerSocialLinks = [
   {
+    name: 'Facebook',
     href: "https://www.facebook.com/profile.php?id=61573748215102&mibextid=ZbWKwL",
     icon: FaFacebook,
   },
 
   {
+    name: 'Instagram',
     href: "https://www.instagram.com/spacedigitalia?igsh=MWhucmN5bXl1YnViZQ==",
     icon: FaInstagram,
   },
 
   {
+    name: 'TikTok',
     href: "https://www.tiktok.com/@spacedigitalia?_t=ZS-8uKNO1JcPod&_r=1",
     icon: FaTiktok,
   },
 
   {
+    name: 'WhatsApp',
     href: "https://wa.me/6281298632939",
     icon: FaWhatsapp,
   },
