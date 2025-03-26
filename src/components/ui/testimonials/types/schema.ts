@@ -21,3 +21,11 @@ export interface LoadMoreButtonProps {
   showAll: boolean;
   onClick: () => void;
 }
+
+export interface TestimonialCardBodyProps {
+  testimonial: TestimonialProps;
+}
+
+export interface TestimonialCardHeaderProps {
+  testimonial: TestimonialProps;
+}

@@ -8,7 +8,7 @@ import {
 
 import { db } from "@/utils/firebase";
 
-import { TestimonialProps } from "@/components/ui/testimonials/lib/schema";
+import { TestimonialProps } from "@/components/ui/testimonials/types/schema";
 
 export function FetchTestimonials(
   callback: (testimonials: TestimonialProps[]) => void

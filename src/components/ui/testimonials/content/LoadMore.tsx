@@ -1,4 +1,4 @@
-import { LoadMoreButtonProps } from '@/components/ui/testimonials/lib/schema'
+import { LoadMoreButtonProps } from '@/components/ui/testimonials/types/schema'
 
 export default function LoadMoreButton({ showAll, onClick }: LoadMoreButtonProps) {
     return (
