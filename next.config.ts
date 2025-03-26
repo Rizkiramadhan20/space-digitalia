@@ -2,6 +2,7 @@
 import type { NextConfig } from "next";
 
 import bundleAnalyzer from "@next/bundle-analyzer";
+import TerserPlugin from "terser-webpack-plugin";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -39,9 +40,6 @@ const nextConfig: NextConfig = {
   },
   output: 'standalone',
   compress: true,
-  scripts: {
-    strategy: 'afterInteractive',
-  },
   poweredByHeader: false,
   headers: async () => [
     {
@@ -63,6 +61,26 @@ const nextConfig: NextConfig = {
       ],
     },
   ],
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      config.optimization.minimize = true;
+      config.optimization.minimizer.push(
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+              dead_code: true
+            },
+            mangle: true,
+            output: {
+              comments: false,
+            },
+          },
+        })
+      );
+    }
+    return config;
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);
