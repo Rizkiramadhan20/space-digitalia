@@ -21,7 +21,6 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <link rel="preload" href="/fonts/open-sans.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://firebase.googleapis.com" />
         <link rel="preconnect" href="https://firestore.googleapis.com" />
@@ -31,7 +30,16 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
-        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string} />
+        {process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && (
+          <GoogleTagManager
+            gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}
+            dataLayer={{
+              'consent': 'default',
+              'analytics_storage': 'denied',
+              'ad_storage': 'denied'
+            }}
+          />
+        )}
         <Providers>
           <Pathname>
             {children}
