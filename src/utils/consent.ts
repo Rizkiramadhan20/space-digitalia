@@ -8,7 +8,24 @@ type DataLayerItem = {
     ad_storage: ConsentStatus;
 };
 
-export const updateAnalyticsConsent = (status: ConsentStatus) => {
+const requestNotificationPermission = async (): Promise<'granted' | 'denied'> => {
+    if (typeof window === 'undefined') return 'denied';
+
+    if (!('Notification' in window)) {
+        return 'denied';
+    }
+
+    try {
+        const permission = await Notification.requestPermission();
+        localStorage.setItem('notification_consent', permission);
+        return permission as 'granted' | 'denied';
+    } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        return 'denied';
+    }
+};
+
+const updateAnalyticsConsent = (status: ConsentStatus) => {
     if (analytics) {
         const consentSettings: ConsentSettings = {
             analytics_storage: status,
@@ -29,7 +46,13 @@ export const updateAnalyticsConsent = (status: ConsentStatus) => {
     localStorage.setItem('analytics_consent', status);
 };
 
-export const getStoredConsent = (): ConsentStatus => {
+const getStoredConsent = (): ConsentStatus => {
     if (typeof window === 'undefined') return 'denied';
     return (localStorage.getItem('analytics_consent') as ConsentStatus) || 'denied';
+};
+
+export {
+    requestNotificationPermission,
+    updateAnalyticsConsent,
+    getStoredConsent
 }; 

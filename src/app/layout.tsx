@@ -14,9 +14,13 @@ import { getStoredConsent } from '@/utils/consent'
 
 import CookieConsent from '@/base/meta/CookieConsent';
 
+import NotificationPrompt from '@/base/meta/NotificationPrompt';
+
 metadata.manifest = "/manifest.json";
 
 export { metadata };
+
+import NotificationWrapper from '@/components/NotificationWrapper';
 
 export default function RootLayout({
   children,
@@ -33,6 +37,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
+        <NotificationPrompt />
         <CookieConsent />
         {process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && (
           <GoogleTagManager
@@ -44,11 +49,13 @@ export default function RootLayout({
             }}
           />
         )}
-        <Providers>
-          <Pathname>
-            {children}
-          </Pathname>
-        </Providers>
+        <NotificationWrapper>
+          <Providers>
+            <Pathname>
+              {children}
+            </Pathname>
+          </Providers>
+        </NotificationWrapper>
       </body>
     </html>
   );
