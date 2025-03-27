@@ -39,7 +39,7 @@ export default function Home() {
         <section className='min-h-screen relative bg-gradient-to-br from-white via-blue-50 to-blue-100 overflow-hidden mt-[0] xl:mt-[-8rem]'>
             <BackgroundEffects />
 
-            <div className='container px-4 xl:px-10 relative z-10 py-12 lg:py-20'>
+            <div className='container px-4 xl:px-10 relative py-12 lg:py-20'>
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center'>
                     {home.map((item) => (
                         <HeroContent key={item.id} item={item} />

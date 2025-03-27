@@ -12,8 +12,13 @@ export const footerNavLinks = [
   },
 
   {
-    label: "Case Studies",
-    href: "/case-studies",
+    label: "Services",
+    href: "/services",
+  },
+
+  {
+    label: "Project",
+    href: "/project",
   },
 
   {
@@ -50,28 +55,6 @@ export const footerSocialLinks = [
     name: 'WhatsApp',
     href: "https://wa.me/6281298632939",
     icon: FaWhatsapp,
-  },
-];
-
-export const services = [
-  {
-    label: "UI/UX Design",
-    href: "/services/ui-ux-design",
-  },
-
-  {
-    label: "Apps Development",
-    href: "/services/apps-development",
-  },
-
-  {
-    label: "Web Development",
-    href: "/services/web-development",
-  },
-
-  {
-    label: "Consulting",
-    href: "/services/consulting",
   },
 ];
 

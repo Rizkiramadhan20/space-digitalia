@@ -16,7 +16,7 @@ import { ref, push, get, query, orderByChild, equalTo } from 'firebase/database'
 
 import logo from "@/base/assets/logo/logo.jpg"
 
-import { footerNavLinks, footerSocialLinks, services, contactInfo } from '@/components/layout/Footer/data/Footer'
+import { footerNavLinks, footerSocialLinks, contactInfo } from '@/components/layout/Footer/data/Footer'
 
 const emailSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
@@ -174,21 +174,6 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Services */}
-                    <div>
-                        <h3 className="text-white text-xl font-bold mb-8">Layanan</h3>
-                        <ul className="space-y-4">
-                            {services.map((item) => (
-                                <li key={item.label}>
-                                    <Link href={item.href} className="text-gray-400 hover:text-white hover:translate-x-2 transition-all duration-300 inline-block">
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Contact Info */}
                     <div>
                         <h3 className="text-white text-xl font-bold mb-8">Hubungi Kami</h3>
                         <div className="space-y-4 flex flex-col">

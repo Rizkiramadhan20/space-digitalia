@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { subscribeToNewContent } from '@/utils/notification';
+
 import toast from 'react-hot-toast';
 
 export const useNotification = () => {
