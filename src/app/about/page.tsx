@@ -10,7 +10,7 @@ import Team from '@/hooks/pages/about/team/Team'
 
 export const metadata: Metadata = {
     title: "About Us | SPACE DIGITALIA",
-    description: "About Us",
+    description: "Halaman tentang space digitalia",
 }
 
 export default function AboutPage() {

@@ -103,7 +103,7 @@ export default function MainNav() {
                         {!user ? (
                             <Link
                                 href="/auth/signin"
-                                className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg transition-all text-sm font-semibold shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:-translate-y-0.5 duration-300"
+                                className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-sm font-semibold shadow-lg hover:-translate-y-0.5 duration-300"
                             >
                                 <CiLogin className="text-lg" />
                                 Login

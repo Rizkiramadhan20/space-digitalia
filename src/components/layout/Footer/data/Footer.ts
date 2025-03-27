@@ -8,7 +8,7 @@ export const footerNavLinks = [
 
   {
     label: "About Us",
-    href: "/about-us",
+    href: "/about",
   },
 
   {
