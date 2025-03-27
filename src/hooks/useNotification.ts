@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { subscribeToNewContent } from '@/utils/notification';
 
 export const useNotification = () => {
@@ -8,7 +9,10 @@ export const useNotification = () => {
         const setupNotifications = async () => {
             if (typeof window === 'undefined') return;
 
-            if (!('Notification' in window)) return;
+            if (!('Notification' in window)) {
+                console.log('Notifications are not supported in this browser');
+                return;
+            }
 
             try {
                 const permission = await Notification.requestPermission();

@@ -14,8 +14,6 @@ import { getStoredConsent } from '@/utils/consent'
 
 import CookieConsent from '@/base/meta/CookieConsent';
 
-import NotificationPrompt from '@/base/meta/NotificationPrompt';
-
 metadata.manifest = "/manifest.json";
 
 export { metadata };
@@ -35,7 +33,6 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
-        <NotificationPrompt />
         <CookieConsent />
         {process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && (
           <GoogleTagManager

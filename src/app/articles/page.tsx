@@ -1,24 +1,15 @@
-'use client';
+import React from 'react'
 
-import { Fragment } from 'react'
-
-import ArticleLayout from '@/hooks/pages/articles/articles/ArticleLayout'
-
-import HeroArticle from '@/hooks/pages/articles/articles/HeroArticles'
+import Article from '@/components/ui/article/Article'
 
 import { GoogleTagManager } from '@next/third-parties/google'
 
-import NotificationWrapper from '@/components/NotificationWrapper'
-
-export default function Article() {
+export default function page() {
     return (
-        <Fragment>
+        <main>
             <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string} />
-            <NotificationWrapper>
-                <HeroArticle />
-                <ArticleLayout />
-            </NotificationWrapper>
-        </Fragment>
+            <Article />
+        </main>
     )
 }
 

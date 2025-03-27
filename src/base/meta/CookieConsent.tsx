@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { updateAnalyticsConsent, getStoredConsent } from '@/utils/consent';
+import { updateConsent, getStoredConsent } from '@/utils/consent';
 
 export default function CookieConsent() {
     const [showBanner, setShowBanner] = useState(false);
@@ -14,13 +14,13 @@ export default function CookieConsent() {
         }
     }, []);
 
-    const acceptAll = () => {
-        updateAnalyticsConsent('granted');
+    const acceptAll = async () => {
+        await updateConsent('granted');
         setShowBanner(false);
     };
 
-    const rejectAll = () => {
-        updateAnalyticsConsent('denied');
+    const rejectAll = async () => {
+        await updateConsent('denied');
         setShowBanner(false);
     };
 
@@ -29,9 +29,14 @@ export default function CookieConsent() {
     return (
         <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg z-50">
             <div className="max-w-screen-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-sm">
-                    Kami menggunakan cookies untuk menganalisis penggunaan website dan meningkatkan pengalaman Anda.
-                </p>
+                <div className="space-y-2">
+                    <p className="text-sm">
+                        Kami menggunakan cookies untuk menganalisis penggunaan website dan meningkatkan pengalaman Anda.
+                    </p>
+                    <p className="text-sm text-gray-600">
+                        Aktifkan notifikasi untuk mendapatkan informasi terbaru tentang project dan artikel baru.
+                    </p>
+                </div>
                 <div className="flex gap-2">
                     <button
                         onClick={rejectAll}
