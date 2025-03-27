@@ -6,6 +6,13 @@ import HeroProject from '@/hooks/pages/project/project/ui/HeroProject'
 
 import { GoogleTagManager } from '@next/third-parties/google'
 
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Project | SPACE DIGITALIA',
+    description: 'Project',
+}
+
 export default function Project() {
     return (
         <Fragment>
