@@ -1,65 +1,60 @@
+import dynamic from 'next/dynamic';
+
 import { metadata } from "@/base/meta/Metadata";
 
 import "@/base/style/globals.css";
 
-import Providers from "@/base/router/Provider";
-
-import Pathname from "@/base/router/Pathname";
-
 import { openSans } from "@/base/fonts/Fonts";
 
-import { GoogleTagManager } from '@next/third-parties/google'
+import { siteConfig } from '@/types/config';
 
-import CookieConsent from '@/base/meta/CookieConsent';
+import { getGTMConfig } from '@/types/config';
+
+import GTMProvider from '@/base/meta/GTMProvider';
+
+import CookieConsentProvider from '@/base/meta/CookieConstentProiver';
+
+const Providers = dynamic(() => import("@/base/router/Provider"), {
+  ssr: true
+});
+
+const Pathname = dynamic(() => import("@/base/router/Pathname"), {
+  ssr: true
+});
 
 metadata.manifest = "/manifest.json";
-
-interface GTMDataLayer {
-  [key: string]: string | number | boolean;
-  consent: 'pending' | 'granted' | 'denied';
-  analytics_storage: 'granted' | 'denied';
-  ad_storage: 'granted' | 'denied';
-  functionality_storage: 'granted' | 'denied';
-  security_storage: 'granted' | 'denied';
-  wait_for_update: number;
-}
 
 export { metadata };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const gtmConfig: GTMDataLayer = {
-    'consent': 'pending',
-    'analytics_storage': 'denied',
-    'ad_storage': 'denied',
-    'functionality_storage': 'denied',
-    'security_storage': 'granted',
-    'wait_for_update': 500
-  };
-
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://firebase.googleapis.com" />
-        <link rel="preconnect" href="https://firestore.googleapis.com" />
-        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
-        <link rel="preconnect" href="https://app.midtrans.com" />
-        <link rel="dns-prefetch" href="https://ik.imagekit.io" />
+        {siteConfig.preconnect.map(({ url, crossOrigin }) => (
+          <link
+            key={url}
+            rel="preconnect"
+            href={url}
+            {...(crossOrigin && { crossOrigin: "anonymous" })}
+          />
+        ))}
+
+        {siteConfig.dnsPrefetch.map(({ url }) => (
+          <link key={url} rel="dns-prefetch" href={url} />
+        ))}
       </head>
       <body className={`${openSans.variable} antialiased`}>
-        <CookieConsent />
+        <CookieConsentProvider />
         {process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && (
-          <GoogleTagManager
+          <GTMProvider
             gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}
-            dataLayer={gtmConfig}
+            dataLayer={getGTMConfig()}
           />
         )}
         <Providers>
-          <Pathname>
-            {children}
-          </Pathname>
+          <Pathname>{children}</Pathname>
         </Providers>
       </body>
     </html>
