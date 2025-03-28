@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import Home from '@/components/ui/home/Home'
 
@@ -16,16 +16,14 @@ import Testimonials from '@/components/ui/testimonials/Testimonials'
 
 export default function page() {
   return (
-    <Fragment>
-      <main className='overflow-hidden'>
-        <Home />
-        <Featured />
-        <Service />
-        <Project />
-        <Article />
-        <Company />
-        <Testimonials />
-      </main>
-    </Fragment>
+    <main className='overflow-hidden'>
+      <Home />
+      <Featured />
+      <Service />
+      <Project />
+      <Article />
+      <Company />
+      <Testimonials />
+    </main>
   )
 }
