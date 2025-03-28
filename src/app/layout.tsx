@@ -1,26 +1,18 @@
-import dynamic from 'next/dynamic';
-
 import { metadata } from "@/base/meta/Metadata";
 
 import "@/base/style/globals.css";
 
+import Providers from "@/base/router/Provider";
+
+import Pathname from "@/base/router/Pathname";
+
 import { openSans } from "@/base/fonts/Fonts";
 
-import { siteConfig } from '@/types/config';
+import { GoogleTagManager } from '@next/third-parties/google'
 
-import { getGTMConfig } from '@/types/config';
+import { getStoredConsent } from '@/utils/consent'
 
-import GTMProvider from '@/base/meta/GTMProvider';
-
-import CookieConsentProvider from '@/base/meta/CookieConstentProiver';
-
-const Providers = dynamic(() => import("@/base/router/Provider"), {
-  ssr: true
-});
-
-const Pathname = dynamic(() => import("@/base/router/Pathname"), {
-  ssr: true
-});
+import CookieConsent from '@/base/meta/CookieConsent';
 
 metadata.manifest = "/manifest.json";
 
@@ -32,29 +24,29 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        {siteConfig.preconnect.map(({ url, crossOrigin }) => (
-          <link
-            key={url}
-            rel="preconnect"
-            href={url}
-            {...(crossOrigin && { crossOrigin: "anonymous" })}
-          />
-        ))}
-
-        {siteConfig.dnsPrefetch.map(({ url }) => (
-          <link key={url} rel="dns-prefetch" href={url} />
-        ))}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://firebase.googleapis.com" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+        <link rel="preconnect" href="https://app.midtrans.com" />
+        <link rel="dns-prefetch" href="https://ik.imagekit.io" />
       </head>
       <body className={`${openSans.variable} antialiased`}>
-        <CookieConsentProvider />
+        <CookieConsent />
         {process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && (
-          <GTMProvider
+          <GoogleTagManager
             gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}
-            dataLayer={getGTMConfig()}
+            dataLayer={{
+              'consent': 'default',
+              'analytics_storage': getStoredConsent(),
+              'ad_storage': getStoredConsent()
+            }}
           />
         )}
         <Providers>
-          <Pathname>{children}</Pathname>
+          <Pathname>
+            {children}
+          </Pathname>
         </Providers>
       </body>
     </html>
