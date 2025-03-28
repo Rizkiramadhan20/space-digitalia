@@ -2,18 +2,18 @@ import React, { Fragment } from 'react'
 
 export const metadata = {
     title: 'Kebijakan Privasi | Space Digitalia',
-    description: 'Halaman ini berisi kebijakan privasi dari Space Digitalia',
+    description: 'Kebijakan Privasi',
 }
 
-import HeroKebijakanPrivasi from '@/hooks/pages/KebijakanPrivasi/ui/HeroKebijakanPrivasi'
+import KebijakanPrivasi from '@/hooks/pages/KebijakanPrivasi/KebijakanPrivasi'
 
-import KebijakanPrivasiLayout from '@/hooks/pages/KebijakanPrivasi/KebijakanPrivasiLayout'
+import HeroKebijakanPrivasi from '@/hooks/pages/KebijakanPrivasi/HeroKebijakanPrivasi'
 
 export default function page() {
     return (
         <Fragment>
             <HeroKebijakanPrivasi />
-            <KebijakanPrivasiLayout />
+            <KebijakanPrivasi />
         </Fragment>
     )
 }
