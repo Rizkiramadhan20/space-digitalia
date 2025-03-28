@@ -10,17 +10,34 @@ import { openSans } from "@/base/fonts/Fonts";
 
 import { GoogleTagManager } from '@next/third-parties/google'
 
-import { getStoredConsent } from '@/utils/consent'
-
 import CookieConsent from '@/base/meta/CookieConsent';
 
 metadata.manifest = "/manifest.json";
+
+interface GTMDataLayer {
+  [key: string]: string | number | boolean;
+  consent: 'pending' | 'granted' | 'denied';
+  analytics_storage: 'granted' | 'denied';
+  ad_storage: 'granted' | 'denied';
+  functionality_storage: 'granted' | 'denied';
+  security_storage: 'granted' | 'denied';
+  wait_for_update: number;
+}
 
 export { metadata };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const gtmConfig: GTMDataLayer = {
+    'consent': 'pending',
+    'analytics_storage': 'denied',
+    'ad_storage': 'denied',
+    'functionality_storage': 'denied',
+    'security_storage': 'granted',
+    'wait_for_update': 500
+  };
+
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
@@ -36,11 +53,7 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && (
           <GoogleTagManager
             gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}
-            dataLayer={{
-              'consent': 'default',
-              'analytics_storage': getStoredConsent(),
-              'ad_storage': getStoredConsent()
-            }}
+            dataLayer={gtmConfig}
           />
         )}
         <Providers>
