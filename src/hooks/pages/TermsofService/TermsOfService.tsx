@@ -15,7 +15,7 @@ import { termsOfServiceData } from '@/hooks/pages/TermsofService/data/TermsofSer
 export default function TermsOfService() {
     return (
         <section className="min-h-screen py-16 lg:py-24 bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl relative">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                 <Header />
 
                 <motion.div
