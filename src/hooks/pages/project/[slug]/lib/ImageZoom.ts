@@ -16,16 +16,20 @@ export const useImageZoom = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<DragStart>({ x: 0, y: 0 });
 
-  const handleZoomIn = (specificZoom?: number) => {
-    if (specificZoom !== undefined) {
-      setZoomLevel(specificZoom);
-    } else {
-      setZoomLevel((prev) => Math.min(prev + 0.5, 3));
-    }
-  };
+  const handleZoomIn = useCallback(() => {
+    setZoomLevel((prev) => {
+      const currentZoom = !isNaN(prev) && prev !== null ? prev : 1;
+      const newZoom = Math.min(currentZoom + 0.5, 3);
+      return newZoom;
+    });
+  }, []);
 
   const handleZoomOut = useCallback(() => {
-    setZoomLevel((prev) => Math.max(prev - 0.25, 0.5));
+    setZoomLevel((prev) => {
+      const currentZoom = !isNaN(prev) && prev !== null ? prev : 1;
+      const newZoom = Math.max(currentZoom - 0.5, 0.5);
+      return newZoom;
+    });
     setPosition({ x: 0, y: 0 });
   }, []);
 

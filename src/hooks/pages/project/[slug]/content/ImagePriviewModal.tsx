@@ -44,7 +44,11 @@ export default function ImagePreviewModal({
                                 <div className="w-3 h-3 rounded-full bg-green-500/90 hover:bg-green-400 transition-colors" />
                             </div>
                             <div className="text-sm text-white/70 font-mono truncate max-w-[250px] md:max-w-[400px]">
-                                {selectedImage?.split('/').pop()} • {Math.round(zoomLevel * 100)}%
+                                {(() => {
+                                    const zoom = !isNaN(zoomLevel) && zoomLevel !== null ? zoomLevel : 1;
+                                    const percentage = Math.round(zoom * 100);
+                                    return `${selectedImage?.split('/').pop()} • ${percentage}%`;
+                                })()}
                             </div>
                         </div>
                         <button

@@ -228,13 +228,11 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
     // Handle license selection
     const handleLicenseSelect = (licenseTitle: string) => {
         setSelectedLicense(licenseTitle)
-        console.log('Selected License:', licenseTitle)
     }
 
     // Handle delivery method selection
     const handleDeliveryMethodSelect = (method: 'download' | 'delivery') => {
         setDeliveryMethod(method)
-        console.log('Selected Delivery Method:', method)
     }
 
     // Handle transaction process
@@ -431,16 +429,16 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
             <div className="container px-4 xl:px-10 py-6 sm:py-8">
                 {project.map((project) => (
                     <div key={project.id}>
-                        {/* Breadcrumbs - modernized with subtle hover effects */}
-                        <div className="breadcrumbs text-xs md:text-sm mb-6 md:mb-8">
-                            <ul className="flex flex-wrap items-center gap-2">
+                        {/* Breadcrumbs - improved styling */}
+                        <div className="breadcrumbs text-xs md:text-sm mb-8">
+                            <ul className="flex flex-wrap items-center gap-3">
                                 <li>
                                     <Link
                                         href="/"
-                                        className="flex items-center gap-2 px-3 py-1.5 rounded-full
-                                            bg-primary/5 hover:bg-primary/10 
-                                            border border-primary/10 hover:border-primary/20
-                                            transition-all duration-200"
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg
+                                            bg-card hover:bg-card/80
+                                            border border-border/50 hover:border-border
+                                            transition-all duration-200 ease-in-out"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -481,81 +479,66 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                             {/* Left Column */}
                             <div className="lg:col-span-8 space-y-6 md:space-y-8">
-                                {/* Hero Image with enhanced overlay and animations */}
-                                <div className='relative aspect-[16/9] rounded-xl md:rounded-2xl overflow-hidden group'>
+                                {/* Hero Image - enhanced styling */}
+                                <div className='relative aspect-video rounded-2xl overflow-hidden group'>
                                     <Image
                                         src={project.imageUrl}
                                         alt={`${project.title} - Main Project Image`}
                                         fill
-                                        className="object-cover transition-all duration-700 group-hover:scale-110"
+                                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                         priority
                                     />
-                                    <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent 
-                                        flex flex-col items-start justify-end p-6 md:p-8
-                                        transform transition-all duration-700 group-hover:bg-black/60'>
-                                        <div className="absolute top-4 left-4 px-3 py-1.5 
-                                            bg-black/50 backdrop-blur-sm rounded-full 
-                                            text-xs text-white/90 border border-white/10 
+                                    <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent 
+                                        flex flex-col items-start justify-end p-8 md:p-10
+                                        transform transition-all duration-500'>
+                                        <div className="absolute top-6 left-6 px-4 py-2 
+                                            bg-black/60 backdrop-blur-md rounded-lg 
+                                            text-sm text-white/90 border border-white/20 
                                             flex items-center gap-2">
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                             Featured Image
                                         </div>
-                                        <h1 className='text-white text-2xl md:text-3xl font-semibold mb-3 
-                                            transform transition-all duration-700 
-                                            group-hover:translate-y-0 group-hover:opacity-100
-                                            translate-y-2 opacity-90'>{project.title}</h1>
-                                        <p className='text-gray-200 max-w-2xl text-sm md:text-base
-                                            transform transition-all duration-700 
-                                            group-hover:translate-y-0 group-hover:opacity-100
-                                            translate-y-2 opacity-80'>{project.description}</p>
+                                        <h1 className='text-white text-3xl md:text-4xl font-bold mb-4 
+                                            transform transition-all duration-500'>{project.title}</h1>
+                                        <p className='text-gray-200 max-w-2xl text-base md:text-lg
+                                            transform transition-all duration-500'>{project.description}</p>
                                     </div>
                                 </div>
 
-                                {/* Gallery Grid with Flexbox Layout */}
-                                <div className="space-y-4">
-                                    {/* Gallery Header */}
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-card rounded-full border">
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
-                                        </svg>
-                                        <span className="text-xs font-medium">Preview Gallery</span>
-                                    </div>
-
-                                    {/* Flexbox Gallery Layout */}
-                                    <div className="flex sm:flex-wrap overflow-x-auto sm:overflow-visible gap-4">
-                                        {project.images?.map((previewImage, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => setSelectedImage(previewImage)}
-                                                className="flex-1 min-w-[280px] relative aspect-video rounded-lg border overflow-hidden group"
-                                            >
-                                                <Image
-                                                    src={previewImage}
-                                                    alt={`${project.title} - Preview ${index + 1}`}
-                                                    fill
-                                                    className="object-cover transition group-hover:scale-105"
-                                                    priority={index === 0}
-                                                />
-
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition" />
-
-                                                <div className="absolute bottom-2 right-2 flex items-center gap-1.5 px-2 py-1 
-                                                    bg-black/50 rounded text-white text-xs 
-                                                    opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 
-                                                    transition-all duration-200">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                            d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                                                    </svg>
-                                                    Preview {index + 1}
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
+                                {/* Gallery Grid - improved layout */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {project.images?.map((previewImage, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setSelectedImage(previewImage)}
+                                            className="relative aspect-video rounded-xl overflow-hidden group
+                                                ring-1 ring-border/50 hover:ring-2 hover:ring-primary/30
+                                                transition-all duration-300 ease-in-out"
+                                        >
+                                            <Image
+                                                src={previewImage}
+                                                alt={`${project.title} - Preview ${index + 1}`}
+                                                fill
+                                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                priority={index === 0}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent 
+                                                opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                            <div className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-2
+                                                bg-black/70 backdrop-blur-sm rounded-lg text-white text-sm
+                                                opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0
+                                                transition-all duration-300">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                        d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                                                </svg>
+                                                Preview {index + 1}
+                                            </div>
+                                        </button>
+                                    ))}
                                 </div>
 
                                 {/* Description Section - improved card styling */}
@@ -785,7 +768,7 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                                             onClick={() => handleDeliveryMethodSelect('download')}
                                                             className={`flex flex-col items-center justify-center p-4 rounded-xl border 
                                                                 transition-all duration-200 ${deliveryMethod === 'download'
-                                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                                    ? 'bg-primary text-white border-primary'
                                                                     : 'bg-primary/5 hover:bg-primary/10 border-primary/20 hover:border-primary/30'
                                                                 }`}
                                                         >
@@ -803,7 +786,7 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                                                 onClick={() => handleDeliveryMethodSelect('delivery')}
                                                                 className={`flex flex-col items-center justify-center p-4 rounded-xl border 
                                                                     transition-all duration-200 ${deliveryMethod === 'delivery'
-                                                                        ? 'bg-primary text-primary-foreground border-primary'
+                                                                        ? 'bg-primary text-white border-primary'
                                                                         : 'bg-primary/5 hover:bg-primary/10 border-primary/20 hover:border-primary/30'
                                                                     }`}
                                                             >
@@ -821,15 +804,15 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                                     <button
                                                         onClick={handleTransaction}
                                                         disabled={!selectedLicense || !deliveryMethod || isProcessing}
-                                                        className={`w-full py-4 px-6 rounded-xl font-medium
+                                                        className={`w-full py-4 px-6 rounded-xl font-medium text-white
                                                             ${(!selectedLicense || !deliveryMethod || isProcessing)
                                                                 ? 'bg-primary/50 cursor-not-allowed'
                                                                 : 'bg-primary hover:bg-primary/90 active:bg-primary/80'
-                                                            } text-primary-foreground transition-all duration-200`}
+                                                            } transition-all duration-200`}
                                                     >
                                                         {isProcessing ? (
                                                             <div className="flex items-center justify-center gap-2">
-                                                                <div className="w-5 h-5 border-2 border-primary-foreground/20 border-t-primary-foreground rounded-full animate-spin" />
+                                                                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                                                                 <span>Processing...</span>
                                                             </div>
                                                         ) : !selectedLicense
@@ -844,17 +827,19 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                         </div>
                                     </div>
 
-                                    {/* Technologies Card - Updated styling */}
-                                    <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border/50">
-                                        <h2 className="text-lg font-semibold mb-4">Technologies</h2>
-                                        <div className="flex flex-wrap gap-2">
+                                    {/* Technologies Card - enhanced styling */}
+                                    <div className="bg-card rounded-2xl p-6 border border-border/50 
+                                        backdrop-blur-md shadow-lg shadow-primary/5">
+                                        <h2 className="text-xl font-semibold mb-6 text-primary">Technologies</h2>
+                                        <div className="flex flex-wrap gap-3">
                                             {project.frameworks?.map((tech, index) => (
                                                 <div key={index}
-                                                    className="flex items-center gap-2 px-3 py-2 
-                                                        bg-primary/5 hover:bg-primary/10 
-                                                        rounded-lg transition-all duration-300
-                                                        border border-primary/10 hover:border-primary/20">
-                                                    <div className="relative w-5 h-5">
+                                                    className="flex items-center gap-3 px-4 py-2.5
+                                                        bg-card hover:bg-primary/5
+                                                        rounded-xl transition-all duration-300
+                                                        border border-border/50 hover:border-primary/30
+                                                        group cursor-pointer">
+                                                    <div className="relative w-6 h-6 transform transition-transform duration-300 group-hover:scale-110">
                                                         <Image
                                                             src={tech.imageUrl}
                                                             alt={tech.title}
@@ -862,7 +847,9 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                                             className="object-contain"
                                                         />
                                                     </div>
-                                                    <span className="text-sm font-medium">{tech.title}</span>
+                                                    <span className="text-sm font-medium text-foreground/80 group-hover:text-primary">
+                                                        {tech.title}
+                                                    </span>
                                                 </div>
                                             ))}
                                         </div>
