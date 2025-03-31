@@ -57,3 +57,29 @@ export interface Transaction {
   userId: string;
   userName: string;
 }
+
+export interface DateRange {
+  startDate: string;
+  endDate: string;
+}
+
+export interface TransactionFilterProps {
+  isFilterVisible: boolean;
+  dateRange: DateRange;
+  setDateRange: (range: DateRange) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (status: string) => void;
+}
+
+export interface TransactionHeaderProps {
+  isFilterVisible: boolean;
+  setIsFilterVisible: (visible: boolean) => void;
+}
+
+export interface TransactionModalProps {
+  isOpen: boolean;
+  transaction: Transaction | null;
+  onClose: () => void;
+}
