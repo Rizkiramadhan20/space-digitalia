@@ -50,3 +50,14 @@ export interface Transaction {
     }>;
   };
 }
+
+export interface TransactionDetailsModalProps {
+  transaction: Transaction;
+  onClose: () => void;
+  handleClickOutside: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export interface TransactionCardProps {
+  transaction: Transaction;
+  onViewDetails: (transaction: Transaction) => void;
+}
