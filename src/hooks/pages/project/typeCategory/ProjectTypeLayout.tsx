@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState, Fragment } from 'react'
+
 import { motion } from 'framer-motion'
 
 import { FetchTypeCategory } from '@/hooks/pages/project/typeCategory/lib/FetchTypeCategory'
@@ -654,8 +655,30 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
                                         <div className="absolute top-4 left-4 px-4 py-2 
                                             bg-white/90 backdrop-blur-md text-gray-800 
                                             capitalize rounded-xl text-sm font-medium 
-                                            shadow-sm border border-gray-100/50">
+                                            shadow-sm border border-gray-100/50
+                                            hover:bg-white hover:shadow-md transition-all duration-300">
                                             {item.typeCategory}
+                                        </div>
+
+                                        {/* Status Badge */}
+                                        <div className={`absolute top-4 right-4 px-4 py-2 
+                                            ${item.statusProject === 'development'
+                                                ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30'
+                                                : 'bg-green-500/20 text-green-600 border-green-500/30'} 
+                                            backdrop-blur-md capitalize rounded-xl text-sm font-medium 
+                                            shadow-sm border transition-all duration-300
+                                            hover:shadow-md flex items-center gap-2`}>
+                                            {item.statusProject === 'development' ? (
+                                                <>
+                                                    <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                                                    Development
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                                    Finished
+                                                </>
+                                            )}
                                         </div>
 
                                         {/* Modern Overlay with Glassmorphism */}

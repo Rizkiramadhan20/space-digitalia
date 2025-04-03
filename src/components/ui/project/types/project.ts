@@ -27,6 +27,7 @@ export interface ProjectType {
   delivery: number;
   downloads: number;
   images: string[];
+  statusProject: string;
   frameworks: Framework[];
   licenseDetails: {
     downloadUrl: string;

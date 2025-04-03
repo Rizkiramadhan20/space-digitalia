@@ -21,6 +21,7 @@ export interface ProjectType {
     role: string;
     uid: string;
   };
+  statusProject: string;
   content: string;
   createdAt: Timestamp | Date;
   updatedAt: Timestamp | Date;

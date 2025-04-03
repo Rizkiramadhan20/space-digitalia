@@ -75,7 +75,8 @@ export const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) =>
                                 priority
                                 sizes="(max-width: 1280px) 100vw, 1280px"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent">
+                            </div>
                         </div>
 
                         {/* Gallery Grid */}
@@ -118,12 +119,39 @@ export const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) =>
                                 <TechnologiesCard frameworks={project.frameworks} />
 
                                 {/* Stats Grid */}
-                                <StatsGrid
-                                    downloads={project.downloads}
-                                    stock={project.stock}
-                                    sold={project.sold}
-                                    delivery={project.delivery}
-                                />
+                                <div className="space-y-4">
+                                    {/* Status Badges */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 30 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.6, delay: 0.5 }}
+                                        className="p-4 rounded-xl bg-gray-800/20 border border-gray-700/30"
+                                    >
+                                        <h3 className="text-xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">Status Pengerjaan</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            <div className={`
+                                                flex items-center gap-2 bg-gray-800/40 backdrop-blur-sm rounded-lg px-3 py-2 border border-gray-700/30
+                                                ${project.statusProject === 'development'
+                                                    ? 'hover:border-blue-500/50'
+                                                    : 'hover:border-purple-500/50'}
+                                                transition-all duration-300 hover:scale-105
+                                            `}>
+                                                <span className={`w-2 h-2 rounded-full ${project.statusProject === 'development' ? 'bg-blue-500' : 'bg-purple-500'}`}></span>
+                                                <div className="flex flex-col">
+                                                    <span className="text-gray-300 text-sm capitalize">{project.statusProject}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    <StatsGrid
+                                        downloads={project.downloads}
+                                        stock={project.stock}
+                                        sold={project.sold}
+                                        delivery={project.delivery}
+                                    />
+                                </div>
 
                                 {/* Price Range Card */}
                                 <PriceCard licenseDetails={project.licenseDetails} />
