@@ -86,6 +86,7 @@ export const menuItems = [
     href: "/dashboard/super-admins/project",
     subItems: [
       { label: "Daftar Project", href: "/dashboard/super-admins/project" },
+      { label: "Status", href: "/dashboard/super-admins/project/status" },
       { label: "Category", href: "/dashboard/super-admins/project/category" },
       { label: "Type", href: "/dashboard/super-admins/project/type" },
       { label: "Licence", href: "/dashboard/super-admins/project/license" },
