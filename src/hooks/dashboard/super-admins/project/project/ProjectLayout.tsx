@@ -65,6 +65,7 @@ export default function ProjectLayout() {
         licenseTitle: '',
         licenseDetails: [],
         linkPreview: '',
+        statusProject: 'development',
         author: {
             name: '',
             role: '',
@@ -204,7 +205,8 @@ export default function ProjectLayout() {
             licenseTitle: '',
             licenseDetails: [],
             linkPreview: '',
-            frameworks: []
+            frameworks: [],
+            statusProject: 'development'
         }
     })
 
@@ -230,6 +232,7 @@ export default function ProjectLayout() {
                 sold: newProject.sold || 0,
                 delivery: newProject.delivery || 0,
                 downloads: newProject.downloads || 0,
+                statusProject: data.statusProject as "development" | "finished",
                 author: {
                     name: user?.displayName || '',
                     role: user?.role || '',
@@ -329,6 +332,7 @@ export default function ProjectLayout() {
             setValue('licenseTitle', project.licenseTitle || '');
             setValue('linkPreview', project.linkPreview || '');
             setValue('frameworks', project.frameworks);
+            setValue('statusProject', project.statusProject);
 
             const modal = document.getElementById('project_modal') as HTMLDialogElement | null
             modal?.showModal()
@@ -398,6 +402,7 @@ export default function ProjectLayout() {
             licenseTitle: '',
             licenseDetails: [],
             linkPreview: '',
+            statusProject: 'development',
             author: {
                 name: '',
                 role: '',
@@ -867,6 +872,7 @@ export default function ProjectLayout() {
                                     </div>
                                     <h4 className="font-semibold text-lg text-gray-900">Basic Information</h4>
                                 </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="form-control">
                                         <label className="text-sm font-medium text-gray-700 mb-1.5">Title</label>
@@ -904,6 +910,21 @@ export default function ProjectLayout() {
                                         />
                                         {errors.description && (
                                             <span className="text-red-500 text-sm mt-1">{errors.description.message}</span>
+                                        )}
+                                    </div>
+
+                                    {/* Status Project */}
+                                    <div className="form-control">
+                                        <label className="text-sm font-medium text-gray-700 mb-1.5">Status Project</label>
+                                        <select
+                                            {...register('statusProject')}
+                                            className="select select-bordered w-full bg-gray-50/50 border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all hover:border-purple-300"
+                                        >
+                                            <option value="development" className="text-gray-700">Development</option>
+                                            <option value="finished" className="text-gray-700">Finished</option>
+                                        </select>
+                                        {errors.statusProject && (
+                                            <span className="text-red-500 text-sm mt-1">{errors.statusProject.message}</span>
                                         )}
                                     </div>
                                 </div>

@@ -1,18 +1,22 @@
 import React from 'react';
-
 import { format } from 'date-fns';
-
-import { CategoryContent } from '@/hooks/dashboard/super-admins/project/category/lib/schema';
 import { Pagination } from '@/base/helper/Pagination';
+import { Timestamp } from 'firebase/firestore';
 
-interface CategoryTableProps {
-    categories: CategoryContent[];
-    onEdit: (category: CategoryContent) => void;
+export interface StatusContent {
+    id?: string;
+    title: string;
+    createdAt?: Timestamp;
+}
+
+interface StatusTableProps {
+    status: StatusContent[];
+    onEdit: (status: StatusContent) => void;
     onDelete: (id: string) => void;
 }
 
-export const CategoryTable: React.FC<CategoryTableProps> = ({
-    categories,
+export const StatusTable: React.FC<StatusTableProps> = ({
+    status,
     onEdit,
     onDelete
 }) => {
@@ -22,8 +26,8 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
 
     // Calculate pagination values
     const offset = currentPage * itemsPerPage;
-    const currentCategories = categories.slice(offset, offset + itemsPerPage);
-    const pageCount = Math.ceil(categories.length / itemsPerPage);
+    const currentStatus = status.slice(offset, offset + itemsPerPage);
+    const pageCount = Math.ceil(status.length / itemsPerPage);
 
     // Handle page change
     const handlePageChange = (selectedItem: { selected: number }) => {
@@ -49,17 +53,17 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white">
-                            {currentCategories.map((category) => (
-                                <tr key={category.id} className="hover:bg-gray-50/50 transition-colors duration-200">
+                            {currentStatus.map((statusItem: StatusContent) => (
+                                <tr key={statusItem.id} className="hover:bg-gray-50/50 transition-colors duration-200">
                                     <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center'>
-                                        {category.createdAt && format(category.createdAt.toDate(), 'PPpp')}
+                                        {statusItem.createdAt && format(statusItem.createdAt.toDate(), 'PPpp')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center capitalize">
-                                        {category.title}
+                                        {statusItem.title}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm flex justify-center">
                                         <button
-                                            onClick={() => onEdit(category)}
+                                            onClick={() => onEdit(statusItem)}
                                             className="inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg mr-2 transition-colors duration-200"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,7 +72,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => onDelete(category.id!)}
+                                            onClick={() => onDelete(statusItem.id!)}
                                             className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,10 +83,10 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
                                     </td>
                                 </tr>
                             ))}
-                            {categories.length === 0 && (
+                            {status.length === 0 && (
                                 <tr>
                                     <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                                        No categories found
+                                        No status found
                                     </td>
                                 </tr>
                             )}
@@ -92,7 +96,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
             </div>
 
             {/* Add Pagination */}
-            {categories.length > 0 && (
+            {status.length > 0 && (
                 <Pagination
                     currentPage={currentPage}
                     totalPages={pageCount}

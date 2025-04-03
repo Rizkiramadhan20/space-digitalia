@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function CategoryProjectSkelaton() {
+export default function StatusProjectSkelaton() {
     return (
         <section className='min-h-full px-0 sm:px-4'>
             {/* Header Section Skeleton */}

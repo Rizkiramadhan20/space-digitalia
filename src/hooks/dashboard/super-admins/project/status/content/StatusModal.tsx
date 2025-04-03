@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { CategoryContent } from '@/hooks/dashboard/super-admins/project/category/lib/schema';
+import { StatusProjectContent } from '@/hooks/dashboard/super-admins/project/status/lib/schema';
 
-interface CategoryModalProps {
+interface StatusProjectModalProps {
     isEditing: boolean;
     isSubmitting: boolean;
-    formData: CategoryContent;
+    formData: StatusProjectContent;
     onSubmit: (e: React.FormEvent) => void;
     onClose: () => void;
     onChange: (value: string) => void;
 }
 
-export const CategoryModal: React.FC<CategoryModalProps> = ({
+export const StatusProjectModal: React.FC<StatusProjectModalProps> = ({
     isEditing,
     isSubmitting,
     formData,
@@ -20,17 +20,17 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     onChange
 }) => {
     return (
-        <dialog id="category_modal" className="modal">
+        <dialog id="status_project_modal" className="modal">
             <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-50 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-screen p-4">
                     <div className="bg-white rounded-3xl shadow-2xl w-[90%] max-w-2xl p-8">
                         <div className="flex items-center justify-between mb-6">
                             <div className="space-y-1">
                                 <h3 className="text-2xl font-bold text-gray-900">
-                                    {isEditing ? 'Edit Category' : 'Add Category'}
+                                    {isEditing ? 'Edit Status Project' : 'Add Status Project'}
                                 </h3>
                                 <p className="text-sm text-gray-500">
-                                    {isEditing ? 'Update existing category' : 'Add a new category to your projects'}
+                                    {isEditing ? 'Update existing status project' : 'Add a new status project to your projects'}
                                 </p>
                             </div>
                             <button
@@ -45,13 +45,13 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
                         <form method="dialog" onSubmit={onSubmit} className="space-y-8">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Category Title</label>
+                                <label className="text-sm font-medium text-gray-700">Status Project Title</label>
                                 <input
                                     type="text"
                                     value={formData.title}
                                     onChange={(e) => onChange(e.target.value)}
                                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                    placeholder="Enter category title"
+                                    placeholder="Enter status project title"
                                 />
                             </div>
 
