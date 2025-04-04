@@ -1,88 +1,179 @@
 import React from 'react'
 
-export default function AdminSkelaton() {
+export default function ProjectDetailSkeleton() {
     return (
-        <section className="min-h-full py-0 px-0 sm:py-4 sm:px-4">
-            {/* Header Section Skeleton */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <div className='flex flex-col gap-1.5'>
-                    <div className="h-8 w-48 bg-gray-200 rounded-lg relative overflow-hidden">
-                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                    </div>
-                    <div className="h-4 w-64 bg-gray-200 rounded-lg relative overflow-hidden">
-                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+        <section className="min-h-screen bg-background text-foreground">
+            <div className="container px-4 xl:px-10 py-6 sm:py-8">
+                {/* Breadcrumbs Skeleton */}
+                <div className="mb-8">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="h-8 w-24 bg-gray-200 rounded-lg relative overflow-hidden">
+                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                        </div>
+                        <div className="h-8 w-32 bg-gray-200 rounded-lg relative overflow-hidden">
+                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                        </div>
+                        <div className="h-8 w-40 bg-gray-200 rounded-lg relative overflow-hidden">
+                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                        </div>
                     </div>
                 </div>
-                <div className="h-11 w-full md:w-40 bg-gray-200 rounded-2xl relative overflow-hidden">
-                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                </div>
-            </div>
 
-            {/* Filter Controls Skeleton */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="flex-1">
-                    <div className="h-11 w-full bg-gray-200 rounded-xl relative overflow-hidden">
-                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                    </div>
-                </div>
-                <div className="w-full md:w-48">
-                    <div className="h-11 w-full bg-gray-200 rounded-xl relative overflow-hidden">
-                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                    </div>
-                </div>
-            </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                    {/* Left Column Skeleton */}
+                    <div className="lg:col-span-8 space-y-6 md:space-y-8">
+                        {/* Hero Image Skeleton */}
+                        <div className='relative aspect-video rounded-2xl overflow-hidden bg-gray-200'>
+                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                        </div>
 
-            {/* Table Skeleton */}
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[800px]">
-                        <thead>
-                            <tr className="border-b border-gray-200 bg-gray-50/50">
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Email</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Role</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <tr key={i} className="hover:bg-gray-50/50">
-                                    <td className="px-6 py-4">
-                                        <div className="h-4 w-32 bg-gray-200 rounded relative overflow-hidden">
-                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="h-4 w-48 bg-gray-200 rounded relative overflow-hidden">
-                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="h-6 w-24 bg-gray-200 rounded-full relative overflow-hidden">
-                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex gap-2">
-                                            <div className="h-8 w-16 bg-gray-200 rounded-xl relative overflow-hidden">
-                                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                                            </div>
-                                            <div className="h-8 w-16 bg-gray-200 rounded-xl relative overflow-hidden">
-                                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                        {/* Gallery Grid Skeleton */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-gray-200">
+                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                </div>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        </div>
 
-            {/* Pagination Skeleton */}
-            <div className="flex justify-center">
-                <div className="h-10 w-80 bg-gray-200 rounded-lg relative overflow-hidden">
-                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                        {/* Description Section Skeleton */}
+                        <div className="bg-card/50 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 space-y-6 border border-border/50">
+                            <div className="h-8 w-48 bg-gray-200 rounded-lg relative overflow-hidden">
+                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="h-4 w-full bg-gray-200 rounded-lg relative overflow-hidden">
+                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                </div>
+                                <div className="h-4 w-5/6 bg-gray-200 rounded-lg relative overflow-hidden">
+                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                </div>
+                                <div className="h-4 w-4/6 bg-gray-200 rounded-lg relative overflow-hidden">
+                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                </div>
+                            </div>
+
+                            {/* Content Section Skeleton */}
+                            <div className="pt-6">
+                                <div className="h-8 w-40 bg-gray-200 rounded-lg relative overflow-hidden mb-4">
+                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                </div>
+                                <div className="space-y-4">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="h-4 w-full bg-gray-200 rounded-lg relative overflow-hidden">
+                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column Skeleton */}
+                    <div className="lg:col-span-4">
+                        <div className="sticky top-4 space-y-6">
+                            {/* Author Profile Card Skeleton */}
+                            <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border/50">
+                                {/* Author Info Skeleton */}
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="w-16 h-16 rounded-full bg-gray-200 relative overflow-hidden">
+                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                    </div>
+                                    <div>
+                                        <div className="h-6 w-32 bg-gray-200 rounded-lg relative overflow-hidden mb-2">
+                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                        </div>
+                                        <div className="h-4 w-24 bg-gray-200 rounded-lg relative overflow-hidden">
+                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Project Stats Skeleton */}
+                                <div className="space-y-6 mb-8">
+                                    {/* Rating Card Skeleton */}
+                                    <div className="bg-primary/5 rounded-xl p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex gap-1">
+                                                {[1, 2, 3, 4, 5].map((i) => (
+                                                    <div key={i} className="w-5 h-5 bg-gray-200 rounded-full relative overflow-hidden">
+                                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="h-6 w-16 bg-gray-200 rounded-lg relative overflow-hidden">
+                                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                            </div>
+                                        </div>
+                                        <div className="h-4 w-32 bg-gray-200 rounded-lg relative overflow-hidden mt-2">
+                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Project Metrics Grid Skeleton */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {[1, 2, 3, 4, 5].map((i) => (
+                                            <div key={i} className="bg-card/50 rounded-xl p-4 border border-border/50">
+                                                <div className="h-4 w-20 bg-gray-200 rounded-lg relative overflow-hidden mb-2">
+                                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                                </div>
+                                                <div className="h-6 w-12 bg-gray-200 rounded-lg relative overflow-hidden">
+                                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Last Updated Skeleton */}
+                                <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg">
+                                    <div className="h-4 w-4 bg-gray-200 rounded-full relative overflow-hidden">
+                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                    </div>
+                                    <div className="h-4 w-40 bg-gray-200 rounded-lg relative overflow-hidden">
+                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* License Options Skeleton */}
+                            <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border/50">
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="h-6 w-32 bg-gray-200 rounded-lg relative overflow-hidden mb-2">
+                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                        </div>
+                                        <div className="h-4 w-48 bg-gray-200 rounded-lg relative overflow-hidden">
+                                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="h-12 w-full bg-gray-200 rounded-xl relative overflow-hidden">
+                                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Technologies Card Skeleton */}
+                            <div className="bg-card rounded-2xl p-6 border border-border/50 backdrop-blur-md shadow-lg shadow-primary/5">
+                                <div className="h-6 w-32 bg-gray-200 rounded-lg relative overflow-hidden mb-6">
+                                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="flex items-center gap-3 px-4 py-2.5 bg-card rounded-xl border border-border/50">
+                                            <div className="w-6 h-6 bg-gray-200 rounded-full relative overflow-hidden">
+                                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                            </div>
+                                            <div className="h-4 w-16 bg-gray-200 rounded-lg relative overflow-hidden">
+                                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200"></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

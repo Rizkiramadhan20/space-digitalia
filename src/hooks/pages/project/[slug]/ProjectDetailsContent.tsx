@@ -20,7 +20,7 @@ import { Timestamp } from 'firebase/firestore'
 
 import { ref, onValue, increment, update, get } from 'firebase/database';
 
-import { database } from '@/utils/firebase'; // Update import to use existing config
+import { database } from '@/utils/firebase';
 
 import ImagePreviewModal from '@/hooks/pages/project/[slug]/content/ImagePriviewModal'
 
