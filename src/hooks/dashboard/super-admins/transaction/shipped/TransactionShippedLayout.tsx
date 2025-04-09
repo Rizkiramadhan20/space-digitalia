@@ -137,7 +137,7 @@ export default function TransactionShippedLayout() {
             const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS as string, selectedTransaction.orderId);
 
             if (newStatus === 'completed') {
-                let timeLeft = 30;
+                let timeLeft = 10;
                 const toastId = toast.loading(`Moving to completed transactions in ${timeLeft} seconds...`);
 
                 // Create interval to update the countdown
@@ -148,7 +148,7 @@ export default function TransactionShippedLayout() {
                     });
                 }, 1000);
 
-                // Set a timeout for 30 seconds
+                // Set a timeout for 10 seconds
                 setTimeout(async () => {
                     clearInterval(interval); // Clear the interval
                     try {
@@ -175,7 +175,7 @@ export default function TransactionShippedLayout() {
                             id: toastId,
                         });
                     }
-                }, 30000); // 30 seconds delay
+                }, 10000); // 10 seconds delay
             } else {
                 // For other status updates, just update the document
                 await updateDoc(transactionRef, {

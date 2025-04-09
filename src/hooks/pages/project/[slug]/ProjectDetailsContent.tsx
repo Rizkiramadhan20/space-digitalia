@@ -30,7 +30,7 @@ import { useAuth } from '@/utils/context/AuthContext'
 
 import { toast } from 'react-hot-toast'
 
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore'
 
 import { db } from '@/utils/firebase'
 
@@ -46,6 +46,16 @@ interface Address {
     details: string;
     postalCode: string;
     isDefault: boolean;
+}
+
+interface Rating {
+    createdAt: Timestamp;
+    rating: number;
+    review: string;
+    transactionId: string;
+    userId: string;
+    userName: string;
+    userPhotoURL: string;
 }
 
 export default function ProjectDetailsContent({ slug }: { slug: string }) {
@@ -84,6 +94,9 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
 
     // Add state for free transaction modal
     const [showFreeModal, setShowFreeModal] = useState(false)
+
+    // Add state for ratings
+    const [ratings, setRatings] = useState<Rating[]>([])
 
     useEffect(() => {
         setLoading(true)
@@ -422,6 +435,30 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
         };
     }, []);
 
+    useEffect(() => {
+        const fetchRatings = async () => {
+            try {
+                console.log('Fetching ratings for project:', slug);
+                const ratingsRef = collection(db, 'projects', slug, 'ratings');
+                const ratingsSnapshot = await getDocs(ratingsRef);
+
+                if (ratingsSnapshot.empty) {
+                    console.log('No ratings found for this project.');
+                    setRatings([]);
+                } else {
+                    const ratingsData = ratingsSnapshot.docs.map(doc => doc.data() as Rating);
+                    console.log('Fetched ratings:', ratingsData);
+                    setRatings(ratingsData);
+                }
+            } catch (error) {
+                console.error('Error fetching ratings:', error);
+                setRatings([]);
+            }
+        };
+
+        fetchRatings();
+    }, [slug]);
+
     if (loading) return <ProjectDetailSkelaton />
 
     return (
@@ -480,7 +517,7 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                             {/* Left Column */}
                             <div className="lg:col-span-8 space-y-6 md:space-y-8">
                                 {/* Hero Image - enhanced styling */}
-                                <div className='relative aspect-video rounded-2xl overflow-hidden group'>
+                                <div className='relative h-[400px] rounded-2xl overflow-hidden group'>
                                     <Image
                                         src={project.imageUrl}
                                         alt={`${project.title} - Main Project Image`}
@@ -508,15 +545,15 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                     </div>
                                 </div>
 
-                                {/* Gallery Grid - improved layout */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {/* Gallery Grid - responsive layout */}
+                                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-visible pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
                                     {project.images?.map((previewImage, index) => (
                                         <button
                                             key={index}
                                             onClick={() => setSelectedImage(previewImage)}
-                                            className="relative aspect-video rounded-xl overflow-hidden group
+                                            className="relative h-[150px] md:h-[200px] w-[200px] md:w-full flex-shrink-0 rounded-xl overflow-hidden group
                                                 ring-1 ring-border/50 hover:ring-2 hover:ring-primary/30
-                                                transition-all duration-300 ease-in-out"
+                                                transition-all duration-300 ease-in-out snap-center"
                                         >
                                             <Image
                                                 src={previewImage}
@@ -578,6 +615,45 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                     </div>
                                 </div>
 
+                                {/* Ratings Section */}
+                                <div className="mt-8">
+                                    <h2 className="text-2xl font-semibold text-primary mb-4">Ratings</h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {ratings.map((rating, index) => (
+                                            <div key={index} className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                                                <div className="flex items-center gap-4 mb-4">
+                                                    <Image
+                                                        src={rating.userPhotoURL}
+                                                        alt={rating.userName}
+                                                        width={50}
+                                                        height={50}
+                                                        className="rounded-full"
+                                                    />
+                                                    <div>
+                                                        <h3 className="text-lg font-semibold">{rating.userName}</h3>
+                                                        <p className="text-sm text-gray-500">Transaction ID: {rating.transactionId}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <svg
+                                                            key={i}
+                                                            className={`w-5 h-5 ${i < rating.rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                        </svg>
+                                                    ))}
+                                                </div>
+                                                <p className="text-gray-700">{rating.review}</p>
+                                                <p className="text-sm text-gray-500 mt-2">
+                                                    Posted on: {rating.createdAt.toDate().toLocaleString()}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
 
                             </div>
 
@@ -614,23 +690,51 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                             <div className="bg-primary/5 rounded-xl p-4">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex gap-1">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <svg key={i} className={`w-5 h-5 ${i < (project.rating || 0)
-                                                                ? 'text-yellow-500'
-                                                                : 'text-gray-300 dark:text-gray-600'}`}
-                                                                fill="currentColor" viewBox="0 0 20 20">
-                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                            </svg>
-                                                        ))}
+                                                        {[...Array(5)].map((_, i) => {
+                                                            const rating = project.averageRating || 0;
+                                                            const isFilled = i < Math.floor(rating);
+                                                            const isHalf = i === Math.floor(rating) && rating % 1 >= 0.5;
+
+                                                            return (
+                                                                <svg key={i}
+                                                                    className={`w-5 h-5 ${isFilled
+                                                                        ? 'text-yellow-500'
+                                                                        : isHalf
+                                                                            ? 'text-yellow-500'
+                                                                            : 'text-gray-300 dark:text-gray-600'
+                                                                        }`}
+                                                                    fill={isHalf ? "url(#half-star)" : "currentColor"}
+                                                                    viewBox="0 0 24 24"
+                                                                >
+                                                                    {isHalf ? (
+                                                                        <defs>
+                                                                            <linearGradient id="half-star" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                                                <stop offset="50%" stopColor="currentColor" />
+                                                                                <stop offset="50%" stopColor="rgb(209 213 219)" />
+                                                                            </linearGradient>
+                                                                        </defs>
+                                                                    ) : null}
+                                                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                                                </svg>
+                                                            );
+                                                        })}
                                                     </div>
                                                     <div className="flex items-baseline gap-2">
-                                                        <span className="text-xl font-bold text-primary">{(project.rating || 0).toFixed(1)}</span>
+                                                        <span className="text-xl font-bold text-primary">{(project.averageRating || 0).toFixed(1)}</span>
                                                         <span className="text-sm text-muted-foreground">/ 5.0</span>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground mt-2">
-                                                    Based on {project.ratingCount || 0} reviews
-                                                </p>
+                                                <div className="flex items-center justify-between mt-2">
+                                                    <p className="text-sm text-muted-foreground">
+                                                        ({project.ratingCount || 0} ratings)
+                                                    </p>
+                                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                        <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                                        </svg>
+                                                        <span>Verified</span>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             {/* Project Metrics Grid - Improved interaction */}

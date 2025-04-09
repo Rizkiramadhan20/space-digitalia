@@ -808,6 +808,30 @@ export default function ProjectLayout() {
 
                                 {/* Card Content */}
                                 <div className="p-6 space-y-4">
+                                    {/* Rating Display */}
+                                    <div className='flex items-center gap-2'>
+                                        <div className='inline-flex items-center gap-1 text-sm text-gray-500 
+                                            bg-gray-50 px-3 py-1.5 rounded-lg'>
+                                            <span>{(item.averageRating || 0).toFixed(1)}</span>
+                                            <div className="flex gap-0.5">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <svg
+                                                        key={i}
+                                                        className={`w-3 h-3 ${i < Math.round(item.averageRating || 0) ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <span className='inline-block text-sm text-gray-500 
+                                            bg-gray-50 px-3 py-1.5 rounded-lg'>
+                                            ({item.ratingCount || 0} ratings)
+                                        </span>
+                                    </div>
+
                                     {/* Title with improved hover effect */}
                                     <h3 className='text-lg font-semibold text-gray-900 
                                         group-hover:text-blue-600 transition-all duration-300 
@@ -858,50 +882,50 @@ export default function ProjectLayout() {
                             </div>
                         ))}
                     </div>
-                </div>
 
-                {pageCount > 1 && (
-                    <div className="mt-12 flex flex-col sm:flex-row gap-4 px-4 xl:px-10 justify-between items-center">
-                        {/* Page indicator */}
-                        <div className="text-sm font-medium text-gray-600">
-                            Page {currentPage + 1} of {pageCount}
+                    {pageCount > 1 && (
+                        <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                            {/* Page indicator */}
+                            <div className="text-sm font-medium text-gray-600">
+                                Page {currentPage + 1} of {pageCount}
+                            </div>
+
+                            <ReactPaginate
+                                previousLabel={
+                                    <span className="flex items-center gap-1">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                        Previous
+                                    </span>
+                                }
+                                nextLabel={
+                                    <span className="flex items-center gap-1">
+                                        Next
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </span>
+                                }
+                                breakLabel="..."
+                                pageCount={pageCount}
+                                marginPagesDisplayed={2}
+                                pageRangeDisplayed={3}
+                                onPageChange={handlePageChange}
+                                containerClassName="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-sm border border-gray-100/50"
+                                pageClassName="rounded-xl overflow-hidden"
+                                pageLinkClassName="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+                                previousClassName="rounded-xl overflow-hidden"
+                                previousLinkClassName="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 flex items-center"
+                                nextClassName="rounded-xl overflow-hidden"
+                                nextLinkClassName="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 flex items-center"
+                                breakClassName="px-4 py-2 text-sm font-medium text-gray-700"
+                                activeClassName="bg-blue-600 text-white hover:bg-blue-700"
+                                activeLinkClassName="!text-white hover:!text-white hover:!bg-transparent"
+                            />
                         </div>
-
-                        <ReactPaginate
-                            previousLabel={
-                                <span className="flex items-center gap-1">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                    Previous
-                                </span>
-                            }
-                            nextLabel={
-                                <span className="flex items-center gap-1">
-                                    Next
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </span>
-                            }
-                            breakLabel="..."
-                            pageCount={pageCount}
-                            marginPagesDisplayed={2}
-                            pageRangeDisplayed={3}
-                            onPageChange={handlePageChange}
-                            containerClassName="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-sm border border-gray-100/50"
-                            pageClassName="rounded-xl overflow-hidden"
-                            pageLinkClassName="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
-                            previousClassName="rounded-xl overflow-hidden"
-                            previousLinkClassName="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 flex items-center"
-                            nextClassName="rounded-xl overflow-hidden"
-                            nextLinkClassName="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 flex items-center"
-                            breakClassName="px-4 py-2 text-sm font-medium text-gray-700"
-                            activeClassName="bg-blue-600 text-white hover:bg-blue-700"
-                            activeLinkClassName="!text-white hover:!text-white hover:!bg-transparent"
-                        />
-                    </div>
-                )}
+                    )}
+                </div>
             </section>
 
             {/* Social Media Follow Modal */}
@@ -1221,7 +1245,33 @@ export default function ProjectLayout() {
                                                 { label: "Downloads", value: selectedPreview.downloads },
                                                 { label: "Stock", value: selectedPreview.stock },
                                                 { label: "Sold", value: selectedPreview.sold },
-                                                { label: "Delivery", value: `${selectedPreview.delivery}` }
+                                                { label: "Delivery", value: `${selectedPreview.delivery}` },
+                                                {
+                                                    label: "Average Rating",
+                                                    value: (
+                                                        <div className="flex flex-col gap-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <span>{(selectedPreview.averageRating || 0).toFixed(1)}</span>
+                                                                <div className="flex gap-0.5">
+                                                                    {[...Array(5)].map((_, i) => (
+                                                                        <svg
+                                                                            key={i}
+                                                                            className={`w-4 h-4 ${i < Math.round(selectedPreview.averageRating || 0) ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                                            fill="currentColor"
+                                                                            viewBox="0 0 20 20"
+                                                                        >
+                                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                        </svg>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm text-gray-400">
+                                                                    <span>({selectedPreview.ratingCount || 0} ratings)</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                },
+                                                { label: "Total Rating", value: selectedPreview.ratingCount || 0 }
                                             ].map((stat, index) => (
                                                 <div key={index} className="bg-gray-800/30 backdrop-blur-sm p-4 rounded-lg border border-gray-700/30 hover:border-indigo-500/30 transition-all duration-300">
                                                     <p className="text-gray-400">{stat.label}</p>

@@ -150,6 +150,8 @@ export const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) =>
                                         stock={project.stock}
                                         sold={project.sold}
                                         delivery={project.delivery}
+                                        averageRating={project.averageRating}
+                                        ratingCount={project.ratingCount}
                                     />
                                 </div>
 

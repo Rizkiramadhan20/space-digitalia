@@ -28,6 +28,8 @@ export interface ProjectType {
   delivery: number;
   downloads: number;
   photoURL: string;
+  averageRating: number;
+  ratingCount: number;
   images: string[];
   frameworks: Framework[];
   licenseDetails: {

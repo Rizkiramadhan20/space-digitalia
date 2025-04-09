@@ -45,6 +45,7 @@ export interface ProjectType {
   typeTitle: string;
   rating: number;
   ratingCount: number;
+  averageRating: number;
 }
 
 export interface ProjectCardProps {
@@ -81,6 +82,8 @@ export interface StatsGridProps {
   stock: number;
   sold: number;
   delivery: string | number;
+  averageRating?: number;
+  ratingCount?: number;
 }
 
 export interface LicenseDetail {
