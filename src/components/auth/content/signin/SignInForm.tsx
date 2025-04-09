@@ -155,7 +155,7 @@ export default function SignInForm({ isLoading, onSubmit, onGoogleSignIn, onGith
 
                 <div className='text-center text-gray-500'>
                     Don&apos;t have an account? {' '}
-                    <Link href="/auth/signup" className='text-primary hover:text-primary/80 font-medium'>
+                    <Link href="/signup" className='text-primary hover:text-primary/80 font-medium'>
                         Sign up
                     </Link>
                 </div>

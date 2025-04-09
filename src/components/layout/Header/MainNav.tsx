@@ -262,7 +262,7 @@ export default function MainNav() {
                                 {!user && isMobileMenuOpen && (
                                     <li className="border-t mt-2 pt-2">
                                         <Link
-                                            href="/auth/signin"
+                                            href="/signin"
                                             className="flex items-center gap-4 px-8 py-4 text-gray-600 hover:text-primary hover:bg-gray-50/80 transition-all"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >

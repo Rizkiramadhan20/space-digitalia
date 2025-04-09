@@ -7,7 +7,7 @@ import { Role } from '@/utils/context/interface/Auth';
 // Paths that are publicly accessible
 const publicPaths = [
     '/',
-    '/auth/register',
+    '/register',
     '/about-us',
     '/services',
     '/project',
@@ -17,9 +17,9 @@ const publicPaths = [
 
 // Auth paths that should be accessible only for non-authenticated users
 const authPaths = [
-    '/auth/signin',
-    '/auth/signup',
-    '/auth/forgot-password',
+    '/signin',
+    '/signup',
+    '/forgot-password',
 ];
 
 // Role-based path mapping
@@ -54,7 +54,7 @@ export function middleware(request: NextRequest) {
     if (pathname.startsWith('/dashboard')) {
         // If not authenticated, redirect to login
         if (!token || !userRole) {
-            const loginUrl = new URL('/auth/signin', request.url);
+            const loginUrl = new URL('/signin', request.url);
             loginUrl.searchParams.set('redirect', pathname);
             return NextResponse.redirect(loginUrl);
         }
@@ -72,7 +72,7 @@ export function middleware(request: NextRequest) {
 
     // For authenticated routes that aren't dashboard routes
     if (!token && !publicPaths.includes(pathname)) {
-        const loginUrl = new URL('/auth/signin', request.url);
+        const loginUrl = new URL('/signin', request.url);
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);
     }
