@@ -41,7 +41,7 @@ export default function SignUpContent() {
         setIsLoading(true)
         try {
             await signUp(data.email, data.password, data.displayName, data.phone)
-            router.push('/auth/signin')
+            router.push('/signin')
         } catch (error) {
             console.error('Registration error:', error)
         } finally {
@@ -109,13 +109,13 @@ export default function SignUpContent() {
                             <div className='space-y-6'>
                                 <div className='flex gap-4 border-b border-gray-200'>
                                     <Link
-                                        href="/auth/signin"
+                                        href="/signin"
                                         className={`flex-1 py-4 font-medium text-center text-gray-500 hover:text-gray-900 transition-colors`}
                                     >
                                         Sign In
                                     </Link>
                                     <Link
-                                        href="/auth/signup"
+                                        href="/signup"
                                         className={`flex-1 py-4 font-medium text-center ${true ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-900 transition-colors'}`}
                                     >
                                         Sign Up
@@ -309,7 +309,7 @@ export default function SignUpContent() {
 
                                 <div className='text-center text-gray-600'>
                                     Already have an account? {' '}
-                                    <Link href="/auth/signin" className='text-primary hover:text-primary/80 font-medium transition-colors'>
+                                    <Link href="/signin" className='text-primary hover:text-primary/80 font-medium transition-colors'>
                                         Sign in
                                     </Link>
                                 </div>
