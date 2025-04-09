@@ -539,8 +539,8 @@ export default function ProjectLayout() {
     // Add Midtrans script when modal is opened
     useEffect(() => {
         if (isPreviewOpen) {
-            const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js';
-            const midtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
+            const midtransScriptUrl = 'https://app.midtrans.com/snap/snap.js';
+            const midtransClientKey = process.env.MIDTRANS_CLIENT_KEY;
 
             const scriptElement = document.createElement('script');
             scriptElement.src = midtransScriptUrl;

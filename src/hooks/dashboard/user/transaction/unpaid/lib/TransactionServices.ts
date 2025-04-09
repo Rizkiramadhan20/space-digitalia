@@ -100,7 +100,7 @@ export const handleContinuePayment = (
     return;
   }
 
-  const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
+  const snapScript = "https://app.midtrans.com/snap/snap.js";
   const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY as string;
 
   if (!clientKey) {
