@@ -223,7 +223,7 @@ export default function ProjectLayout() {
             // Validate user is logged in and has required fields
             if (!user || !user.uid || !user.email || !user.displayName) {
                 localStorage.setItem('redirectAfterLogin', window.location.pathname);
-                router.push('/auth/signin');
+                router.push('/signin');
                 toast.error('Please sign in with complete profile information');
                 return;
             }
@@ -511,7 +511,7 @@ export default function ProjectLayout() {
 
             if (!user || !user.uid || !user.email || !user.displayName) {
                 toast.error('Please sign in to continue');
-                router.push('/auth/signin');
+                router.push('/signin');
                 return;
             }
 

@@ -41,13 +41,13 @@ export default function SignInForm({ isLoading, onSubmit, onGoogleSignIn, onGith
             <div className='space-y-6'>
                 <div className='flex gap-4 border-b border-gray-200'>
                     <Link
-                        href="/auth/signin"
+                        href="/signin"
                         className={`flex-1 py-4 font-medium text-center ${true ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Sign In
                     </Link>
                     <Link
-                        href="/auth/signup"
+                        href="/signup"
                         className={`flex-1 py-4 font-medium text-center text-gray-500 hover:text-gray-700`}
                     >
                         Sign Up

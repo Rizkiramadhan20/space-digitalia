@@ -254,7 +254,7 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
         if (!user) {
             toast.error('Please sign in to continue')
             localStorage.setItem('redirectAfterLogin', window.location.href)
-            router.push('/auth/signin')
+            router.push('/signin')
             return
         }
 

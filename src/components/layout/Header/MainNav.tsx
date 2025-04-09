@@ -102,7 +102,7 @@ export default function MainNav() {
                     <div className="flex items-center gap-4">
                         {!user ? (
                             <Link
-                                href="/auth/signin"
+                                href="/signin"
                                 className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-sm font-semibold shadow-lg hover:-translate-y-0.5 duration-300"
                             >
                                 <CiLogin className="text-lg" />

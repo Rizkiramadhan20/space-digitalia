@@ -190,7 +190,7 @@ export default function ProjectTypeDetails({ typeCategory }: { typeCategory: str
         try {
             if (!user || !user.uid || !user.email || !user.displayName) {
                 localStorage.setItem('redirectAfterLogin', window.location.pathname);
-                router.push('/auth/signin');
+                router.push('/signin');
                 toast.error('Please sign in with complete profile information');
                 return;
             }
