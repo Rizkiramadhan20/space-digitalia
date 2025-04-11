@@ -13,51 +13,72 @@ const nextConfig: NextConfig = {
     domains: [
       "ik.imagekit.io",
       "lh3.googleusercontent.com",
-      "avatars.githubusercontent.com"
+      "avatars.githubusercontent.com",
     ],
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   reactStrictMode: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"],
+          }
+        : false,
   },
   experimental: {
     optimizePackageImports: [
-      'react-icons',
-      'date-fns',
-      'lodash',
-      '@mui/material',
-      '@mui/icons-material',
-      'framer-motion'
+      "react-icons",
+      "date-fns",
+      "lodash",
+      "@mui/material",
+      "@mui/icons-material",
+      "framer-motion",
     ],
     serverActions: {
-      bodySizeLimit: '2mb',
-      allowedOrigins: ['https://spacedigitalia.my.id', 'localhost:3000']
+      bodySizeLimit: "2mb",
+      allowedOrigins: ["https://spacedigitalia.my.id", "localhost:3000"],
     },
   },
-  output: 'standalone',
+  output: "standalone",
   compress: true,
   poweredByHeader: false,
   headers: async () => [
     {
-      source: '/:path*',
+      source: "/:path*",
       headers: [
         {
-          key: 'Cache-Control',
-          value: 'public, max-age=3600, must-revalidate',
-        }
+          key: "Cache-Control",
+          value: "public, max-age=3600, must-revalidate",
+        },
+        {
+          key: "X-Content-Type-Options",
+          value: "nosniff",
+        },
+        {
+          key: "X-Frame-Options",
+          value: "SAMEORIGIN",
+        },
+        {
+          key: "X-XSS-Protection",
+          value: "1; mode=block",
+        },
+        {
+          key: "Referrer-Policy",
+          value: "strict-origin-when-cross-origin",
+        },
       ],
     },
     {
-      source: '/_next/static/:path*',
+      source: "/_next/static/:path*",
       headers: [
         {
-          key: 'Cache-Control',
-          value: 'public, max-age=31536000, immutable',
-        }
+          key: "Cache-Control",
+          value: "public, max-age=31536000, immutable",
+        },
       ],
     },
   ],
@@ -69,7 +90,7 @@ const nextConfig: NextConfig = {
           terserOptions: {
             compress: {
               drop_console: true,
-              dead_code: true
+              dead_code: true,
             },
             mangle: true,
             output: {
