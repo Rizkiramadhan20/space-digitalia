@@ -10,7 +10,7 @@ import Footer from "@/components/layout/Footer/Footer";
 
 import { Toaster } from "react-hot-toast";
 
-// import CookieConsent from '@/base/meta/CookieConsent';
+import CookieConsent from '@/base/meta/CookieConsent';
 
 const Pathname = ({ children }: { children: React.ReactNode }) => {
     const pathname = usePathname();
@@ -50,7 +50,7 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
                 }}
             />
             {!isAdminRoute && <Header />}
-            {/* <CookieConsent /> */}
+            <CookieConsent />
             {children}
             {!isAdminRoute && <Footer />}
         </main>
