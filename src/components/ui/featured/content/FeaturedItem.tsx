@@ -2,9 +2,11 @@ import Image from 'next/image'
 
 import { motion } from 'framer-motion'
 
+import { memo } from 'react'
+
 import { FeaturedItemProps } from '@/components/ui/featured/lib/schema'
 
-export default function FeaturedItem({ item }: FeaturedItemProps) {
+function FeaturedItem({ item }: FeaturedItemProps) {
     return (
         <motion.div
             className='group flex-1 min-w-[280px] flex flex-row items-start gap-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-4'
@@ -24,7 +26,10 @@ export default function FeaturedItem({ item }: FeaturedItemProps) {
                     src={item.imageUrl}
                     alt={item.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className='object-cover rounded-lg group-hover:scale-105 transition-transform duration-300'
+                    loading="lazy"
+                    quality={75}
                 />
             </motion.div>
 
@@ -51,3 +56,5 @@ export default function FeaturedItem({ item }: FeaturedItemProps) {
         </motion.div>
     )
 }
+
+export default memo(FeaturedItem);

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 
 import Image from "next/image";
 
@@ -10,25 +10,29 @@ import { createPortal } from 'react-dom';
 
 import { ProjectCardProps } from "@/components/ui/project/types/project";
 
-import { ProjectModal } from "@/components/ui/project/content/ProjectModal";
+import ProjectModal from "@/components/ui/project/content/ProjectModal";
 
-export const ProjectCard = ({ project, leftTimeline, rightTimeline }: ProjectCardProps) => {
+function ProjectCard({ project, leftTimeline, rightTimeline }: ProjectCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleCardClick = (e: React.MouseEvent) => {
+    const handleCardClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         setIsModalOpen(true);
         leftTimeline?.play();
         rightTimeline?.play();
-    };
+    }, [leftTimeline, rightTimeline]);
+
+    const handleCloseModal = useCallback(() => {
+        setIsModalOpen(false);
+    }, []);
+
+    const handleEsc = useCallback((event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            setIsModalOpen(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const handleEsc = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                setIsModalOpen(false);
-            }
-        };
-
         if (isModalOpen) {
             document.body.style.overflow = 'hidden';
             document.addEventListener('keydown', handleEsc);
@@ -40,7 +44,23 @@ export const ProjectCard = ({ project, leftTimeline, rightTimeline }: ProjectCar
             document.body.style.overflow = 'unset';
             document.removeEventListener('keydown', handleEsc);
         };
-    }, [isModalOpen]);
+    }, [isModalOpen, handleEsc]);
+
+    const renderStars = useCallback(() => {
+        const rating = project.averageRating || 0;
+        return [...Array(5)].map((_, i) => {
+            const isFilled = i < Math.floor(rating);
+            return (
+                <svg key={i}
+                    className={`w-3 h-3 ${isFilled ? 'text-yellow-500' : 'text-gray-400'}`}
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+            );
+        });
+    }, [project.averageRating]);
 
     return (
         <>
@@ -55,25 +75,14 @@ export const ProjectCard = ({ project, leftTimeline, rightTimeline }: ProjectCar
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    loading="lazy"
+                    quality={75}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/90 group-hover:via-black/40 group-hover:to-black/95 transition-all duration-300">
                     {/* Rating Display */}
                     <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg">
                         <div className="flex gap-0.5">
-                            {[...Array(5)].map((_, i) => {
-                                const rating = project.averageRating || 0;
-                                const isFilled = i < Math.floor(rating);
-
-                                return (
-                                    <svg key={i}
-                                        className={`w-3 h-3 ${isFilled ? 'text-yellow-500' : 'text-gray-400'}`}
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                                    </svg>
-                                );
-                            })}
+                            {renderStars()}
                         </div>
                         <span className="text-xs font-medium text-white">{(project.averageRating || 0).toFixed(1)}</span>
                     </div>
@@ -106,10 +115,12 @@ export const ProjectCard = ({ project, leftTimeline, rightTimeline }: ProjectCar
                 <ProjectModal
                     project={project}
                     isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={handleCloseModal}
                 />,
                 document.body
             )}
         </>
     );
-};
+}
+
+export default memo(ProjectCard);

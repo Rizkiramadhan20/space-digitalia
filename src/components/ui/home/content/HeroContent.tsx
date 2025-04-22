@@ -2,11 +2,13 @@ import Link from 'next/link';
 
 import { motion } from 'framer-motion';
 
+import { memo } from 'react';
+
 import { HeroContentProps } from '@/components/ui/home/types/schema';
 
 import { heroContentAnimations } from '@/components/ui/home/animation/animation';
 
-export default function HeroContent({ item }: HeroContentProps) {
+function HeroContent({ item }: HeroContentProps) {
     return (
         <motion.div
             className='flex flex-col gap-8 lg:gap-10 items-center text-center lg:text-start lg:items-start'
@@ -40,6 +42,7 @@ export default function HeroContent({ item }: HeroContentProps) {
                     <Link
                         href={item.button1.link}
                         className='group relative px-8 py-4 rounded-full bg-blue-600 text-white font-semibold overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/30 block w-full sm:w-fit'
+                        prefetch={false}
                     >
                         <span className='relative z-10'>{item.button1.text}</span>
                         <div className='absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-400 ease-out'></div>
@@ -55,6 +58,7 @@ export default function HeroContent({ item }: HeroContentProps) {
                     <Link
                         href={item.button2.link}
                         className='group px-8 py-4 rounded-full border-2 border-blue-600 text-blue-600 font-semibold transition-all duration-500 hover:bg-blue-50/80 hover:shadow-2xl hover:shadow-blue-500/20 backdrop-blur-sm block w-full sm:w-fit'
+                        prefetch={false}
                     >
                         {item.button2.text}
                     </Link>
@@ -63,3 +67,5 @@ export default function HeroContent({ item }: HeroContentProps) {
         </motion.div>
     );
 }
+
+export default memo(HeroContent);

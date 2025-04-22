@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 
 import { FetchHome } from '@/components/ui/home/lib/FetchHome'
 
@@ -8,15 +8,23 @@ import HomeSkelaton from '@/components/ui/home/HomeSkelaton'
 
 import { HomeType } from '@/components/ui/home/types/schema'
 
-import BackgroundEffects from '@/components/ui/home/content/Background'
-
 import HeroContent from '@/components/ui/home/content/HeroContent'
 
 import HeroImage from '@/components/ui/home/content/HeroImage'
 
-import Left from '@/components/ui/home/content/Left'
+import dynamic from 'next/dynamic';
 
-import Right from '@/components/ui/home/content/Right'
+const BackgroundEffects = dynamic(() => import('@/components/ui/home/content/Background'), {
+    ssr: false,
+})
+
+const Left = dynamic(() => import('@/components/ui/home/content/Left'), {
+    ssr: false,
+})
+
+const Right = dynamic(() => import('@/components/ui/home/content/Right'), {
+    ssr: false,
+})
 
 export default function Home() {
     const [home, setHome] = useState<HomeType[]>([]);
@@ -31,6 +39,8 @@ export default function Home() {
         return () => unsubscribe();
     }, []);
 
+    const memoizedHome = useMemo(() => home, [home]);
+
     if (loading) {
         return <HomeSkelaton />;
     }
@@ -41,11 +51,11 @@ export default function Home() {
 
             <div className='container px-4 xl:px-10 relative py-12 lg:py-20'>
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center'>
-                    {home.map((item) => (
+                    {memoizedHome.map((item) => (
                         <HeroContent key={item.id} item={item} />
                     ))}
 
-                    {home.map((image) => (
+                    {memoizedHome.map((image) => (
                         <HeroImage key={image.id} image={image} />
                     ))}
                 </div>

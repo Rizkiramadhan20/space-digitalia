@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 
 import Image from 'next/image';
 
+import { memo } from 'react';
+
 import { ServiceItemProps } from '@/components/ui/service/lib/schema';
 
-export default function ServiceItem({ item, index }: ServiceItemProps) {
+function ServiceItem({ item, index }: ServiceItemProps) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -30,6 +32,8 @@ export default function ServiceItem({ item, index }: ServiceItemProps) {
                         width={100}
                         height={100}
                         className='w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover'
+                        loading="lazy"
+                        quality={75}
                     />
                     <div>
                         <h2 className='font-bold text-xl sm:text-2xl mb-2 sm:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600'>
@@ -75,8 +79,13 @@ export default function ServiceItem({ item, index }: ServiceItemProps) {
                     width={800}
                     height={800}
                     className='w-full h-auto'
+                    loading="lazy"
+                    quality={75}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </motion.div>
         </motion.div>
     );
 }
+
+export default memo(ServiceItem);

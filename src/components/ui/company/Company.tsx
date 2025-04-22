@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, memo } from 'react'
 
 import { FetchCompany } from '@/components/ui/company/lib/FetchCompany'
 
@@ -14,7 +14,7 @@ import CompanyGrid from '@/components/ui/company/ui/CompanyGrid'
 
 import CompanyBackground from '@/components/ui/company/ui/Background'
 
-export default function Company() {
+const Company = () => {
     const [company, setCompany] = useState<CompanyType[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -27,6 +27,8 @@ export default function Company() {
         return () => unsubscribe();
     }, []);
 
+    const memoizedCompany = useMemo(() => company, [company]);
+
     if (loading) {
         return <CompanySkelaton />;
     }
@@ -35,9 +37,11 @@ export default function Company() {
         <section className='min-h-full px-4 xl:px-10 py-6 sm:py-8'>
             <div className="container relative z-10">
                 <CompanyHeader />
-                <CompanyGrid companies={company} />
+                <CompanyGrid companies={memoizedCompany} />
                 <CompanyBackground />
             </div>
         </section>
     )
 }
+
+export default memo(Company);

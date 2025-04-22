@@ -1,9 +1,15 @@
 import { Fragment } from 'react'
+
 import type { Metadata } from 'next'
+
 import Script from "next/script";
+
 import TagsArticleContent from '@/hooks/pages/articles/[tag]/TagsArticleContent'
+
 import { generateMetadata as getArticleMetadata } from '@/hooks/pages/articles/[tag]/meta/metadata'
+
 import TagsArticleHero from '@/hooks/pages/articles/[tag]/TagsArticleHero'
+
 import TagsArticleNotFound from '@/hooks/pages/articles/[tag]/TagsArticleNotFound'
 
 type Props = {

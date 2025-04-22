@@ -1,10 +1,15 @@
 "use client"
 
-import { useRef } from "react";
+import { useRef, useMemo, useCallback, memo } from "react";
+
 import ProjectSkelaton from "@/components/ui/project/ProjectSkelaton";
+
 import { useRouter } from "next/navigation";
-import { ProjectCard } from "@/components/ui/project/content/ProjectCard";
+
+import ProjectCard from "@/components/ui/project/content/ProjectCard";
+
 import { useResponsive, useProjectData, useProjectAnimation, getProjectColumns } from "@/components/ui/project/lib/UseManagement";
+
 import { motion } from "framer-motion";
 
 // Konfigurasi animasi
@@ -13,7 +18,7 @@ const fadeInUp = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
 };
 
-export default function Portfolio() {
+function Portfolio() {
     const router = useRouter();
     const leftColumnRef = useRef<HTMLDivElement>(null!);
     const rightColumnRef = useRef<HTMLDivElement>(null!);
@@ -31,14 +36,20 @@ export default function Portfolio() {
         isMobile
     );
 
+    const handleSeeMore = useCallback(() => {
+        router.push("/project");
+    }, [router]);
+
+    const { firstProjects, secondProjects } = useMemo(() =>
+        getProjectColumns(projects, isMobile),
+        [projects, isMobile]
+    );
+
+    const memoizedFirstProjects = useMemo(() => firstProjects, [firstProjects]);
+    const memoizedSecondProjects = useMemo(() => secondProjects, [secondProjects]);
+
     if (loading) {
         return <ProjectSkelaton />;
-    }
-
-    const { firstProjects, secondProjects } = getProjectColumns(projects, isMobile);
-
-    const handleSeeMore = () => {
-        router.push("/project");
     }
 
     return (
@@ -99,7 +110,7 @@ export default function Portfolio() {
                                     ref={leftColumnRef}
                                     className="flex flex-col gap-4 sm:gap-8 p-3 sm:p-4"
                                 >
-                                    {secondProjects.map((project, index) => (
+                                    {memoizedSecondProjects.map((project, index) => (
                                         <ProjectCard
                                             key={`down-${project.title}-${index}`}
                                             project={project}
@@ -124,7 +135,7 @@ export default function Portfolio() {
                                     ref={rightColumnRef}
                                     className="flex flex-col gap-4 sm:gap-8 p-3 sm:p-4"
                                 >
-                                    {firstProjects.map((project, index) => (
+                                    {memoizedFirstProjects.map((project, index) => (
                                         <ProjectCard
                                             key={`up-${project.title}-${index}`}
                                             project={project}
@@ -141,3 +152,5 @@ export default function Portfolio() {
         </section>
     );
 }
+
+export default memo(Portfolio);

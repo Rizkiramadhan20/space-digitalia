@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 
 import { motion } from 'framer-motion';
+
+import { useRouter } from 'next/navigation';
 
 import { FetchArticle } from '@/components/ui/article/lib/FetchArticle';
 
@@ -12,67 +12,62 @@ import { ArticleType } from '@/components/ui/article/lib/schema';
 
 import ArticleSkelaton from '@/components/ui/article/ArticleSkelaton';
 
-import TopArticle from '@/components/ui/article/ui/TopArticle';
-
 import ArticleCard from '@/components/ui/article/ui/ArticleCard';
 
-export default function Article() {
+import TopArticle from '@/components/ui/article/ui/TopArticle';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+}
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5
+        }
+    }
+}
+
+const Article = () => {
+    const router = useRouter();
     const [article, setArticle] = useState<ArticleType[]>([]);
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
 
     useEffect(() => {
         const unsubscribe = FetchArticle((newArticle) => {
-            const sortedArticles = newArticle.sort((a, b) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-            setArticle(sortedArticles);
+            setArticle(newArticle);
             setLoading(false);
         });
 
         return () => unsubscribe();
     }, []);
 
+    const memoizedArticle = useMemo(() => article, [article]);
+    const topArticle = memoizedArticle[0];
+    const otherArticles = memoizedArticle.slice(1);
+
+    const handleViewAll = () => {
+        router.push('/articles');
+    };
+
     if (loading) {
         return <ArticleSkelaton />;
     }
-
-    const handleViewAll = () => {
-        router.push("/articles");
-    }
-
-    const limitedArticles = article.slice(0, 4);
-    const topArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
-    const otherArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.2
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                duration: 0.5,
-                ease: "easeOut"
-            }
-        }
-    };
 
     return (
         <motion.section
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={containerVariants}
+            viewport={{ once: true }}
             className='min-h-full px-4 xl:px-10 py-6 sm:py-20'
         >
             <div className="container">
@@ -152,5 +147,7 @@ export default function Article() {
                 </motion.div>
             </div>
         </motion.section>
-    );
+    )
 }
+
+export default memo(Article);

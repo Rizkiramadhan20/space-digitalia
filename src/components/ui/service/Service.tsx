@@ -1,36 +1,32 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
-
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react'
 import { motion } from 'framer-motion';
-
 import { FetchService } from '@/components/ui/service/lib/FetchService'
-
 import { ServiceType } from '@/components/ui/service/lib/schema'
-
 import ServiceSkeleton from '@/components/ui/service/ServiceSkelaton';
-
 import ServicePaths from '@/components/ui/service/content/ServicePaths';
-
 import ServiceItem from '@/components/ui/service/content/ServiceItem';
 
-export default function Service() {
+function Service() {
     const [service, setService] = useState<ServiceType[]>([]);
     const [loading, setLoading] = useState(true);
     const [visibleSections, setVisibleSections] = useState<number[]>([]);
 
+    const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+        entries.forEach((entry) => {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            if (entry.isIntersecting) {
+                setVisibleSections(prev => Array.from(new Set([...prev, index])));
+            } else {
+                setVisibleSections(prev => prev.filter(i => i !== index));
+            }
+        });
+    }, []);
+
     useEffect(() => {
         const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    const index = parseInt(entry.target.getAttribute('data-index') || '0');
-                    if (entry.isIntersecting) {
-                        setVisibleSections(prev => Array.from(new Set([...prev, index])));
-                    } else {
-                        setVisibleSections(prev => prev.filter(i => i !== index));
-                    }
-                });
-            },
+            handleIntersection,
             {
                 threshold: 0.3,
                 rootMargin: "-100px 0px"
@@ -41,7 +37,7 @@ export default function Service() {
         elements.forEach((el) => observer.observe(el));
 
         return () => observer.disconnect();
-    }, [service]);
+    }, [handleIntersection, service]);
 
     useEffect(() => {
         const unsubscribe = FetchService((newService) => {
@@ -51,6 +47,8 @@ export default function Service() {
 
         return () => unsubscribe();
     }, []);
+
+    const memoizedService = useMemo(() => service, [service]);
 
     if (loading) {
         return <ServiceSkeleton />;
@@ -73,10 +71,10 @@ export default function Service() {
 
                 <div className="flex flex-col gap-16 sm:gap-32 relative">
                     <div className="absolute left-[50px] top-[130px] h-[calc(100%-120px)] w-full hidden md:block z-[-1]">
-                        <ServicePaths serviceLength={service.length} visibleSections={visibleSections} />
+                        <ServicePaths serviceLength={memoizedService.length} visibleSections={visibleSections} />
                     </div>
 
-                    {service.map((item, index) => (
+                    {memoizedService.map((item, index) => (
                         <ServiceItem key={item.id} item={item} index={index} />
                     ))}
                 </div>
@@ -84,3 +82,5 @@ export default function Service() {
         </section>
     )
 }
+
+export default memo(Service);
