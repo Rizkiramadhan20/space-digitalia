@@ -4,6 +4,8 @@ import { collection, getDocs, query, where } from "firebase/firestore"
 
 import { db } from "@/utils/firebase"
 
+import { formatSlug } from "@/base/helper/formatSlug"
+
 interface Article {
     id: string
     slug: string
@@ -110,7 +112,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Article routes
     const articleRoutes = articles.map(article => ({
-        url: `${baseUrl}/articles/${article.tags}/${article.slug}`,
+        url: `${baseUrl}/articles/${formatSlug(article.tags?.[0] || "")}/${article.slug}`,
         lastModified: new Date(article.createdAt),
         changeFrequency: 'daily' as const,
         priority: 0.8,
@@ -118,7 +120,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Tag routes
     const tagRoutes = Array.from(tags).map(tag => ({
-        url: `${baseUrl}/articles/${tag}`,
+        url: `${baseUrl}/articles/${formatSlug(tag)}`,
         lastModified: new Date(),
         changeFrequency: 'daily' as const,
         priority: 0.7,
@@ -126,7 +128,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Project routes
     const projectRoutes = projects.map(project => ({
-        url: `${baseUrl}/project/${project.typeCategory}/${project.typeTitle}/${project.slug}`,
+        url: `${baseUrl}/project/${formatSlug(project.typeCategory)}/${formatSlug(project.typeTitle)}/${project.slug}`,
         lastModified: new Date(project.createdAt),
         changeFrequency: 'weekly' as const,
         priority: 0.7,
