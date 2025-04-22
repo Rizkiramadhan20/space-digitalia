@@ -23,26 +23,89 @@ interface Project {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://spacedigitalia.my.id'
+    let articles: Article[] = []
+    let projects: Project[] = []
 
-    // Fetch articles
-    const articlesRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_ARTICLES as string)
-    const articlesQuery = query(articlesRef, where("status", "==", "published"))
-    const articlesSnapshot = await getDocs(articlesQuery)
-    const articles = articlesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.().toISOString() || "",
-    })) as Article[]
+    try {
+        // Fetch articles
+        const articlesRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_ARTICLES as string)
+        const articlesQuery = query(articlesRef, where("status", "==", "published"))
+        const articlesSnapshot = await getDocs(articlesQuery)
+        articles = articlesSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate?.().toISOString() || new Date().toISOString(),
+        })) as Article[]
 
-    // Fetch projects
-    const projectsRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT as string)
-    const projectsQuery = query(projectsRef, where("createdAt", "!=", ""))
-    const projectsSnapshot = await getDocs(projectsQuery)
-    const projects = projectsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.().toISOString() || "",
-    })) as Project[]
+        // Fetch projects
+        const projectsRef = collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT as string)
+        const projectsQuery = query(projectsRef, where("createdAt", "!=", ""))
+        const projectsSnapshot = await getDocs(projectsQuery)
+        projects = projectsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate?.().toISOString() || new Date().toISOString(),
+        })) as Project[]
+    } catch (error) {
+        console.error('Error fetching data for sitemap:', error)
+        // Return static routes if data fetching fails
+        return [
+            {
+                url: baseUrl,
+                lastModified: new Date(),
+                changeFrequency: 'daily',
+                priority: 1,
+            },
+            {
+                url: `${baseUrl}/about`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly' as const,
+                priority: 0.8,
+            },
+            {
+                url: `${baseUrl}/articles`,
+                lastModified: new Date(),
+                changeFrequency: 'daily' as const,
+                priority: 0.9,
+            },
+            {
+                url: `${baseUrl}/contact`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly' as const,
+                priority: 0.7,
+            },
+            {
+                url: `${baseUrl}/project`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly' as const,
+                priority: 0.8,
+            },
+            {
+                url: `${baseUrl}/services`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly' as const,
+                priority: 0.8,
+            },
+            {
+                url: `${baseUrl}/signin`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly' as const,
+                priority: 0.5,
+            },
+            {
+                url: `${baseUrl}/signup`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly' as const,
+                priority: 0.5,
+            },
+            {
+                url: `${baseUrl}/forgot-password`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly' as const,
+                priority: 0.3,
+            },
+        ]
+    }
 
     // Get unique tags from articles
     const tags = new Set<string>()
