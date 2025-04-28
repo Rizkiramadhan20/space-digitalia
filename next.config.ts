@@ -1,107 +1,25 @@
-/** @type {import('next').NextConfig} */
 import type { NextConfig } from "next";
-
-import bundleAnalyzer from "@next/bundle-analyzer";
-import TerserPlugin from "terser-webpack-plugin";
-
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      "ik.imagekit.io",
-      "lh3.googleusercontent.com",
-      "avatars.githubusercontent.com",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ik.imagekit.io",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
     ],
-    formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: 60,
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-  },
-  reactStrictMode: true,
-  compiler: {
-    removeConsole:
-      process.env.NODE_ENV === "production"
-        ? {
-            exclude: ["error", "warn"],
-          }
-        : false,
-  },
-  experimental: {
-    optimizePackageImports: [
-      "react-icons",
-      "date-fns",
-      "lodash",
-      "@mui/material",
-      "@mui/icons-material",
-      "framer-motion",
-    ],
-    serverActions: {
-      bodySizeLimit: "2mb",
-      allowedOrigins: ["https://spacedigitalia.my.id", "localhost:3000"],
-    },
-  },
-  output: "standalone",
-  compress: true,
-  poweredByHeader: false,
-  headers: async () => [
-    {
-      source: "/:path*",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "public, max-age=3600, must-revalidate",
-        },
-        {
-          key: "X-Content-Type-Options",
-          value: "nosniff",
-        },
-        {
-          key: "X-Frame-Options",
-          value: "SAMEORIGIN",
-        },
-        {
-          key: "X-XSS-Protection",
-          value: "1; mode=block",
-        },
-        {
-          key: "Referrer-Policy",
-          value: "strict-origin-when-cross-origin",
-        },
-      ],
-    },
-    {
-      source: "/_next/static/:path*",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "public, max-age=31536000, immutable",
-        },
-      ],
-    },
-  ],
-  webpack: (config, { dev, isServer }) => {
-    if (!dev && !isServer) {
-      config.optimization.minimize = true;
-      config.optimization.minimizer.push(
-        new TerserPlugin({
-          terserOptions: {
-            compress: {
-              drop_console: true,
-              dead_code: true,
-            },
-            mangle: true,
-            output: {
-              comments: false,
-            },
-          },
-        })
-      );
-    }
-    return config;
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+})(nextConfig);
