@@ -104,28 +104,29 @@ export default function DashboardLayout({
 
     return (
         <Fragment>
-            <div className="flex min-h-screen">
+            <div className="flex h-screen bg-white overflow-hidden">
                 {/* Sidebar */}
-                <div className={`
-                    fixed inset-0 lg:relative lg:inset-auto
+                <aside className={`
+                    fixed inset-y-0 left-0 lg:relative
                     ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     lg:translate-x-0 transition-all duration-300 ease-in-out
                     w-72 lg:w-[280px] bg-white z-30
                     border-r border-slate-200 shadow-sm
+                    flex flex-col
                 `}>
                     {renderHeader()}
-                </div>
+                </aside>
 
                 {/* Overlay */}
                 {isSidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm lg:hidden z-20 animate-fade-in"
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden z-20"
                         onClick={() => setIsSidebarOpen(false)}
                     />
                 )}
 
                 {/* Main Content */}
-                <div className="flex-1 relative w-full lg:w-[calc(100%-280px)]">
+                <main className="flex-1 flex flex-col h-screen overflow-hidden">
                     {/* Top Navigation Bar */}
                     <div className="sticky top-0 z-20 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6 backdrop-blur-sm bg-white/80">
                         {/* Left side */}
@@ -217,10 +218,13 @@ export default function DashboardLayout({
                         </div>
                     </div>
 
-                    <main className="py-4 px-4">
-                        {children}
-                    </main>
-                </div>
+                    {/* Main Content Area */}
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="px-4 py-4">
+                            {children}
+                        </div>
+                    </div>
+                </main>
             </div>
         </Fragment>
     );

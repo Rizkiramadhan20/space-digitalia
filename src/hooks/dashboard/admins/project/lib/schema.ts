@@ -29,6 +29,7 @@ export interface Project {
   delivery: number;
   downloads: number;
   licenseTitle: string;
+  statusProject: "development" | "finished";
   licenseDetails: LicenseDetail[];
   linkPreview?: string;
   frameworks: {
@@ -64,6 +65,7 @@ export interface FormInputs {
     title: string;
     imageUrl: string;
   }[];
+  statusProject: "development" | "finished";
 }
 
 export interface Framework {
