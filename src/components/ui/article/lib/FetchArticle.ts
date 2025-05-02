@@ -4,7 +4,7 @@ import { db } from "@/utils/firebase";
 
 import { ArticleType } from "@/components/ui/article/lib/schema";
 
-export function FetchArticle(callback: (article: ArticleType[]) => void) {
+export function FetchArticle(callback: (blog: ArticleType[]) => void) {
   const q = query(
     collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_ARTICLES as string),
     where("status", "==", "published")
@@ -15,7 +15,8 @@ export function FetchArticle(callback: (article: ArticleType[]) => void) {
       snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.().toISOString() || "",
+        createdAt: doc.data().createdAt?.toDate?.().toISOString() as string,
+        updatedAt: doc.data().updatedAt?.toDate?.().toISOString() as string,
       })) as ArticleType[]
     );
   });

@@ -68,3 +68,25 @@ export interface ImageModalProps {
   closeModal: () => void;
   setZoomLevel: (zoom: number) => void;
 }
+
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface DragStart {
+  x: number;
+  y: number;
+}
+
+export interface Address {
+  fullName: string;
+  phone: string;
+  province: string;
+  city: string;
+  district: string;
+  streetAddress: string;
+  details: string;
+  postalCode: string;
+  isDefault: boolean;
+}

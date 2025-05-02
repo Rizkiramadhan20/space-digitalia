@@ -113,3 +113,7 @@ export interface ProjectDescriptionProps {
   content: string;
   inView: boolean;
 }
+
+export interface ProjectHeaderProps {
+  project: ProjectType;
+}

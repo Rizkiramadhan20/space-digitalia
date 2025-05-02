@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-import { ImageModalProps } from "../lib/schema"
+import { ImageModalProps } from "@/hooks/pages/project/[slug]/types/schema"
 
 export default function ImagePreviewModal({
     selectedImage,

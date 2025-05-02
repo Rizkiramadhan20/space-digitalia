@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -44,16 +44,18 @@ const Article = () => {
 
     useEffect(() => {
         const unsubscribe = FetchArticle((newArticle) => {
-            setArticle(newArticle);
+            const sortedArticle = newArticle.sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            setArticle(sortedArticle);
             setLoading(false);
         });
 
         return () => unsubscribe();
     }, []);
 
-    const memoizedArticle = useMemo(() => article, [article]);
-    const topArticle = memoizedArticle[0];
-    const otherArticles = memoizedArticle.slice(1);
+    const topArticle = article.length > 0 ? article[0] : null;
+    const otherArticle = article.filter(item => item !== topArticle);
 
     const handleViewAll = () => {
         router.push('/articles');
@@ -133,7 +135,7 @@ const Article = () => {
                     viewport={{ once: true, amount: 0.1 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
-                    {otherArticles.map((item, index) => (
+                    {otherArticle.map((item, index) => (
                         <motion.div
                             key={index}
                             variants={itemVariants}

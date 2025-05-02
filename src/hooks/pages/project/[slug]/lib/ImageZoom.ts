@@ -1,14 +1,6 @@
 import { useState, useCallback } from "react";
 
-interface Position {
-  x: number;
-  y: number;
-}
-
-interface DragStart {
-  x: number;
-  y: number;
-}
+import { Position, DragStart } from "@/hooks/pages/project/[slug]/types/schema";
 
 export const useImageZoom = () => {
   const [zoomLevel, setZoomLevel] = useState(1);

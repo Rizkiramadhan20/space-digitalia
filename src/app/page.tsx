@@ -8,8 +8,6 @@ import Service from "@/components/ui/service/Service"
 
 import Project from "@/components/ui/project/Project"
 
-import Company from '@/components/ui/company/Company'
-
 import Article from '@/components/ui/article/Article'
 
 import Testimonials from '@/components/ui/testimonials/Testimonials'
@@ -22,7 +20,6 @@ export default function page() {
       <Service />
       <Project />
       <Article />
-      <Company />
       <Testimonials />
     </main>
   )
