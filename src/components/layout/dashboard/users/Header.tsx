@@ -39,7 +39,7 @@ export default function UserHeader({ onSidebarToggle }: HeaderProps) {
         }
 
         // For dashboard page
-        if (normalizedHref === '/dashboard/users') {
+        if (normalizedHref === '/dashboard/user') {
             return normalizedPathname === normalizedHref;
         }
 
