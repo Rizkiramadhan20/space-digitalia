@@ -25,24 +25,30 @@ export default function CookieConsent() {
       // Handle notification permission
       if ('Notification' in window) {
         const permission = await Notification.requestPermission();
+        localStorage.setItem('notification_permission', permission);
+
         if (permission === 'granted') {
           toast.success('Notifikasi berhasil diaktifkan!');
           subscribeToNewContent((content) => {
             console.log('New content added:', content);
           });
         }
+      } else {
+        localStorage.setItem('notification_permission', 'unsupported');
       }
 
       setShowBanner(false);
     } catch (error) {
       console.error('Error accepting consent:', error);
       toast.error('Terjadi kesalahan saat mengaktifkan consent');
+      localStorage.setItem('notification_permission', 'error');
     }
   };
 
   const rejectAll = async () => {
     try {
       await updateConsent('denied');
+      localStorage.setItem('notification_permission', 'denied');
       localStorage.setItem('notification_prompt_shown', 'true');
       setShowBanner(false);
       toast.success('Preferensi Anda telah disimpan');

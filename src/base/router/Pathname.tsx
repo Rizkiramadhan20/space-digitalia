@@ -12,6 +12,8 @@ import { Toaster } from "react-hot-toast";
 
 import CookieConsent from '@/base/meta/CookieConsent';
 
+import WhatsApp from "@/base/popup/WhatsApp"
+
 const Pathname = ({ children }: { children: React.ReactNode }) => {
     const pathname = usePathname();
 
@@ -50,7 +52,8 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
                 }}
             />
             {!isAdminRoute && <Header />}
-            <CookieConsent />
+            {!isAdminRoute && <CookieConsent />}
+            {!isAdminRoute && <WhatsApp />}
             {children}
             {!isAdminRoute && <Footer />}
         </main>
