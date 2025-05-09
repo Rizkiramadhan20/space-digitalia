@@ -8,11 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { AnimatedX } from "@/base/popup/modal/Close";
 
-import dynamic from 'next/dynamic';
-
-const ViewModal = dynamic(() => import('@/base/popup/modal/ViewModal'), {
-    ssr: false,
-})
+import ViewModal from "@/base/popup/modal/ViewModal";
 
 import {
     textVariants,
