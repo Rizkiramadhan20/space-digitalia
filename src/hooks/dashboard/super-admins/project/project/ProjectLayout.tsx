@@ -302,6 +302,12 @@ export default function ProjectLayout() {
 
     const handleEdit = async (project: Project) => {
         try {
+            // Check if user is the author or has admin/super-admin role
+            if (project.author.uid !== user?.uid && !hasRole(['super-admins', 'admins'])) {
+                toast.error('You can only edit your own projects');
+                return;
+            }
+
             setIsEditing(true)
             setEditingId(project.id!)
 
@@ -808,8 +814,14 @@ export default function ProjectLayout() {
                                 </button>
                                 <button
                                     onClick={() => handleEdit(project)}
-                                    className="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Edit project"
+                                    className={`inline-flex items-center justify-center p-2 rounded-lg transition-colors ${project.author.uid === user?.uid || hasRole(['super-admins', 'admins'])
+                                        ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
+                                        : 'text-gray-400 cursor-not-allowed'
+                                        }`}
+                                    title={project.author.uid === user?.uid || hasRole(['super-admins', 'admins'])
+                                        ? "Edit project"
+                                        : "You can only edit your own projects"}
+                                    disabled={project.author.uid !== user?.uid && !hasRole(['super-admins', 'admins'])}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

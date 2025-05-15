@@ -304,6 +304,12 @@ export default function ProjectLayout() {
 
     const handleEdit = async (project: Project) => {
         try {
+            // Check if user is authorized to edit
+            if (project.author?.uid !== user?.uid) {
+                toast.error('You can only edit your own projects')
+                return
+            }
+
             setIsEditing(true)
             setEditingId(project.id!)
 

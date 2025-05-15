@@ -228,7 +228,8 @@ export default function ArticleModal({ article, onClose, onSuccess }: ArticleMod
                 author: {
                     name: user.displayName,
                     photoURL: user.photoURL,
-                    role: user.role
+                    role: user.role,
+                    uid: user.uid
                 },
                 createdAt: article?.createdAt || Timestamp.now(),
                 updatedAt: Timestamp.now(),

@@ -14,6 +14,7 @@ export interface Article {
     name: string;
     photoURL: string;
     role: string;
+    uid: string;
   };
   description: string;
   status: "draft" | "published";

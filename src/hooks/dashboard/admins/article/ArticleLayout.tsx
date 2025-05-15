@@ -16,7 +16,12 @@ import Image from 'next/image'
 
 import ArticleSkeleton from '@/hooks/dashboard/admins/article/ArticleSkelaton'
 
+import { useAuth } from '@/utils/context/AuthContext'
+
+import { toast } from 'react-hot-toast'
+
 export default function ArticleLayout() {
+    const { user, hasRole } = useAuth()
     const [articles, setArticles] = useState<Article[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
@@ -83,6 +88,12 @@ export default function ArticleLayout() {
     }
 
     const handleEdit = (article: Article) => {
+        // Check if user is the author or has admin/super-admin role
+        if (article.author.uid !== user?.uid && !hasRole(['super-admins', 'admins'])) {
+            toast.error('You can only edit your own articles');
+            return;
+        }
+
         setSelectedArticle(article)
         const modal = document.getElementById('article_modal') as HTMLDialogElement | null;
         modal?.showModal();
@@ -325,7 +336,14 @@ export default function ArticleLayout() {
                                 </button>
                                 <button
                                     onClick={() => handleEdit(article)}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${article.author.uid === user?.uid || hasRole(['super-admins', 'admins'])
+                                        ? 'text-white bg-indigo-600 hover:bg-indigo-700'
+                                        : 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                                        }`}
+                                    disabled={article.author.uid !== user?.uid && !hasRole(['super-admins', 'admins'])}
+                                    title={article.author.uid === user?.uid || hasRole(['super-admins', 'admins'])
+                                        ? "Edit article"
+                                        : "You can only edit your own articles"}
                                 >
                                     Edit
                                 </button>
