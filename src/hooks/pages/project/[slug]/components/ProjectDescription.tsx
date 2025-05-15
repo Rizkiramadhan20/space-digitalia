@@ -37,6 +37,8 @@ export default function ProjectDescription({ project }: ProjectDescriptionProps)
                         [&_li[data-list='bullet']]:before:text-lg
                         [&_li[data-list='bullet']]:before:leading-tight
                         
+                        [&_.ql-video]:w-full [&_.ql-video]:aspect-video [&_.ql-video]:rounded-lg [&_.ql-video]:shadow-md [&_.ql-video]:my-4 sm:[&_.ql-video]:my-6
+
                         [&_li_strong]:text-foreground [&_li_strong]:font-medium
                         [&_span.ql-ui]:hidden"
                     dangerouslySetInnerHTML={{ __html: project.content }}

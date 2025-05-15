@@ -23,7 +23,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             [{ 'header': [1, 2, false] }],
             ['bold', 'italic', 'underline', 'strike'],
             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            ['link', 'image'],
+            ['link', 'image', 'video'],
             ['clean']
         ],
         clipboard: {
@@ -35,7 +35,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         'header',
         'bold', 'italic', 'underline', 'strike',
         'list',
-        'link', 'image'
+        'link', 'image', 'video'
     ];
 
     return (
