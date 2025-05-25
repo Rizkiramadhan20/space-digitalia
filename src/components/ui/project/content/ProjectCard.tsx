@@ -46,22 +46,6 @@ function ProjectCard({ project, leftTimeline, rightTimeline }: ProjectCardProps)
         };
     }, [isModalOpen, handleEsc]);
 
-    const renderStars = useCallback(() => {
-        const rating = project.averageRating || 0;
-        return [...Array(5)].map((_, i) => {
-            const isFilled = i < Math.floor(rating);
-            return (
-                <svg key={i}
-                    className={`w-3 h-3 ${isFilled ? 'text-yellow-500' : 'text-gray-400'}`}
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                </svg>
-            );
-        });
-    }, [project.averageRating]);
-
     return (
         <>
             <motion.div
@@ -79,14 +63,6 @@ function ProjectCard({ project, leftTimeline, rightTimeline }: ProjectCardProps)
                     quality={75}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/90 group-hover:via-black/40 group-hover:to-black/95 transition-all duration-300">
-                    {/* Rating Display */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg">
-                        <div className="flex gap-0.5">
-                            {renderStars()}
-                        </div>
-                        <span className="text-xs font-medium text-white">{(project.averageRating || 0).toFixed(1)}</span>
-                    </div>
-
                     <div className="absolute inset-0 flex items-center justify-center">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

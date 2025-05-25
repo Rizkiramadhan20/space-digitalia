@@ -12,27 +12,11 @@ import { useImageZoom } from '@/hooks/pages/project/[slug]/lib/ImageZoom'
 
 import { useImageDownload } from '@/hooks/pages/project/[slug]/lib/ImageDownload'
 
-import { Timestamp } from 'firebase/firestore'
-
 import { ref, onValue, increment, update, get } from 'firebase/database'
 
 import { database } from '@/utils/firebase'
 
 import ImagePreviewModal from '@/hooks/pages/project/[slug]/content/ImagePriviewModal'
-
-import { useRouter } from 'next/navigation'
-
-import { useAuth } from '@/utils/context/AuthContext'
-
-import { toast } from 'react-hot-toast'
-
-import { doc, getDoc } from 'firebase/firestore'
-
-import { db } from '@/utils/firebase'
-
-import { runTransaction } from 'firebase/firestore'
-
-import { Address } from '@/hooks/pages/project/[slug]/types/schema'
 
 import ProjectHeader from '@/hooks/pages/project/[slug]/components/ProjectHeader'
 
@@ -42,13 +26,9 @@ import ProjectDescription from '@/hooks/pages/project/[slug]/components/ProjectD
 
 import ProjectSidebar from '@/hooks/pages/project/[slug]/components/ProjectSidebar'
 
-import FreeTransactionModal from '@/hooks/pages/project/[slug]/components/FreeTransactionModal'
-
 import RelatedProjects from '@/hooks/pages/project/[slug]/components/RelatedProject'
 
 export default function ProjectDetailsContent({ slug }: { slug: string }) {
-    const router = useRouter()
-    const { user } = useAuth()
     const [project, setProject] = useState<ProjectType[]>([])
     const [relatedProjects, setRelatedProjects] = useState<ProjectType[]>([])
     const [loading, setLoading] = useState(true)
@@ -71,21 +51,12 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
         setZoomLevel
     } = useImageZoom()
 
-    // Add state for selected license
-    const [selectedLicense, setSelectedLicense] = useState<string>('')
-    const [deliveryMethod, setDeliveryMethod] = useState<'download' | 'delivery' | ''>('')
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [defaultAddress, setDefaultAddress] = useState<Address | null>(null)
-    const [showFreeModal, setShowFreeModal] = useState(false)
-
-    // Add state for ratings
     useEffect(() => {
         setLoading(true)
         const unsubscribe = FetchProjectDetails(slug, setProject)
 
         const incrementViewCount = async (ipAddress: string) => {
             try {
-                // Skip if ipAddress is a timestamp (fallback value)
                 if (!isNaN(Number(ipAddress))) {
                     console.log('Skipping invalid IP address (timestamp):', ipAddress);
                     return;
@@ -94,7 +65,6 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                 const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`);
                 const locationData = await locationResponse.json();
 
-                // Validate location data
                 if (locationData.error || !locationData.city) {
                     console.log('Invalid location data:', locationData);
                     return;
@@ -124,7 +94,6 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                     const currentTime = new Date();
                     const hoursDifference = (currentTime.getTime() - lastViewTime.getTime()) / (1000 * 60 * 60);
 
-                    // Update timestamp if last view was more than 24 hours ago
                     if (hoursDifference >= 24) {
                         await update(viewsRef, {
                             count: increment(1),
@@ -138,10 +107,8 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
             }
         };
 
-        // Initialize view counter
         const viewsRef = ref(database, `${process.env.NEXT_PUBLIC_PROJECT_VIEWS}/${slug}`);
 
-        // Listen to view count changes
         const viewsListener = onValue(viewsRef, (snapshot) => {
             const views = snapshot.val()?.count || 0;
             setViewCount(views);
@@ -184,13 +151,11 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
         resetZoom()
     }, [selectedImage, resetZoom])
 
-    // Wrap closeModal in useCallback to prevent infinite re-renders
     const closeModal = useCallback(() => {
         setSelectedImage(null)
         resetZoom()
     }, [resetZoom])
 
-    // Update useEffect with closeModal in dependencies
     useEffect(() => {
         const handleEscKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && selectedImage) {
@@ -202,218 +167,17 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
         return () => window.removeEventListener('keydown', handleEscKey)
     }, [selectedImage, closeModal])
 
-    // Add useEffect to handle body scrolling
     useEffect(() => {
         if (selectedImage) {
-            // Prevent scrolling on body when modal is open
             document.body.style.overflow = 'hidden'
         } else {
-            // Re-enable scrolling when modal is closed
             document.body.style.overflow = 'unset'
         }
 
-        // Cleanup function to ensure scrolling is re-enabled when component unmounts
         return () => {
             document.body.style.overflow = 'unset'
         }
     }, [selectedImage])
-
-    // Handle license selection
-    const handleLicenseSelect = (licenseTitle: string) => {
-        setSelectedLicense(licenseTitle)
-    }
-
-    // Handle delivery method selection
-    const handleDeliveryMethodSelect = (method: 'download' | 'delivery') => {
-        setDeliveryMethod(method)
-    }
-
-    // Handle transaction process
-    const handleTransaction = async () => {
-        if (!user) {
-            toast.error('Please sign in to continue')
-            localStorage.setItem('redirectAfterLogin', window.location.href)
-            router.push('/signin')
-            return
-        }
-
-        if (!selectedLicense) {
-            toast.error('Please select a license')
-            return
-        }
-
-        if (!deliveryMethod) {
-            toast.error('Please select a delivery method')
-            return
-        }
-
-        if (deliveryMethod === 'delivery' && !defaultAddress) {
-            toast.error('Please add a delivery address')
-            return
-        }
-
-        setIsProcessing(true)
-
-        try {
-            const selectedLicenseDetails = project[0].licenseDetails.find(
-                license => license.title === selectedLicense
-            )
-
-            if (!selectedLicenseDetails) {
-                throw new Error('Selected license details not found')
-            }
-
-            // Check if license is free
-            if (selectedLicenseDetails.price === 0) {
-                // Show free transaction modal instead of redirecting
-                setShowFreeModal(true)
-                setIsProcessing(false)
-                return
-            }
-
-            // Continue with existing paid transaction flow
-            const checkoutUrl = `/checkout?` + new URLSearchParams({
-                projectId: project[0].id,
-                licenseType: selectedLicense,
-                deliveryMethod: deliveryMethod
-            }).toString()
-
-            router.push(checkoutUrl)
-        } catch (error) {
-            console.error('Transaction error:', error)
-            toast.error('Failed to process transaction')
-        } finally {
-            setIsProcessing(false)
-        }
-    }
-
-    // Handle free transaction confirmation
-    const handleFreeTransactionConfirm = async () => {
-        setIsProcessing(true)
-        try {
-            // Get selected license details
-            const selectedLicenseDetails = project[0].licenseDetails.find(
-                license => license.title === selectedLicense
-            );
-
-            if (!selectedLicenseDetails) {
-                throw new Error('Selected license details not found');
-            }
-
-            // Generate unique IDs
-            const orderId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            const transactionId = `${Math.random().toString(36).substr(2, 9)}`;
-
-            // Create transaction document in Firestore
-            const transactionRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_TRANSACTIONS!, orderId);
-            const projectRef = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT!, project[0].id);
-
-            // Prepare transaction data
-            const transactionData = {
-                orderId,
-                transactionId,
-                projectId: project[0].id,
-                userId: user?.uid,
-                amount: 0,
-                projectTitle: project[0].title,
-                licenseType: selectedLicense,
-                deliveryMethod,
-                paymentMethod: "free",
-                downloadUrl: selectedLicenseDetails.downloadUrl || null,
-                imageUrl: project[0].imageUrl,
-                deliveryAddress: deliveryMethod === 'delivery' ? defaultAddress : null,
-                status: "success",
-                createdAt: Timestamp.now(),
-                updatedAt: Timestamp.now(),
-                userEmail: user?.email,
-                userName: user?.displayName,
-                userPhotoURL: user?.photoURL ?? null,
-                paymentDetails: {
-                    transaction_status: "success",
-                    status_message: "Free transaction completed successfully",
-                    transaction_id: transactionId,
-                    order_id: orderId,
-                    gross_amount: "0",
-                    payment_type: "free",
-                    transaction_time: new Date().toISOString(),
-                    status_code: "200",
-                    fraud_status: "accept",
-                },
-                linkTransaction: `${process.env.NEXT_PUBLIC_URL}/payment/status/${orderId}`,
-                isProcessing: false,
-            };
-
-            // Run transaction
-            await runTransaction(db, async (transaction) => {
-                // Get project data
-                const projectDoc = await transaction.get(projectRef);
-                if (!projectDoc.exists()) {
-                    throw new Error("Project not found");
-                }
-
-                const projectData = projectDoc.data();
-
-                // Update project stats
-                const updateData = {
-                    sold: (projectData.sold || 0) + 1,
-                    stock: typeof projectData.stock === "number"
-                        ? Math.max(0, projectData.stock - 1)
-                        : projectData.stock,
-                    ...(deliveryMethod === "download"
-                        ? { downloads: (projectData.downloads || 0) + 1 }
-                        : { delivery: (projectData.delivery || 0) + 1 }),
-                };
-
-                // Save transaction and update project
-                transaction.set(transactionRef, transactionData);
-                transaction.update(projectRef, updateData);
-            });
-
-            toast.success('Free download processed successfully!');
-            // Redirect to payment status page
-            router.push(`/payment/status/${orderId}`);
-        } catch (error) {
-            console.error('Free transaction error:', error);
-            toast.error(error instanceof Error ? error.message : 'Failed to process free transaction');
-        } finally {
-            setIsProcessing(false);
-            setShowFreeModal(false);
-        }
-    }
-
-    // Fetch default address when delivery method changes
-    useEffect(() => {
-        const fetchDefaultAddress = async () => {
-            if (deliveryMethod === 'delivery' && user?.uid) {
-                const userDoc = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_ACCOUNTS!, user.uid);
-                const userSnap = await getDoc(userDoc);
-
-                if (userSnap.exists()) {
-                    const addresses: Address[] = userSnap.data().addresses || [];
-                    const defaultAddr = addresses.find(addr => addr.isDefault);
-                    setDefaultAddress(defaultAddr || null);
-                }
-            }
-        };
-
-        fetchDefaultAddress();
-    }, [deliveryMethod, user?.uid]);
-
-    // Add Midtrans script when component mounts
-    useEffect(() => {
-        const midtransScriptUrl = 'https://app.midtrans.com/snap/snap.js';
-        const midtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
-
-        const scriptElement = document.createElement('script');
-        scriptElement.src = midtransScriptUrl;
-        scriptElement.setAttribute('data-client-key', midtransClientKey || '');
-
-        document.body.appendChild(scriptElement);
-
-        return () => {
-            document.body.removeChild(scriptElement);
-        };
-    }, []);
 
     if (loading) return <ProjectDetailSkelaton />
 
@@ -435,13 +199,6 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                                 <ProjectSidebar
                                     project={project}
                                     viewCount={viewCount}
-                                    selectedLicense={selectedLicense}
-                                    deliveryMethod={deliveryMethod}
-                                    defaultAddress={defaultAddress}
-                                    isProcessing={isProcessing}
-                                    handleLicenseSelect={handleLicenseSelect}
-                                    handleDeliveryMethodSelect={handleDeliveryMethodSelect}
-                                    handleTransaction={handleTransaction}
                                 />
                             </div>
                         </div>
@@ -470,16 +227,6 @@ export default function ProjectDetailsContent({ slug }: { slug: string }) {
                     setZoomLevel={setZoomLevel}
                 />
             )}
-
-            <FreeTransactionModal
-                showFreeModal={showFreeModal}
-                setShowFreeModal={setShowFreeModal}
-                selectedLicense={selectedLicense}
-                deliveryMethod={deliveryMethod}
-                defaultAddress={defaultAddress}
-                isProcessing={isProcessing}
-                handleFreeTransactionConfirm={handleFreeTransactionConfirm}
-            />
         </section>
     )
 }

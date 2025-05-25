@@ -1,33 +1,19 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore'
-
 import { db } from '@/utils/firebase'
-
 import imagekitInstance from '@/utils/imagekit'
-
 import { compressImage } from '@/base/helper/ImageCompression'
-
 import { toast } from 'react-hot-toast'
-
 import Image from 'next/image'
-
 import ProjectSkelaton from "@/hooks/dashboard/super-admins/project/project/ProjectSkelaton"
-
 import RichTextEditor from '@/base/helper/TextEditor'
-
 import { useAuth } from '@/utils/context/AuthContext'
-
 import { useRouter } from 'next/navigation'
-
-import { Project, ProjectType, LicenseProject, LicenseDetail, FormInputs } from '@/hooks/dashboard/super-admins/project/project/lib/schema'
-
+import { Project, ProjectType, FormInputs } from '@/hooks/dashboard/super-admins/project/project/lib/schema'
 import { Pagination } from '@/base/helper/Pagination'
-
 import { useForm } from 'react-hook-form'
-
 import ViewModal from './Modal/ViewModal'
 
 export default function ProjectLayout() {
@@ -43,7 +29,6 @@ export default function ProjectLayout() {
 
     const [projects, setProjects] = useState<Project[]>([])
     const [projectTypes, setProjectTypes] = useState<ProjectType[]>([])
-    const [licenseProjects, setLicenseProjects] = useState<LicenseProject[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [newProject, setNewProject] = useState<Project>({
@@ -56,12 +41,6 @@ export default function ProjectLayout() {
         typeTitle: '',
         status: 'active',
         content: '',
-        stock: 0,
-        sold: 0,
-        downloads: 0,
-        delivery: 0,
-        licenseTitle: '',
-        licenseDetails: [],
         linkPreview: '',
         statusProject: 'development',
         author: {
@@ -113,7 +92,6 @@ export default function ProjectLayout() {
                 await Promise.all([
                     fetchProjects(),
                     fetchProjectTypes(),
-                    fetchLicenseProjects(),
                     fetchFrameworks()
                 ])
             } catch (error) {
@@ -130,12 +108,32 @@ export default function ProjectLayout() {
     const fetchProjects = async () => {
         try {
             const querySnapshot = await getDocs(collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_PROJECT as string))
-            const projectsData = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-                downloads: doc.data().downloads || 0,
-                sold: doc.data().sold || 0
-            })) as Project[]
+            const projectsData = querySnapshot.docs.map(doc => {
+                const data = doc.data()
+                return {
+                    id: doc.id,
+                    title: data.title || '',
+                    description: data.description || '',
+                    imageUrl: data.imageUrl || '',
+                    images: data.images || [],
+                    slug: data.slug || '',
+                    typeCategory: data.typeCategory || '',
+                    typeTitle: data.typeTitle || '',
+                    status: data.status || 'active',
+                    content: data.content || '',
+                    statusProject: data.statusProject || 'development',
+                    linkPreview: data.linkPreview || '',
+                    author: data.author || {
+                        name: '',
+                        role: '',
+                        uid: '',
+                        photoURL: ''
+                    },
+                    frameworks: data.frameworks || [],
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt
+                } as Project
+            })
 
             const sortedProjects = projectsData.sort((a, b) => {
                 const timestampA = a.createdAt instanceof Timestamp ? a.createdAt.toMillis() : 0
@@ -163,19 +161,6 @@ export default function ProjectLayout() {
         }
     }
 
-    const fetchLicenseProjects = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, process.env.NEXT_PUBLIC_COLLECTIONS_LICENSE_PROJECT as string))
-            const licensesData = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                title: doc.data().title
-            })) as LicenseProject[]
-            setLicenseProjects(licensesData)
-        } catch {
-            toast.error('Failed to fetch license projects')
-        }
-    }
-
     const generateSlug = (title: string) => {
         return title
             .toLowerCase()
@@ -199,9 +184,6 @@ export default function ProjectLayout() {
             typeTitle: '',
             status: 'active',
             content: '',
-            stock: 0,
-            licenseTitle: '',
-            licenseDetails: [],
             linkPreview: '',
             frameworks: [],
             statusProject: 'development'
@@ -227,9 +209,6 @@ export default function ProjectLayout() {
                 status: data.status as "active" | "inactive",
                 imageUrl: newProject.imageUrl || '',
                 images: newProject.images || [],
-                sold: newProject.sold || 0,
-                delivery: newProject.delivery || 0,
-                downloads: newProject.downloads || 0,
                 statusProject: data.statusProject as "development" | "finished",
                 author: {
                     name: user?.displayName || '',
@@ -311,20 +290,11 @@ export default function ProjectLayout() {
             setIsEditing(true)
             setEditingId(project.id!)
 
-            // Ensure licenseDetails is an array with proper structure
-            const licenseDetails = project.licenseDetails?.map(detail => ({
-                title: detail.title || '',
-                price: detail.price || 0,
-                downloadUrl: detail.downloadUrl || ''
-            })) || [];
-
             setNewProject({
-                ...project,
-                licenseDetails
+                ...project
             });
 
-            // Set form values including licenseDetails
-            setValue('licenseDetails', licenseDetails);
+            // Set form values
             setValue('title', project.title || '');
             setValue('description', project.description || '');
             setValue('slug', project.slug || '');
@@ -332,8 +302,6 @@ export default function ProjectLayout() {
             setValue('typeTitle', project.typeTitle || '');
             setValue('status', project.status || 'active');
             setValue('content', project.content || '');
-            setValue('stock', project.stock || 0);
-            setValue('licenseTitle', project.licenseTitle || '');
             setValue('linkPreview', project.linkPreview || '');
             setValue('frameworks', project.frameworks);
             setValue('statusProject', project.statusProject);
@@ -399,12 +367,6 @@ export default function ProjectLayout() {
             typeTitle: '',
             status: 'active',
             content: '',
-            stock: 0,
-            sold: 0,
-            downloads: 0,
-            delivery: 0,
-            licenseTitle: '',
-            licenseDetails: [],
             linkPreview: '',
             statusProject: 'development',
             author: {
@@ -485,59 +447,6 @@ export default function ProjectLayout() {
             </div>
         </div>
     )
-
-    const handleLicenseDetailChange = (index: number, field: keyof LicenseDetail, value: string | number) => {
-        const updatedDetails = [...newProject.licenseDetails];
-        updatedDetails[index] = {
-            ...updatedDetails[index],
-            [field]: value
-        };
-        setNewProject({ ...newProject, licenseDetails: updatedDetails });
-
-        // Sync with React Hook Form
-        setValue('licenseDetails', updatedDetails);
-    }
-
-    // Update addLicenseDetail function
-    const addLicenseDetail = () => {
-        const newDetail = { title: '', price: 0, downloadUrl: '' };
-        const updatedDetails = [...newProject.licenseDetails, newDetail];
-        setNewProject({
-            ...newProject,
-            licenseDetails: updatedDetails
-        });
-
-        // Sync with React Hook Form
-        setValue('licenseDetails', updatedDetails);
-    }
-
-    // Update removeLicenseDetail function
-    const removeLicenseDetail = (index: number) => {
-        const updatedDetails = newProject.licenseDetails.filter((_, i) => i !== index);
-        setNewProject({ ...newProject, licenseDetails: updatedDetails });
-
-        // Sync with React Hook Form
-        setValue('licenseDetails', updatedDetails);
-    }
-
-    // Update the formatPrice function to handle zero and empty values
-    const formatPrice = (price: string | number): string => {
-        // Handle empty or zero values
-        if (price === '' || price === 0 || price === '0') return '0'
-
-        // Remove any non-digit characters
-        const numericValue = String(price).replace(/\D/g, '')
-        // Format with thousand separator
-        return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-    }
-
-    // Update the parseFormattedPrice function to handle zero values
-    const parseFormattedPrice = (formattedPrice: string): number => {
-        // Handle empty input
-        if (!formattedPrice) return 0
-        // Remove thousand separators and convert to number
-        return parseInt(formattedPrice.replace(/\./g, ''), 10) || 0
-    }
 
     // Add handleView function
     const handleView = (project: Project) => {
@@ -787,16 +696,16 @@ export default function ProjectLayout() {
                             {/* Stats */}
                             <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-100">
                                 <div className="text-center">
-                                    <p className="text-sm font-semibold text-gray-900">{project.stock}</p>
-                                    <p className="text-xs text-gray-500">Stock</p>
+                                    <p className="text-sm font-semibold text-gray-900">{project.statusProject}</p>
+                                    <p className="text-xs text-gray-500">Status</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-sm font-semibold text-gray-900">{project.sold}</p>
-                                    <p className="text-xs text-gray-500">Sold</p>
+                                    <p className="text-sm font-semibold text-gray-900">{project.typeCategory}</p>
+                                    <p className="text-xs text-gray-500">Category</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-sm font-semibold text-gray-900">{project.downloads}</p>
-                                    <p className="text-xs text-gray-500">Downloads</p>
+                                    <p className="text-sm font-semibold text-gray-900">{project.typeTitle}</p>
+                                    <p className="text-xs text-gray-500">Type</p>
                                 </div>
                             </div>
 
@@ -1113,7 +1022,7 @@ export default function ProjectLayout() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
-                                    <h4 className="font-semibold text-lg text-gray-900">Images & Stock</h4>
+                                    <h4 className="font-semibold text-lg text-gray-900">Images</h4>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Thumbnail Upload */}
@@ -1380,21 +1289,6 @@ export default function ProjectLayout() {
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Stock Input */}
-                                    <div className="form-control md:col-span-2">
-                                        <label className="text-sm font-medium text-gray-700 mb-1.5">Stock</label>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            {...register('stock', { valueAsNumber: true })}
-                                            className="input input-bordered w-full bg-gray-50/50 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
-                                            placeholder="Enter stock quantity"
-                                        />
-                                        {errors.stock && (
-                                            <span className="text-red-500 text-sm mt-1">{errors.stock.message}</span>
-                                        )}
-                                    </div>
                                 </div>
                             </div>
 
@@ -1406,85 +1300,9 @@ export default function ProjectLayout() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
                                         </svg>
                                     </div>
-                                    <h4 className="font-semibold text-lg text-gray-900">Content & License</h4>
+                                    <h4 className="font-semibold text-lg text-gray-900">Content</h4>
                                 </div>
                                 <div className="space-y-6">
-                                    <div className="form-control">
-                                        <label className="text-sm font-medium text-gray-700 mb-1.5">License Type</label>
-                                        <select
-                                            {...register('licenseTitle')}
-                                            className="select select-bordered w-full bg-gray-50/50 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all"
-                                        >
-                                            <option value="">Select License Type</option>
-                                            {licenseProjects.map((license) => (
-                                                <option key={license.id} value={license.title}>
-                                                    {license.title}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors.licenseTitle && (
-                                            <span className="text-red-500 text-sm mt-1">{errors.licenseTitle.message}</span>
-                                        )}
-                                    </div>
-
-                                    {/* License Details */}
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-sm font-medium text-gray-700">License Details</label>
-                                            <button
-                                                type="button"
-                                                onClick={addLicenseDetail}
-                                                className="btn btn-sm btn-ghost text-amber-600 hover:bg-amber-50"
-                                            >
-                                                Add Detail
-                                            </button>
-                                        </div>
-
-                                        {newProject.licenseDetails.map((detail, index) => (
-                                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                                                <div className="form-control">
-                                                    <label className="text-sm font-medium text-gray-700 mb-1.5">Title</label>
-                                                    <input
-                                                        type="text"
-                                                        value={detail.title || ''}
-                                                        onChange={(e) => handleLicenseDetailChange(index, 'title', e.target.value)}
-                                                        className="input input-bordered w-full bg-white border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all"
-                                                        placeholder="Enter title"
-                                                    />
-                                                </div>
-                                                <div className="form-control">
-                                                    <label className="text-sm font-medium text-gray-700 mb-1.5">Price</label>
-                                                    <input
-                                                        type="text"
-                                                        value={formatPrice(detail.price ?? '')}
-                                                        onChange={(e) => handleLicenseDetailChange(index, 'price', parseFormattedPrice(e.target.value))}
-                                                        className="input input-bordered w-full bg-white border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all"
-                                                        placeholder="Enter price"
-                                                    />
-                                                </div>
-                                                <div className="form-control relative">
-                                                    <label className="text-sm font-medium text-gray-700 mb-1.5">Download URL</label>
-                                                    <input
-                                                        type="url"
-                                                        value={detail.downloadUrl || ''}
-                                                        onChange={(e) => handleLicenseDetailChange(index, 'downloadUrl', e.target.value)}
-                                                        className="input input-bordered w-full bg-white border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all pr-10"
-                                                        placeholder="Enter download URL"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeLicenseDetail(index)}
-                                                        className="absolute right-2 top-8 text-red-500 hover:text-red-700"
-                                                    >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
                                     <div className="form-control">
                                         <label className="text-sm font-medium text-gray-700 mb-1.5">Content</label>
                                         <RichTextEditor

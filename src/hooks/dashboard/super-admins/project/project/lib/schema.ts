@@ -1,6 +1,5 @@
 export interface LicenseDetail {
   title?: string;
-  price?: number;
   downloadUrl?: string;
   deliveryType?: "download" | "delivery";
 }
@@ -24,13 +23,7 @@ export interface Project {
     uid: string;
     photoURL?: string;
   };
-  stock: number;
-  sold: number;
-  delivery: number;
-  downloads: number;
-  licenseTitle: string;
   statusProject: "development" | "finished";
-  licenseDetails: LicenseDetail[];
   linkPreview?: string;
   frameworks: {
     title: string;
@@ -57,9 +50,6 @@ export interface FormInputs {
   typeTitle: string;
   status: string;
   content: string;
-  stock: number;
-  licenseTitle: string;
-  licenseDetails: LicenseDetail[];
   linkPreview: string;
   frameworks: {
     title: string;

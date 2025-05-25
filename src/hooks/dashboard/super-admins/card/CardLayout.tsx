@@ -12,16 +12,6 @@ import WelcomeSection from '@/hooks/dashboard/super-admins/card/ui/Welcome';
 
 import StatsSection from '@/hooks/dashboard/super-admins/card/ui/Stats';
 
-import RecapAnalysisSection from '@/hooks/dashboard/super-admins/card/ui/RecapAnalysis';
-
-import UserTransactionSection from '@/hooks/dashboard/super-admins/card/ui/userTransaction';
-
-import SalesChartSection from '@/hooks/dashboard/super-admins/card/ui/SalesChart';
-
-import CategoryDistributionSection from '@/hooks/dashboard/super-admins/card/ui/Distribution';
-
-import TopSellingSection from '@/hooks/dashboard/super-admins/card/ui/TopSelling';
-
 import { useStats } from '@/hooks/dashboard/super-admins/card/lib/useStats';
 
 import { useChartData } from '@/hooks/dashboard/super-admins/card/lib/useChartData';
@@ -36,11 +26,9 @@ registerChartComponents();
 
 export default function SuperAdminDashboardPage() {
     const { stats, loading: statsLoading } = useStats();
-    const { salesData, categoryData, topSellingItems, loading: chartLoading, filterSalesByDate } = useChartData();
-    const [startDate, setStartDate] = useState<Date | null>(new Date());
-    const [selectedPeriod, setSelectedPeriod] = useState('Minggu Ini');
+    const { loading: chartLoading } = useChartData();
     const [currentTime, setCurrentTime] = useState(new Date());
-    const { recapStats, loading: recapLoading } = useRecapAnalytics();
+    const { loading: recapLoading } = useRecapAnalytics();
     const { user } = useAuth();
     const { weather } = useWeather();
 
@@ -54,9 +42,6 @@ export default function SuperAdminDashboardPage() {
         return () => clearInterval(timer);
     }, []);
 
-    useEffect(() => {
-        filterSalesByDate(startDate, selectedPeriod);
-    }, [startDate, selectedPeriod, filterSalesByDate]);
 
     if (isLoading) {
         return <CardSkelaton />;
@@ -68,23 +53,6 @@ export default function SuperAdminDashboardPage() {
                 <WelcomeSection user={user} currentTime={currentTime} />
 
                 <StatsSection stats={stats} weather={weather} />
-
-                <RecapAnalysisSection recapStats={recapStats} />
-
-                <UserTransactionSection userTransactions={recapStats.userTransactions} />
-
-                <SalesChartSection
-                    salesData={salesData}
-                    startDate={startDate}
-                    setStartDate={setStartDate}
-                    selectedPeriod={selectedPeriod}
-                    setSelectedPeriod={setSelectedPeriod}
-                    filterSalesByDate={filterSalesByDate}
-                />
-
-                <CategoryDistributionSection categoryData={categoryData} />
-
-                <TopSellingSection topSellingItems={topSellingItems} />
             </div>
         </section>
     );

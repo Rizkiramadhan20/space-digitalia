@@ -9,8 +9,6 @@ import { Gallery } from "@/components/ui/project/content/ui/Gallery";
 import { AuthorCard } from "@/components/ui/project/content/ui/AuthorCard";
 import { ProjectDescription } from "@/components/ui/project/content/ui/ProjectDescription";
 import { TechnologiesCard } from "@/components/ui/project/content/ui/Technologies";
-import { StatsGrid } from "@/components/ui/project/content/ui/StatsGrid";
-import { PriceCard } from "@/components/ui/project/content/ui/PriceCard";
 import { DetailButton } from "@/components/ui/project/content/ui/DetailButton";
 
 const StatusBadge = memo(({ status }: { status: string }) => {
@@ -136,18 +134,7 @@ function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                             <StatusBadge status={project.statusProject} />
                                         </div>
                                     </motion.div>
-
-                                    <StatsGrid
-                                        downloads={project.downloads}
-                                        stock={project.stock}
-                                        sold={project.sold}
-                                        delivery={project.delivery}
-                                        averageRating={project.averageRating}
-                                        ratingCount={project.ratingCount}
-                                    />
                                 </div>
-
-                                <PriceCard licenseDetails={project.licenseDetails} />
 
                                 <DetailButton
                                     typeCategory={project.typeCategory}

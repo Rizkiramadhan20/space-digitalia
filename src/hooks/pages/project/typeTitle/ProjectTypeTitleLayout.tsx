@@ -23,70 +23,19 @@ import { formatSlug } from '@/base/helper/formatSlug'
 
 import { TbEyeShare } from "react-icons/tb";
 
-import { useAuth } from '@/utils/context/AuthContext';
-
-import { useRouter } from 'next/navigation';
-
-import { toast } from 'react-hot-toast';
-
-import { doc, getDoc } from 'firebase/firestore';
-
-import { db } from '@/utils/firebase';
-
-import { LicenseDetail, Address, PaymentData } from '@/hooks/pages/project/project/lib/schema';
-
 import ViewModal from './modal/ViewModal';
-import SocialMediaModal from './modal/SocialMediaModal';
 
 export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: string }) {
     const [projects, setProjects] = useState<ProjectType[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
     const [currentPage, setCurrentPage] = useState(0)
-    const [openDropdown, setOpenDropdown] = useState<string | null>(null)
-    const [selectedLicense, setSelectedLicense] = useState<{
-        title: string;
-        price: number;
-        licenseTitle: string;
-        downloadUrl: string;
-        delivery?: string;
-        stock?: string;
-        sold?: string;
-        deliveryDays?: string;
-        licenseDetails?: LicenseDetail[];
-    } | null>(null)
 
     const itemsPerPage = 9
 
     // Add new state for preview modal
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [selectedPreview, setSelectedPreview] = useState<ProjectType | null>(null)
-
-    // Add new state
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [deliveryMethod, setDeliveryMethod] = useState<'download' | 'delivery' | ''>('');
-    const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
-
-    // Add state
-    const [socialVerification, setSocialVerification] = useState<{
-        instagram: boolean;
-        tiktok: boolean;
-        youtube: boolean;
-    }>({
-        instagram: false,
-        tiktok: false,
-        youtube: false
-    });
-
-    // Add verification check helper
-    const allSocialsVerified = () => socialVerification.tiktok && socialVerification.instagram && socialVerification.youtube;
-
-    // Add hooks
-    const { user } = useAuth();
-    const router = useRouter();
-
-    // Add state for social modal
-    const [showSocialModal, setShowSocialModal] = useState(false);
 
     useEffect(() => {
         const unsubscribe = FetchTypeTitle(typeTitle, (data) => {
@@ -107,27 +56,8 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
         return () => unsubscribe()
     }, [typeTitle])
 
-    // Fix the filter logic for projects - filter by paid/free status
-    const filteredProjects = projects.filter(item => {
-        // If no license is selected, show all projects
-        if (!selectedLicense) return true;
-
-        // Check if the project has license details
-        if (!item.licenseDetails || item.licenseDetails.length === 0) return false;
-
-        // If "Free" is selected, show projects that have at least one free license
-        if (selectedLicense.licenseTitle.toLowerCase() === 'free') {
-            return item.licenseDetails.some(license => license.price === 0);
-        }
-
-        // If "Paid" is selected, show projects that have at least one paid license
-        if (selectedLicense.licenseTitle.toLowerCase() === 'paid') {
-            return item.licenseDetails.some(license => license.price > 0);
-        }
-
-        return true;
-    });
-
+    // Simplified filter logic - show all projects
+    const filteredProjects = projects;
     const filteredProductsCount = filteredProjects.length;
 
     // Add pagination logic
@@ -136,20 +66,6 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
         const offset = currentPage * itemsPerPage;
         return result.slice(offset, offset + itemsPerPage);
     }
-
-    const license = Array.from(new Set(projects.map(item => item.licenseTitle)))
-
-    // Handle click outside to close dropdown
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (!(event.target as Element).closest('.dropdown')) {
-                setOpenDropdown(null)
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
 
     // Add pagination handler
     const handlePageChange = ({ selected }: { selected: number }) => {
@@ -163,13 +79,11 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
     const handlePreviewOpen = (project: ProjectType) => {
         setSelectedPreview(project)
         setIsPreviewOpen(true)
-        setSelectedLicense(null)
     }
 
     const handlePreviewClose = () => {
         setIsPreviewOpen(false)
         setSelectedPreview(null)
-        setSelectedLicense(null)
     }
 
     // Add effect to prevent background scroll when modal is open
@@ -184,331 +98,6 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
             document.body.style.overflow = 'unset'
         }
     }, [isPreviewOpen])
-
-    // Add useEffect to fetch default address
-    useEffect(() => {
-        const fetchDefaultAddress = async () => {
-            if (deliveryMethod === 'delivery' && user?.uid) {
-                const userDoc = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_ACCOUNTS!, user.uid);
-                const userSnap = await getDoc(userDoc);
-
-                if (userSnap.exists()) {
-                    const addresses: Address[] = userSnap.data().addresses || [];
-                    const defaultAddr = addresses.find(addr => addr.isDefault);
-                    setDefaultAddress(defaultAddr || null);
-                }
-            }
-        };
-
-        fetchDefaultAddress();
-    }, [deliveryMethod, user?.uid]);
-
-    // Add transaction handlers
-    const handlePayment = async () => {
-        try {
-            if (!user || !user.uid || !user.email || !user.displayName) {
-                localStorage.setItem('redirectAfterLogin', window.location.pathname);
-                router.push('/signin');
-                toast.error('Please sign in with complete profile information');
-                return;
-            }
-
-            if (!selectedPreview || !selectedPreview.id || !selectedPreview.title) {
-                toast.error('Invalid project selection');
-                return;
-            }
-
-            if (!selectedLicense || !selectedLicense.title || !selectedLicense.price) {
-                toast.error('Please select a valid license type');
-                return;
-            }
-
-            if (!deliveryMethod) {
-                toast.error('Please select a delivery method');
-                return;
-            }
-
-            if (deliveryMethod === 'delivery' && !defaultAddress) {
-                toast.error('No default delivery address found. Please add an address in your profile.');
-                return;
-            }
-
-            setIsProcessing(true);
-
-            const paymentData: PaymentData = {
-                projectId: selectedPreview.id,
-                userId: user.uid,
-                amount: Math.round(selectedLicense.price),
-                projectTitle: selectedPreview.title,
-                licenseType: selectedLicense.title,
-                userPhotoURL: user.photoURL || null,
-                deliveryMethod: deliveryMethod,
-                userEmail: user.email,
-                userName: user.displayName,
-                imageUrl: selectedPreview.imageUrl,
-                downloadUrl: deliveryMethod === 'download' ? selectedLicense.downloadUrl : undefined,
-                ...(deliveryMethod === 'delivery' && defaultAddress && {
-                    deliveryAddress: {
-                        fullName: defaultAddress.fullName,
-                        phone: defaultAddress.phone,
-                        province: defaultAddress.province,
-                        city: defaultAddress.city,
-                        district: defaultAddress.district,
-                        streetAddress: defaultAddress.streetAddress,
-                        details: defaultAddress.details,
-                        postalCode: defaultAddress.postalCode,
-                    }
-                })
-            };
-
-            const response = await fetch('/api/payment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(paymentData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || data.details || 'Failed to create payment transaction');
-            }
-
-            if (!data.token || !data.transactionId) {
-                throw new Error('Invalid payment token or transaction ID received');
-            }
-
-            if (typeof window.snap === 'undefined') {
-                throw new Error('Payment system not initialized');
-            }
-
-            window.snap.pay(data.token, {
-                onSuccess: async (result) => {
-                    try {
-                        const updateResponse = await fetch('/api/payment/update-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: data.orderId,
-                                status: 'success',
-                                transactionId: result.transaction_id,
-                                paymentDetails: result
-                            }),
-                        });
-
-                        if (!updateResponse.ok) {
-                            toast.error('Failed to update payment status', {
-                                duration: 3000
-                            });
-                            return;
-                        }
-
-                        const successToast = toast.success('Payment successful!', {
-                            duration: 3000
-                        });
-
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(successToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-
-                    } catch {
-                        const errorToast = toast.error('Failed to update payment status', {
-                            duration: 3000
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-                    }
-                },
-                onPending: async (result) => {
-                    try {
-                        const updateResponse = await fetch('/api/payment/update-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: data.orderId,
-                                status: 'pending',
-                                transactionId: result.transaction_id,
-                                paymentDetails: result
-                            }),
-                        });
-
-                        if (!updateResponse.ok) {
-                            toast.error('Failed to update payment status', {
-                                duration: 3000
-                            });
-                            return;
-                        }
-
-                        const pendingToast = toast.loading('Payment is pending...', {
-                            duration: 3000
-                        });
-
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(pendingToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-
-                    } catch {
-                        const errorToast = toast.error('Failed to update payment status', {
-                            duration: 3000
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-                    }
-                },
-                onError: async (result) => {
-                    try {
-                        const updateResponse = await fetch('/api/payment/update-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: data.orderId,
-                                status: 'failure',
-                                transactionId: result.transaction_id,
-                                paymentDetails: result
-                            }),
-                        });
-
-                        if (!updateResponse.ok) {
-                            toast.error('Failed to update payment status', {
-                                duration: 3000
-                            });
-                            return;
-                        }
-
-                        const errorToast = toast.error(`Payment failed: ${result.status_message || 'Unknown error'}`, {
-                            duration: 3000
-                        });
-
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-
-                    } catch {
-                        const errorToast = toast.error('Failed to update payment status', {
-                            duration: 3000
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-                    }
-                },
-                onClose: () => {
-                    setIsProcessing(false);
-                    toast.dismiss();
-                },
-            });
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Payment processing failed');
-            setIsProcessing(false);
-        }
-    };
-
-    const handleFreeTransaction = async () => {
-        try {
-            if (!selectedPreview || !selectedLicense || !deliveryMethod || !user) {
-                toast.error('Please complete all required selections');
-                return;
-            }
-
-            // Show social media modal first
-            setShowSocialModal(true);
-
-        } catch {
-            toast.error('Failed to process transaction');
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    // Update processFreeTransaction
-    const processFreeTransaction = async () => {
-        try {
-            if (!selectedPreview || !selectedLicense || !user) {
-                toast.error('Missing required information');
-                return;
-            }
-
-            setIsProcessing(true);
-
-            const response = await fetch('/api/free-transaction', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    projectId: selectedPreview.id,
-                    userId: user.uid,
-                    projectTitle: selectedPreview.title,
-                    licenseType: selectedLicense.licenseTitle || selectedLicense.title,
-                    deliveryMethod,
-                    imageUrl: selectedPreview.imageUrl,
-                    userEmail: user.email,
-                    userName: user.displayName,
-                    userPhotoURL: user.photoURL ?? null,
-                    deliveryAddress: deliveryMethod === 'delivery' ? defaultAddress : null,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                toast.success('Transaction successful!');
-                router.push(data.redirectUrl);
-            } else {
-                throw new Error(data.error || 'Transaction failed');
-            }
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Failed to process transaction');
-            console.error('Free transaction error:', error);
-        } finally {
-            setIsProcessing(false);
-            setShowSocialModal(false);
-        }
-    };
-
-    const handleTransaction = async () => {
-        if (selectedLicense?.price === 0) {
-            await handleFreeTransaction();
-        } else {
-            await handlePayment();
-        }
-    };
-
-    // Add Midtrans script when modal is opened
-    useEffect(() => {
-        if (isPreviewOpen) {
-            const midtransScriptUrl = 'https://app.midtrans.com/snap/snap.js';
-            const midtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
-
-            const scriptElement = document.createElement('script');
-            scriptElement.src = midtransScriptUrl;
-            scriptElement.setAttribute('data-client-key', midtransClientKey || '');
-
-            document.body.appendChild(scriptElement);
-
-            return () => {
-                document.body.removeChild(scriptElement);
-            };
-        }
-    }, [isPreviewOpen]);
-
-    // Reset processing state when component unmounts
-    useEffect(() => {
-        return () => {
-            setIsProcessing(false);
-        };
-    }, []);
-
-    // Add social verification handler
-    const handleSocialVerification = (platform: 'instagram' | 'tiktok' | 'youtube') => {
-        setSocialVerification(prev => ({
-            ...prev,
-            [platform]: true
-        }));
-    };
 
     if (isLoading) {
         return <ProjectTypeTitleSkelaton />
@@ -555,59 +144,6 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
                                                 </span>
                                             </div>
                                         </button>
-                                    </div>
-
-                                    {/* License Filter */}
-                                    <div className="dropdown relative w-fit sm:w-auto">
-                                        <button
-                                            onClick={() => setOpenDropdown(openDropdown === 'license' ? null : 'license')}
-                                            className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 px-4 py-2.5 rounded-xl
-                                                bg-gray-50/80 hover:bg-gray-100 active:bg-gray-200
-                                                transition-all duration-300 ease-in-out">
-                                            <div className="flex items-center gap-2">
-                                                <GiSettingsKnobs className='text-lg text-gray-600' />
-                                                <span className='text-sm font-medium text-gray-700'>
-                                                    {selectedLicense === null ? 'All Licenses' : selectedLicense.title}
-                                                </span>
-                                            </div>
-                                        </button>
-
-                                        <div className={`dropdown-content absolute z-50 mt-2 bg-white/95 backdrop-blur-md 
-                                                rounded-xl shadow-xl border border-gray-100/50 p-2 
-                                                w-full sm:w-[260px]
-                                                transform origin-top transition-all duration-300
-                                                ${openDropdown === 'license' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}>
-                                            <button
-                                                onClick={() => setSelectedLicense(null)}
-                                                className={`flex items-center gap-2 w-full text-left px-4 py-3 text-sm 
-                                                        rounded-xl transition-all duration-300
-                                                        ${selectedLicense === null
-                                                        ? 'bg-blue-600 text-white font-medium shadow-md'
-                                                        : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                                    }`}
-                                            >
-                                                All Licenses
-                                            </button>
-                                            {license.map((lic) => (
-                                                <button
-                                                    key={lic}
-                                                    onClick={() => setSelectedLicense({
-                                                        title: lic,
-                                                        price: 0,
-                                                        licenseTitle: lic,
-                                                        downloadUrl: ''
-                                                    })}
-                                                    className={`flex items-center gap-2 w-full text-left px-4 py-3 text-sm 
-                                                            rounded-xl transition-all duration-300 capitalize
-                                                            ${selectedLicense?.licenseTitle === lic
-                                                            ? 'bg-blue-600 text-white font-medium shadow-md'
-                                                            : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                                        }`}
-                                                >
-                                                    {lic}
-                                                </button>
-                                            ))}
-                                        </div>
                                     </div>
                                 </div>
 
@@ -811,32 +347,11 @@ export default function ProjectTypeTitleLayout({ typeTitle }: { typeTitle: strin
             {/* Add Preview Modal */}
             {isPreviewOpen && selectedPreview && (
                 <ViewModal
-                    isOpen={isPreviewOpen}
-                    onClose={handlePreviewClose}
+                    isPreviewOpen={isPreviewOpen}
+                    handlePreviewClose={handlePreviewClose}
                     selectedPreview={selectedPreview}
-                    selectedLicense={selectedLicense}
-                    deliveryMethod={deliveryMethod}
-                    defaultAddress={defaultAddress}
-                    isProcessing={isProcessing}
-                    onDeliveryMethodChange={setDeliveryMethod}
-                    onLicenseSelect={setSelectedLicense}
-                    onTransaction={handleTransaction}
                 />
             )}
-
-            {/* Add Social Verification Modal */}
-            <SocialMediaModal
-                isOpen={showSocialModal}
-                onClose={() => setShowSocialModal(false)}
-                socialVerification={socialVerification}
-                onSocialVerification={handleSocialVerification}
-                onContinue={() => {
-                    if (allSocialsVerified()) {
-                        setShowSocialModal(false);
-                        processFreeTransaction();
-                    }
-                }}
-            />
         </Fragment>
     )
 }

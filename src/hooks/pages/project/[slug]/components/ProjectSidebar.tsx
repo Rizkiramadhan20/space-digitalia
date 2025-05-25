@@ -10,32 +10,14 @@ import ProjectMetrics from './ProjectMetrics'
 
 import ProjectTechnologies from './ProjectTechnologies'
 
-import ProjectLicense from './ProjectLicense'
-
-import { Address } from '@/hooks/pages/project/[slug]/types/schema'
-
 interface ProjectSidebarProps {
     project: ProjectType
     viewCount: number
-    selectedLicense: string
-    deliveryMethod: 'download' | 'delivery' | ''
-    defaultAddress: Address | null
-    isProcessing: boolean
-    handleLicenseSelect: (licenseTitle: string) => void
-    handleDeliveryMethodSelect: (method: 'download' | 'delivery') => void
-    handleTransaction: () => void
 }
 
 export default function ProjectSidebar({
     project,
     viewCount,
-    selectedLicense,
-    deliveryMethod,
-    defaultAddress,
-    isProcessing,
-    handleLicenseSelect,
-    handleDeliveryMethodSelect,
-    handleTransaction
 }: ProjectSidebarProps) {
     return (
         <div className="sticky top-4 space-y-6">
@@ -64,7 +46,7 @@ export default function ProjectSidebar({
                 </div>
 
                 {/* Project Stats */}
-                <ProjectMetrics project={project} viewCount={viewCount} />
+                <ProjectMetrics viewCount={viewCount} />
 
                 {/* Last Updated */}
                 <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg">
@@ -94,18 +76,6 @@ export default function ProjectSidebar({
 
             {/* Technologies Card */}
             <ProjectTechnologies project={project} />
-
-            {/* License Card */}
-            <ProjectLicense
-                project={project}
-                selectedLicense={selectedLicense}
-                deliveryMethod={deliveryMethod}
-                defaultAddress={defaultAddress}
-                isProcessing={isProcessing}
-                handleLicenseSelect={handleLicenseSelect}
-                handleDeliveryMethodSelect={handleDeliveryMethodSelect}
-                handleTransaction={handleTransaction}
-            />
         </div>
     )
 }

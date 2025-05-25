@@ -2,12 +2,6 @@
 
 import React, { Fragment, useState, useEffect } from 'react'
 
-import { useAuth } from '@/utils/context/AuthContext';
-
-import { useRouter } from 'next/navigation';
-
-import { toast } from 'react-hot-toast';
-
 import { ProjectType } from '@/components/ui/project/types/project';
 
 import { FetchProject } from '@/hooks/pages/project/project/lib/FetchProject';
@@ -30,19 +24,11 @@ import { formatSlug } from '@/base/helper/formatSlug';
 
 import ReactPaginate from 'react-paginate';
 
-import { doc, getDoc } from 'firebase/firestore';
-
-import { db } from '@/utils/firebase';
-
-import { LicenseDetail, Address, PaymentData } from '@/hooks/pages/project/project/lib/schema';
-
 import ViewModal from './modal/ViewModal';
-import SocialMediaModal from './modal/SocialMediaModal';
 
 export default function ProjectLayout() {
     const [project, setProject] = useState<ProjectType[]>([]);
     const [loading, setLoading] = useState(true);
-    const [isProcessing, setIsProcessing] = useState(false);
 
     // Filter states
     const [currentPage, setCurrentPage] = useState(0);
@@ -52,24 +38,6 @@ export default function ProjectLayout() {
     // Modal states
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [selectedPreview, setSelectedPreview] = useState<ProjectType | null>(null);
-    const [showSocialModal, setShowSocialModal] = useState(false);
-
-    // Update the type definition for selectedLicense
-    const [selectedLicense, setSelectedLicense] = useState<{
-        title: string;
-        price: number;
-        licenseTitle: string;
-        downloadUrl: string;
-        delivery?: string;
-        stock?: string;
-        sold?: string;
-        deliveryDays?: string;
-        licenseDetails?: LicenseDetail[];
-    } | null>(null);
-
-    const [deliveryMethod, setDeliveryMethod] = useState<'download' | 'delivery' | ''>('');
-
-    const license = Array.from(new Set(project.map(item => item.licenseTitle)));
 
     // Filter projects with null checks
     const filteredProjects = project.filter(item => {
@@ -79,11 +47,7 @@ export default function ProjectLayout() {
         const typeMatch = selectedType === 'all' ||
             (item.typeTitle && item.typeTitle.toLowerCase() === selectedType.toLowerCase());
 
-        const licenseMatch = !selectedLicense ||
-            (item.licenseTitle && selectedLicense.licenseTitle &&
-                item.licenseTitle.toLowerCase() === selectedLicense.licenseTitle.toLowerCase());
-
-        return categoryMatch && typeMatch && licenseMatch;
+        return categoryMatch && typeMatch;
     });
 
     const filteredProductsCount = filteredProjects.length;
@@ -161,15 +125,11 @@ export default function ProjectLayout() {
     const handlePreviewOpen = (project: ProjectType) => {
         setSelectedPreview(project);
         setIsPreviewOpen(true);
-        setSelectedLicense(null);
-        setDeliveryMethod('');
     };
 
     const handlePreviewClose = () => {
         setIsPreviewOpen(false);
         setSelectedPreview(null);
-        setSelectedLicense(null);
-        setDeliveryMethod('');
     };
 
     // Prevent background scroll when modal is open
@@ -184,367 +144,6 @@ export default function ProjectLayout() {
             document.body.style.overflow = 'unset';
         };
     }, [isPreviewOpen]);
-
-    // Add new state and hooks
-    const { user } = useAuth();
-    const router = useRouter();
-
-    const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
-
-    // Add useEffect to fetch default address when delivery method changes
-    useEffect(() => {
-        const fetchDefaultAddress = async () => {
-            if (deliveryMethod === 'delivery' && user?.uid) {
-                const userDoc = doc(db, process.env.NEXT_PUBLIC_COLLECTIONS_ACCOUNTS!, user.uid);
-                const userSnap = await getDoc(userDoc);
-
-                if (userSnap.exists()) {
-                    const addresses: Address[] = userSnap.data().addresses || [];
-                    const defaultAddr = addresses.find(addr => addr.isDefault);
-                    setDefaultAddress(defaultAddr || null);
-                }
-            }
-        };
-
-        fetchDefaultAddress();
-    }, [deliveryMethod, user?.uid]);
-
-    // Add handlePayment function
-    const handlePayment = async () => {
-        try {
-            // Validate user is logged in and has required fields
-            if (!user || !user.uid || !user.email || !user.displayName) {
-                localStorage.setItem('redirectAfterLogin', window.location.pathname);
-                router.push('/signin');
-                toast.error('Please sign in with complete profile information');
-                return;
-            }
-
-            // Validate required selections
-            if (!selectedPreview || !selectedPreview.id || !selectedPreview.title) {
-                toast.error('Invalid project selection');
-                return;
-            }
-
-            if (!selectedLicense || !selectedLicense.title || !selectedLicense.price) {
-                toast.error('Please select a valid license type');
-                return;
-            }
-
-            if (!deliveryMethod) {
-                toast.error('Please select a delivery method');
-                return;
-            }
-
-            if (deliveryMethod === 'delivery' && !defaultAddress) {
-                toast.error('No default delivery address found. Please add an address in your profile.');
-                return;
-            }
-
-            setIsProcessing(true);
-
-            // Prepare payment data with address if delivery method is selected
-            const paymentData: PaymentData = {
-                projectId: selectedPreview.id,
-                userId: user.uid,
-                amount: Math.round(selectedLicense.price), // Ensure amount is rounded
-                projectTitle: selectedPreview.title,
-                licenseType: selectedLicense.title,
-                deliveryMethod: deliveryMethod,
-                userEmail: user.email,
-                userName: user.displayName,
-                userPhotoURL: user.photoURL ?? null,
-                imageUrl: selectedPreview.imageUrl,
-                downloadUrl: deliveryMethod === 'download' ? selectedLicense.downloadUrl : undefined,
-                // Add delivery address if delivery method is selected
-                ...(deliveryMethod === 'delivery' && defaultAddress && {
-                    deliveryAddress: {
-                        fullName: defaultAddress.fullName,
-                        phone: defaultAddress.phone,
-                        province: defaultAddress.province,
-                        city: defaultAddress.city,
-                        district: defaultAddress.district,
-                        streetAddress: defaultAddress.streetAddress,
-                        details: defaultAddress.details,
-                        postalCode: defaultAddress.postalCode,
-                    }
-                })
-            };
-
-            const response = await fetch('/api/payment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(paymentData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || data.details || 'Failed to create payment transaction');
-            }
-
-            if (!data.token || !data.transactionId) {
-                throw new Error('Invalid payment token or transaction ID received');
-            }
-
-            // Ensure snap is loaded
-            if (typeof window.snap === 'undefined') {
-                throw new Error('Payment system not initialized');
-            }
-
-            // Configure Midtrans callback handlers
-            window.snap.pay(data.token, {
-                onSuccess: async (result) => {
-                    try {
-                        const updateResponse = await fetch('/api/payment/update-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: data.orderId,
-                                status: 'success',
-                                transactionId: result.transaction_id,
-                                paymentDetails: result
-                            }),
-                        });
-
-                        if (!updateResponse.ok) {
-                            toast.error('Failed to update payment status', {
-                                duration: 3000
-                            });
-                            return;
-                        }
-
-                        // Show success message with longer duration
-                        const successToast = toast.success('Payment successful!', {
-                            duration: 3000
-                        });
-
-                        // Wait for toast to be dismissed before redirecting
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(successToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-
-                    } catch {
-                        const errorToast = toast.error('Failed to update payment status', {
-                            duration: 3000
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-                    }
-                },
-                onPending: async (result) => {
-                    try {
-                        const updateResponse = await fetch('/api/payment/update-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: data.orderId,
-                                status: 'pending',
-                                transactionId: result.transaction_id,
-                                paymentDetails: result
-                            }),
-                        });
-
-                        if (!updateResponse.ok) {
-                            toast.error('Failed to update payment status', {
-                                duration: 3000
-                            });
-                            return;
-                        }
-
-                        const pendingToast = toast.loading('Payment is pending...', {
-                            duration: 3000
-                        });
-
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(pendingToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-
-                    } catch {
-                        const errorToast = toast.error('Failed to update payment status', {
-                            duration: 3000
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-                    }
-                },
-                onError: async (result) => {
-                    try {
-                        const updateResponse = await fetch('/api/payment/update-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                orderId: data.orderId,
-                                status: 'failure',
-                                transactionId: result.transaction_id,
-                                paymentDetails: result
-                            }),
-                        });
-
-                        if (!updateResponse.ok) {
-                            toast.error('Failed to update payment status', {
-                                duration: 3000
-                            });
-                            return;
-                        }
-
-                        const errorToast = toast.error(`Payment failed: ${result.status_message || 'Unknown error'}`, {
-                            duration: 3000
-                        });
-
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-
-                    } catch {
-                        const errorToast = toast.error('Failed to update payment status', {
-                            duration: 3000
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        toast.dismiss(errorToast);
-                        window.location.href = `/payment/status/${data.transactionId}`;
-                    }
-                },
-                onClose: () => {
-                    setIsProcessing(false);
-                    toast.dismiss();
-                },
-            });
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Payment processing failed');
-            setIsProcessing(false);
-        }
-    };
-
-    // Reset processing state when component unmounts
-    useEffect(() => {
-        return () => {
-            setIsProcessing(false);
-        };
-    }, []);
-
-    // Main transaction handler
-    const handleTransaction = async () => {
-        try {
-            // Validate common requirements
-            if (!selectedLicense || !deliveryMethod || !selectedPreview) {
-                toast.error('Please complete all required selections');
-                return;
-            }
-
-            if (!user || !user.uid || !user.email || !user.displayName) {
-                toast.error('Please sign in to continue');
-                router.push('/signin');
-                return;
-            }
-
-            if (deliveryMethod === 'delivery' && !defaultAddress) {
-                toast.error('Please add a delivery address in your profile settings');
-                return;
-            }
-
-            setIsProcessing(true);
-
-            // Route to appropriate handler based on price
-            if (selectedLicense.price === 0) {
-                await handleFreeTransaction();
-            } else {
-                await handlePayment();
-            }
-
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Failed to process transaction');
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    // Add Midtrans script when modal is opened
-    useEffect(() => {
-        if (isPreviewOpen) {
-            const midtransScriptUrl = 'https://app.midtrans.com/snap/snap.js';
-            const midtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
-
-            const scriptElement = document.createElement('script');
-            scriptElement.src = midtransScriptUrl;
-            scriptElement.setAttribute('data-client-key', midtransClientKey || '');
-
-            document.body.appendChild(scriptElement);
-
-            return () => {
-                document.body.removeChild(scriptElement);
-            };
-        }
-    }, [isPreviewOpen]);
-
-    // Update handleFreeTransaction
-    const handleFreeTransaction = async () => {
-        try {
-            if (!selectedPreview || !selectedLicense || !deliveryMethod || !user) {
-                toast.error('Please complete all required selections');
-                return;
-            }
-
-            // Show social media modal first
-            setShowSocialModal(true);
-
-        } catch {
-            toast.error('Failed to process transaction');
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    // Add new function to handle actual free transaction after social verification
-    const processFreeTransaction = async () => {
-        try {
-            // Add null checks for required data
-            if (!selectedPreview || !selectedLicense || !user) {
-                toast.error('Missing required information');
-                return;
-            }
-
-            setIsProcessing(true);
-
-            const response = await fetch('/api/free-transaction', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    projectId: selectedPreview.id,
-                    userId: user.uid,
-                    projectTitle: selectedPreview.title,
-                    licenseType: selectedLicense.licenseTitle || selectedLicense.title,
-                    deliveryMethod,
-                    imageUrl: selectedPreview.imageUrl,
-                    userEmail: user.email,
-                    userName: user.displayName,
-                    userPhotoURL: user.photoURL ?? null,
-                    deliveryAddress: deliveryMethod === 'delivery' ? defaultAddress : null,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                toast.success('Transaction successful!');
-                router.push(data.redirectUrl);
-            } else {
-                toast.error(data.error || 'Transaction failed');
-            }
-        } catch (error) {
-            toast.error('Failed to process transaction');
-            console.error('Free transaction error:', error);
-        } finally {
-            setIsProcessing(false);
-            setShowSocialModal(false);
-        }
-    };
 
     if (loading) {
         return <ProjectSkeleton />;
@@ -657,59 +256,6 @@ export default function ProjectLayout() {
                                                         }`}
                                                 >
                                                     {type}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* License Filter */}
-                                    <div className="dropdown relative w-fit sm:w-auto">
-                                        <button
-                                            onClick={() => setOpenDropdown(openDropdown === 'license' ? null : 'license')}
-                                            className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 px-4 py-2.5 rounded-xl
-                                            bg-gray-50/80 hover:bg-gray-100 active:bg-gray-200
-                                            transition-all duration-300 ease-in-out">
-                                            <div className="flex items-center gap-2">
-                                                <GiSettingsKnobs className='text-lg text-gray-600' />
-                                                <span className='text-sm font-medium text-gray-700'>
-                                                    {selectedLicense === null ? 'All Licenses' : selectedLicense.title}
-                                                </span>
-                                            </div>
-                                        </button>
-
-                                        <div className={`dropdown-content absolute z-50 mt-2 bg-white/95 backdrop-blur-md 
-                                            rounded-xl shadow-xl border border-gray-100/50 p-2 
-                                            w-full sm:w-[260px]
-                                            transform origin-top transition-all duration-300
-                                            ${openDropdown === 'license' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}>
-                                            <button
-                                                onClick={() => setSelectedLicense(null)}
-                                                className={`flex items-center gap-2 w-full text-left px-4 py-3 text-sm 
-                                                    rounded-xl transition-all duration-300
-                                                    ${selectedLicense === null
-                                                        ? 'bg-blue-600 text-white font-medium shadow-md'
-                                                        : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                                    }`}
-                                            >
-                                                All Licenses
-                                            </button>
-                                            {license.map((lic) => (
-                                                <button
-                                                    key={lic}
-                                                    onClick={() => setSelectedLicense({
-                                                        title: lic,
-                                                        price: 0,
-                                                        licenseTitle: lic,
-                                                        downloadUrl: ''
-                                                    })}
-                                                    className={`flex items-center gap-2 w-full text-left px-4 py-3 text-sm 
-                                                        rounded-xl transition-all duration-300 capitalize
-                                                        ${selectedLicense?.licenseTitle === lic
-                                                            ? 'bg-blue-600 text-white font-medium shadow-md'
-                                                            : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                                                        }`}
-                                                >
-                                                    {lic}
                                                 </button>
                                             ))}
                                         </div>
@@ -920,26 +466,11 @@ export default function ProjectLayout() {
                 </div>
             </section>
 
-            {/* Social Media Modal */}
-            <SocialMediaModal
-                showSocialModal={showSocialModal}
-                setShowSocialModal={setShowSocialModal}
-                isProcessing={isProcessing}
-                processFreeTransaction={processFreeTransaction}
-            />
-
             {/* Preview Modal */}
             <ViewModal
                 isPreviewOpen={isPreviewOpen}
                 selectedPreview={selectedPreview}
                 handlePreviewClose={handlePreviewClose}
-                selectedLicense={selectedLicense}
-                setSelectedLicense={setSelectedLicense}
-                deliveryMethod={deliveryMethod}
-                setDeliveryMethod={setDeliveryMethod}
-                defaultAddress={defaultAddress}
-                isProcessing={isProcessing}
-                handleTransaction={handleTransaction}
             />
         </Fragment>
     )

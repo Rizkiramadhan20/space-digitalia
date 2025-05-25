@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FiBarChart2, FiShoppingCart, FiUsers, FiSun, FiMessageCircle, FiFileText } from 'react-icons/fi';
+import { FiShoppingCart, FiUsers, FiSun, FiMessageCircle, FiFileText } from 'react-icons/fi';
 
 import { MdManageAccounts } from "react-icons/md";
 
@@ -41,20 +41,6 @@ export default function StatsSection({ stats, weather }: StatsSectionProps) {
                         <p className="text-slate-500 text-sm">{weather.city}</p>
                     </div>
                 )}
-            </div>
-
-            {/* Stats Cards */}
-            <div className="flex-1 min-w-[250px] bg-white backdrop-blur-lg rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100/20">
-                <div className="flex items-center justify-between">
-                    <div className="w-14 h-14 bg-amber-100/50 backdrop-blur rounded-2xl flex items-center justify-center">
-                        <FiBarChart2 className="w-7 h-7 text-amber-600" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100/50 backdrop-blur text-emerald-600 text-sm font-medium rounded-full">Total</span>
-                </div>
-                <div className="mt-6">
-                    <h3 className="text-3xl font-bold mb-2">{stats.totalTransactions}</h3>
-                    <p className="text-slate-600 text-sm font-medium">Total Transaksi</p>
-                </div>
             </div>
 
             <div className="flex-1 min-w-[500px] bg-white backdrop-blur-lg rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100/20">

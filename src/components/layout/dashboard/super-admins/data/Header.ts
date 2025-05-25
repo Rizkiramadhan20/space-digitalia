@@ -2,7 +2,7 @@ import { FiHome, FiSettings } from "react-icons/fi";
 
 import { RiAdminFill } from "react-icons/ri";
 
-import { GrArticle, GrTransaction } from "react-icons/gr";
+import { GrArticle } from "react-icons/gr";
 
 import { FiLayout } from "react-icons/fi";
 
@@ -11,8 +11,6 @@ import { FaBuildingUser } from "react-icons/fa6";
 import { MdOutlineHomeRepairService, MdUnsubscribe } from "react-icons/md";
 
 import { GoProject } from "react-icons/go";
-
-import { TbReportAnalytics } from "react-icons/tb";
 
 import { IoMdContact } from "react-icons/io";
 
@@ -103,48 +101,6 @@ export const menuItems = [
       { label: "Category", href: "/dashboard/super-admins/article/category" },
       { label: "Tags", href: "/dashboard/super-admins/article/tags" },
     ],
-  },
-
-  {
-    icon: GrTransaction,
-    label: "Transaction",
-    href: "/dashboard/super-admins/transaction",
-    subItems: [
-      {
-        label: "Daftar Transaksi",
-        href: "/dashboard/super-admins/transaction",
-      },
-
-      {
-        label: "Belum Dibayar",
-        href: "/dashboard/super-admins/transaction/unpaid",
-      },
-
-      {
-        label: "Sudah Dibayar",
-        href: "/dashboard/super-admins/transaction/paid",
-      },
-
-      { label: "Dikirim", href: "/dashboard/super-admins/transaction/shipped" },
-
-      { label: "Gratis", href: "/dashboard/super-admins/transaction/free" },
-
-      {
-        label: "Dibatalkan",
-        href: "/dashboard/super-admins/transaction/cancelled",
-      },
-
-      {
-        label: "Selesai",
-        href: "/dashboard/super-admins/transaction/completed",
-      },
-    ],
-  },
-
-  {
-    icon: TbReportAnalytics,
-    label: "Rekap",
-    href: "/dashboard/super-admins/rekap",
   },
 
   {
