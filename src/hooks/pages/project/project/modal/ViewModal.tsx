@@ -99,7 +99,7 @@ export default function ViewModal({
                         {/* Content Section with Glass Morphism */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Left Column */}
-                            <div className="space-y-6">
+                            <div className="space-y-6 order-2 sm:order-1">
                                 <div className="space-y-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30">
                                     <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
                                         Details
@@ -143,7 +143,7 @@ export default function ViewModal({
                             </div>
 
                             {/* Right Column */}
-                            <div className="space-y-6">
+                            <div className="space-y-6 order-1 sm:order-2">
                                 {/* Author Info with Glass Effect */}
                                 <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30 backdrop-blur-md">
                                     <Image

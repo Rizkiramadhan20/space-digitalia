@@ -102,32 +102,7 @@ export default function ViewModal({
                         {/* Content Section with Glass Morphism */}
                         <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-4 md:p-6 bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-md">
                             {/* Left Column */}
-                            <div className="space-y-6">
-                                {/* Author Info with Glass Effect */}
-                                <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30 backdrop-blur-md">
-                                    <Image
-                                        src={selectedPreview.author.photoURL}
-                                        alt={selectedPreview.author.name}
-                                        width={56}
-                                        height={56}
-                                        className="rounded-full ring-2 ring-indigo-500/30"
-                                    />
-                                    <div>
-                                        <h3 className="text-lg text-white font-medium">{selectedPreview.author.name}</h3>
-                                        <p className="text-sm text-gray-400 capitalize">{selectedPreview.author.role}</p>
-                                    </div>
-                                </div>
-
-                                {/* Description and Details */}
-                                <div className="space-y-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30">
-                                    <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
-                                        Description
-                                    </h3>
-                                    <p className="text-gray-300 leading-relaxed">
-                                        {selectedPreview.description}
-                                    </p>
-                                </div>
-
+                            <div className="space-y-6 order-2 sm:order-1">
                                 <div className="space-y-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30">
                                     <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
                                         Details
@@ -171,7 +146,31 @@ export default function ViewModal({
                             </div>
 
                             {/* Right Column */}
-                            <div className="space-y-6">
+                            <div className="space-y-6 order-1 sm:order-2">
+                                {/* Author Info with Glass Effect */}
+                                <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30 backdrop-blur-md">
+                                    <Image
+                                        src={selectedPreview.author.photoURL}
+                                        alt={selectedPreview.author.name}
+                                        width={56}
+                                        height={56}
+                                        className="rounded-full ring-2 ring-indigo-500/30"
+                                    />
+                                    <div>
+                                        <h3 className="text-lg text-white font-medium">{selectedPreview.author.name}</h3>
+                                        <p className="text-sm text-gray-400 capitalize">{selectedPreview.author.role}</p>
+                                    </div>
+                                </div>
+
+                                {/* Description and Details */}
+                                <div className="space-y-4 p-4 rounded-xl bg-gray-800/20 border border-gray-700/30">
+                                    <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
+                                        Description
+                                    </h3>
+                                    <p className="text-gray-300 leading-relaxed">
+                                        {selectedPreview.description}
+                                    </p>
+                                </div>
                                 {/* Technologies */}
                                 <div className="p-4 rounded-xl bg-gray-800/20 border border-gray-700/30">
                                     <h3 className="text-xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
@@ -194,20 +193,6 @@ export default function ViewModal({
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-
-                                {/* Stats Grid */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    {[
-                                        { label: "Downloads", value: selectedPreview.downloads },
-                                        { label: "Stock", value: selectedPreview.stock },
-                                        { label: "Sold", value: selectedPreview.sold }
-                                    ].map((stat, index) => (
-                                        <div key={index} className="bg-gray-800/30 backdrop-blur-sm p-4 rounded-lg border border-gray-700/30 hover:border-indigo-500/30 transition-all duration-300">
-                                            <p className="text-sm text-gray-400">{stat.label}</p>
-                                            <p className="text-xl font-semibold text-white">{stat.value}</p>
-                                        </div>
-                                    ))}
                                 </div>
 
                                 {/* View Details Button */}

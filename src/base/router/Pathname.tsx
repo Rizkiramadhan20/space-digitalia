@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Fragment } from "react";
 
 import { usePathname } from "next/navigation";
 
@@ -9,8 +9,6 @@ import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 
 import { Toaster } from "react-hot-toast";
-
-import CookieConsent from '@/base/meta/CookieConsent';
 
 import WhatsApp from "@/base/popup/WhatsApp"
 
@@ -22,13 +20,10 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
         pathname?.includes("/signin") ||
         pathname?.includes("/signup") ||
         pathname?.includes("/forgot-password") ||
-        pathname?.includes("/payment") ||
-        pathname?.includes("/download") ||
-        pathname?.includes("/checkout") ||
         pathname?.includes("/dashboard") || false;
 
     return (
-        <main>
+        <Fragment>
             <Toaster
                 position="top-center"
                 toastOptions={{
@@ -52,11 +47,10 @@ const Pathname = ({ children }: { children: React.ReactNode }) => {
                 }}
             />
             {!isAdminRoute && <Header />}
-            {!isAdminRoute && <CookieConsent />}
             {!isAdminRoute && <WhatsApp />}
             {children}
             {!isAdminRoute && <Footer />}
-        </main>
+        </Fragment>
     );
 };
 

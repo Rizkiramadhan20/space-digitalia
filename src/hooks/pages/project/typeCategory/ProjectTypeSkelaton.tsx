@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ProjectTypeSkelaton() {
+export default function ProjectTypeTitleSkelaton() {
     return (
         <section className="min-h-full py-24 bg-gradient-to-b from-gray-50/40 via-white to-white relative">
             <div className="container px-4 xl:px-10 mx-auto max-w-[1400px]">
@@ -106,4 +106,4 @@ export default function ProjectTypeSkelaton() {
             </div>
         </section>
     );
-}
+} 

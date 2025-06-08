@@ -15,7 +15,7 @@ export const DetailButton = ({ typeCategory, typeTitle, slug }: DetailButtonProp
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 1 }}
-            className="p-4 rounded-xl bg-gray-800/20 border border-gray-700/30"
+            className="p-4 rounded-xl bg-gray-800/20 border border-gray-700/30 w-full"
         >
             <h3 className="text-xl font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
                 Lihat Detail

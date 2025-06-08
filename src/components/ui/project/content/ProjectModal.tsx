@@ -1,15 +1,28 @@
 "use client"
 
 import { motion, useInView } from "framer-motion";
+
 import Image from "next/image";
+
 import { useRef, useCallback, memo } from "react";
+
 import { ProjectModalProps } from "@/components/ui/project/types/project";
+
 import { UrlBar } from "@/components/ui/project/content/ui/UrlBar";
+
 import { Gallery } from "@/components/ui/project/content/ui/Gallery";
+
 import { AuthorCard } from "@/components/ui/project/content/ui/AuthorCard";
-import { ProjectDescription } from "@/components/ui/project/content/ui/ProjectDescription";
+
+import { ProjectDescription } from "@/components/ui/project/content/ui/ProjectDescriptions";
+
+import { ProjectContent } from "@/components/ui/project/content/ui/ProjectContent";
+
 import { TechnologiesCard } from "@/components/ui/project/content/ui/Technologies";
+
 import { DetailButton } from "@/components/ui/project/content/ui/DetailButton";
+
+import { PriviewButton } from "@/components/ui/project/content/ui/PriviewButton";
 
 const StatusBadge = memo(({ status }: { status: string }) => {
     const getStatusClass = useCallback((status: string) => {
@@ -103,7 +116,9 @@ function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                             transition={{ duration: 0.8 }}
                             className="grid md:grid-cols-2 gap-6 md:gap-8 p-4 md:p-6 bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-md"
                         >
-                            <div className="space-y-6">
+                            <ProjectContent content={project.content} />
+
+                            <div className="space-y-6 order-1 sm:order-2">
                                 <AuthorCard
                                     ref={authorRef}
                                     inView={authorInView}
@@ -116,9 +131,7 @@ function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                     description={project.description}
                                     content={project.content}
                                 />
-                            </div>
 
-                            <div className="space-y-6">
                                 <TechnologiesCard frameworks={project.frameworks} />
 
                                 <div className="space-y-4">
@@ -136,11 +149,17 @@ function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                     </motion.div>
                                 </div>
 
-                                <DetailButton
-                                    typeCategory={project.typeCategory}
-                                    typeTitle={project.typeTitle}
-                                    slug={project.slug}
-                                />
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <PriviewButton
+                                        linkPreview={project.linkPreview}
+                                    />
+
+                                    <DetailButton
+                                        typeCategory={project.typeCategory}
+                                        typeTitle={project.typeTitle}
+                                        slug={project.slug}
+                                    />
+                                </div>
                             </div>
                         </motion.div>
                     </div>

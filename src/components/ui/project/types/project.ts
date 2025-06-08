@@ -24,28 +24,14 @@ export interface ProjectType {
   content: string;
   createdAt: string;
   updatedAt: Timestamp;
-  delivery: number;
-  downloads: number;
   images: string[];
   statusProject: string;
   frameworks: Framework[];
-  licenseDetails: {
-    downloadUrl: string;
-    price: number;
-    title: string;
-  }[];
-  licenseUrl: string;
-  licenseTitle: string;
   linkPreview: string;
   slug: string;
-  sold: number;
   status: string;
-  stock: number;
   typeCategory: string;
   typeTitle: string;
-  rating: number;
-  ratingCount: number;
-  averageRating: number;
 }
 
 export interface ProjectCardProps {
@@ -102,6 +88,10 @@ export interface DetailButtonProps {
   typeCategory: string;
   typeTitle: string;
   slug: string;
+}
+
+export interface PriviewButtonProps {
+  linkPreview: string;
 }
 
 export interface UrlBarProps {
