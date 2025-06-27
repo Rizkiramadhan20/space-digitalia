@@ -69,6 +69,7 @@ export const metadata = {
     "application-name": "Space Digitalia",
     "msapplication-tap-highlight": "no",
     "theme-color": "#f5f5f5",
+    "msvalidate.01": `${process.env.NEXT_PUBLIC_BING_VERIFICATION}`,
   },
   openGraph: {
     type: "website",
